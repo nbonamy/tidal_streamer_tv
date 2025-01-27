@@ -3,4 +3,6 @@
     <color name="fastlane_background">#080808</color>
     <color name="search_opaque">#ffaa3f</color>
     <color name="selected_background">#ffaa3f</color>
+    <color name="item_fg_normal">#EEEEEE</color>
+    <color name="item_fg_selected">#FFFFFF</color>
 </resources>

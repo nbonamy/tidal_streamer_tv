@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.fragment.app.FragmentActivity
 
 /**
- * Details activity class that loads [CollectionDetailsFragment] class.
+ * Details activity class that loads [DetailsFragment] class.
  */
 class DetailsActivity : FragmentActivity() {
 
@@ -13,7 +13,7 @@ class DetailsActivity : FragmentActivity() {
 		setContentView(R.layout.activity_details)
 		if (savedInstanceState == null) {
 			supportFragmentManager.beginTransaction()
-				.replace(R.id.details_fragment, CollectionDetailsFragment())
+				.replace(R.id.details_fragment, DetailsFragment())
 				.commitNow()
 		}
 	}

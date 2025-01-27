@@ -6,6 +6,7 @@ import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface StreamingService {
 
@@ -13,9 +14,9 @@ interface StreamingService {
 	suspend fun stop(): Response<ApiResponse<String>>
 
 	@GET("/play/album/{id}")
-	suspend fun playAlbum(@Path("id") id: String): Response<ApiResponse<Album>>
+	suspend fun playAlbum(@Path("id") id: String, @Query("position") position: Int): Response<ApiResponse<Album>>
 
 	@GET("/play/mix/{id}")
-	suspend fun playMix(@Path("id") id: String): Response<ApiResponse<Queue>>
+	suspend fun playMix(@Path("id") id: String, @Query("position") position: Int): Response<ApiResponse<Queue>>
 
 }

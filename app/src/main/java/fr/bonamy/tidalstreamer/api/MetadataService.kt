@@ -4,6 +4,7 @@ import fr.bonamy.tidalstreamer.models.Album
 import fr.bonamy.tidalstreamer.models.Mix
 import retrofit2.Response
 import retrofit2.http.GET
+import retrofit2.http.Path
 
 interface MetadataService {
 
@@ -21,5 +22,8 @@ interface MetadataService {
 
 	@GET("user/recommended/albums")
 	suspend fun getRecommendedAlbums(): Response<ApiResponse<List<Album>>>
+
+	@GET("info/album/{id}")
+	suspend fun getAlbumTracks(@Path("id") id: String): Response<ApiResponsePage<ItemTrack>>
 
 }

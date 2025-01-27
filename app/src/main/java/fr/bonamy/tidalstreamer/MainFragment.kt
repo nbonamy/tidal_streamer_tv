@@ -90,7 +90,7 @@ class MainFragment : BrowseSupportFragment() {
 	private fun loadRows() {
 
 		val rowsAdapter = ArrayObjectAdapter(ListRowPresenter())
-		val cardPresenter = CardPresenter()
+		val cardPresenter = CollectionPresenter()
 
 		// add NUM_ROWS placeholders
 		for (i in 0..NUM_ROWS-1) {
@@ -103,12 +103,14 @@ class MainFragment : BrowseSupportFragment() {
 			when (val result = apiClient.fetchShortcuts()) {
 
 				is ApiResult.Success -> {
-					var albumsAdapter = ArrayObjectAdapter(cardPresenter)
-					result.data.forEach { album ->
-						albumsAdapter.add(album)
+					var itemAdapter = ArrayObjectAdapter(cardPresenter)
+					result.data.forEach { shortcut ->
+						if (shortcut.title != "" && shortcut.mainArtist() != null) {
+							itemAdapter.add(shortcut)
+						}
 					}
-					val header = HeaderItem( ROWS_TITLE[0])
-					rowsAdapter.replace(0, ListRow(header, albumsAdapter))
+					val header = HeaderItem(ROWS_TITLE[0])
+					rowsAdapter.replace(0, ListRow(header, itemAdapter))
 				}
 
 				is ApiResult.Error -> {
@@ -123,12 +125,12 @@ class MainFragment : BrowseSupportFragment() {
 			when (val result = apiClient.fetchNewAlbums()) {
 
 				is ApiResult.Success -> {
-					var albumsAdapter = ArrayObjectAdapter(cardPresenter)
+					var itemAdapter = ArrayObjectAdapter(cardPresenter)
 					result.data.forEach { album ->
-						albumsAdapter.add(album)
+						itemAdapter.add(album)
 					}
 					val header = HeaderItem(ROWS_TITLE[1])
-					rowsAdapter.replace(1, ListRow(header, albumsAdapter))
+					rowsAdapter.replace(1, ListRow(header, itemAdapter))
 				}
 
 				is ApiResult.Error -> {
@@ -144,12 +146,12 @@ class MainFragment : BrowseSupportFragment() {
 			when (val result = apiClient.fetchRecentAlbums()) {
 
 				is ApiResult.Success -> {
-					var albumsAdapter = ArrayObjectAdapter(cardPresenter)
+					var itemAdapter = ArrayObjectAdapter(cardPresenter)
 					result.data.forEach { album ->
-						albumsAdapter.add(album)
+						itemAdapter.add(album)
 					}
 					val header = HeaderItem(ROWS_TITLE[2])
-					rowsAdapter.replace(2, ListRow(header, albumsAdapter))
+					rowsAdapter.replace(2, ListRow(header, itemAdapter))
 				}
 
 				is ApiResult.Error -> {
@@ -164,12 +166,12 @@ class MainFragment : BrowseSupportFragment() {
 			when (val result = apiClient.fetchRecommendedAlbums()) {
 
 				is ApiResult.Success -> {
-					var albumsAdapter = ArrayObjectAdapter(cardPresenter)
+					var itemAdapter = ArrayObjectAdapter(cardPresenter)
 					result.data.forEach { album ->
-						albumsAdapter.add(album)
+						itemAdapter.add(album)
 					}
 					val header = HeaderItem(ROWS_TITLE[3])
-					rowsAdapter.replace(3, ListRow(header, albumsAdapter))
+					rowsAdapter.replace(3, ListRow(header, itemAdapter))
 				}
 
 				is ApiResult.Error -> {
@@ -184,18 +186,18 @@ class MainFragment : BrowseSupportFragment() {
 			when (val result = apiClient.fetchMixes()) {
 
 				is ApiResult.Success -> {
-					var albumsAdapter = ArrayObjectAdapter(cardPresenter)
+					var itemAdapter = ArrayObjectAdapter(cardPresenter)
 					result.data.forEach { mix ->
 						if (mix.type == "DISCOVERY_MIX") {
-							albumsAdapter.add(0, mix)
+							itemAdapter.add(0, mix)
 						} else if (mix.type == "NEW_RELEASE_MIX") {
-							albumsAdapter.add(1, mix)
+							itemAdapter.add(1, mix)
 						} else {
-							albumsAdapter.add(mix)
+							itemAdapter.add(mix)
 						}
 					}
 					val header = HeaderItem(ROWS_TITLE[4])
-					rowsAdapter.replace(4, ListRow(header, albumsAdapter))
+					rowsAdapter.replace(4, ListRow(header, itemAdapter))
 				}
 
 				is ApiResult.Error -> {

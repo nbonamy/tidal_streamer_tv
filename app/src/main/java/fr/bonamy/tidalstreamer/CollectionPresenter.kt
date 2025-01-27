@@ -14,7 +14,7 @@ import kotlin.properties.Delegates
  * A CardPresenter is used to generate Views and bind Objects to them on demand.
  * It contains an ImageCardView.
  */
-class CardPresenter : Presenter() {
+class CollectionPresenter : Presenter() {
 	private var mDefaultCardImage: Drawable? = null
 	private var sSelectedBackgroundColor: Int by Delegates.notNull()
 	private var sDefaultBackgroundColor: Int by Delegates.notNull()

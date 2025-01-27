@@ -28,17 +28,19 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.SimpleTarget
 import com.bumptech.glide.request.transition.Transition
 import fr.bonamy.tidalstreamer.api.ApiResult
+import fr.bonamy.tidalstreamer.api.MetadataClient
 import fr.bonamy.tidalstreamer.api.StreamingClient
 import fr.bonamy.tidalstreamer.models.Album
 import fr.bonamy.tidalstreamer.models.Collection
 import fr.bonamy.tidalstreamer.models.Mix
+import fr.bonamy.tidalstreamer.models.Track
 import kotlinx.coroutines.launch
 
 /**
  * A wrapper fragment for leanback details screens.
  * It shows a detailed view of video and its metadata plus related videos.
  */
-class CollectionDetailsFragment : DetailsSupportFragment() {
+class DetailsFragment : DetailsSupportFragment(), OnTrackClickListener {
 
 	private var mSelectedCollection: Collection? = null
 
@@ -53,19 +55,38 @@ class CollectionDetailsFragment : DetailsSupportFragment() {
 		mDetailsBackground = DetailsSupportFragmentBackgroundController(this)
 
 		mSelectedCollection = activity!!.intent.getSerializableExtra(DetailsActivity.COLLECTION) as Collection
-		if (mSelectedCollection != null) {
-			mPresenterSelector = ClassPresenterSelector()
-			mAdapter = ArrayObjectAdapter(mPresenterSelector)
-			setupDetailsOverviewRow()
-			setupDetailsOverviewRowPresenter()
-			setupRelatedAlbumListRow()
-			adapter = mAdapter
-			initializeBackground(mSelectedCollection)
-			//onItemViewClickedListener = ItemViewClickedListener()
-		} else {
+		if (mSelectedCollection == null) {
 			val intent = Intent(context!!, MainActivity::class.java)
 			startActivity(intent)
 		}
+
+		mPresenterSelector = ClassPresenterSelector()
+		mAdapter = ArrayObjectAdapter(mPresenterSelector)
+		setupDetailsOverviewRow()
+		setupDetailsOverviewRowPresenter()
+		adapter = mAdapter
+		initializeBackground(mSelectedCollection)
+
+		if (mSelectedCollection!!.tracks() == null) {
+
+			lifecycleScope.launch {
+				val apiClient = MetadataClient()
+				if (mSelectedCollection is Album) {
+					when (val result = apiClient.fetchAlbumTracks((mSelectedCollection as Album).id!!)) {
+						is ApiResult.Success -> {
+							(mSelectedCollection as Album)!!.tracks = result.data
+							mAdapter.notifyArrayItemRangeChanged(0, mAdapter.size())
+						}
+						is ApiResult.Error -> {
+							// Handle the error here
+							Log.e(TAG, "Error fetching album tracks: ${result.exception}")
+						}
+					}
+				}
+			}
+
+		}
+
 	}
 
 	private fun initializeBackground(collection: Collection?) {
@@ -115,26 +136,28 @@ class CollectionDetailsFragment : DetailsSupportFragment() {
 				resources.getString(R.string.play_now),
 			)
 		)
-		actionAdapter.add(
-			Action(
-				ACTION_PLAY_NEXT,
-				resources.getString(R.string.play_next),
-			)
-		)
-		actionAdapter.add(
-			Action(
-				ACTION_QUEUE,
-				resources.getString(R.string.play_after),
-			)
-		)
+//		actionAdapter.add(
+//			Action(
+//				ACTION_PLAY_NEXT,
+//				resources.getString(R.string.play_next),
+//			)
+//		)
+//		actionAdapter.add(
+//			Action(
+//				ACTION_QUEUE,
+//				resources.getString(R.string.play_after),
+//			)
+//		)
+
 		row.actionsAdapter = actionAdapter
 
 		mAdapter.add(row)
 	}
 
 	private fun setupDetailsOverviewRowPresenter() {
+
 		// Set detail background.
-		val detailsPresenter = FullWidthDetailsOverviewRowPresenter(DetailsDescriptionPresenter())
+		val detailsPresenter = FullWidthDetailsOverviewRowPresenter(DetailsPresenter(this))
 		detailsPresenter.backgroundColor =
 			ContextCompat.getColor(context!!, R.color.selected_background)
 
@@ -149,52 +172,16 @@ class CollectionDetailsFragment : DetailsSupportFragment() {
 		detailsPresenter.onActionClickedListener = OnActionClickedListener { action ->
 
 			if (action.id == ACTION_PLAY_NOW) {
-				lifecycleScope.launch {
-					val apiClient = StreamingClient()
-
-					if (mSelectedCollection is Album) {
-						when (val result = apiClient.playAlbum((mSelectedCollection as Album)!!.id!!)) {
-							is ApiResult.Success -> {}
-							is ApiResult.Error -> {
-								Log.e(TAG, "Error playing albums: ${result.exception}")
-							}
-						}
-					} else if (mSelectedCollection is Mix) {
-						when (val result = apiClient.playMix((mSelectedCollection as Mix)!!.id!!)) {
-							is ApiResult.Success -> {}
-							is ApiResult.Error -> {
-								Log.e(TAG, "Error playing collection: ${result.exception}")
-							}
-						}
-					}
-				}
+				playCollection()
 				return@OnActionClickedListener
 			}
 
-//			if (action.id == ACTION_WATCH_TRAILER) {
-//				val intent = Intent(context!!, PlaybackActivity::class.java)
-//				intent.putExtra(DetailsActivity.MOVIE, mSelectedMovie)
-//				startActivity(intent)
-//			} else {
-				Toast.makeText(context!!, action.toString(), Toast.LENGTH_SHORT).show()
-//			}
-		}
-		mPresenterSelector.addClassPresenter(DetailsOverviewRow::class.java, detailsPresenter)
-	}
+			// default for now
+			Toast.makeText(context!!, action.toString(), Toast.LENGTH_SHORT).show()
 
-	private fun setupRelatedAlbumListRow() {
-//		val subcategories = arrayOf(getString(R.string.related_movies))
-//		val list = MovieList.list
-//
-//		Collections.shuffle(list)
-//		val listRowAdapter = ArrayObjectAdapter(CardPresenter())
-//		for (j in 0 until NUM_COLS) {
-//			listRowAdapter.add(list[j % 5])
-//		}
-//
-//		val header = HeaderItem(0, subcategories[0])
-//		mAdapter.add(ListRow(header, listRowAdapter))
-//		mPresenterSelector.addClassPresenter(ListRow::class.java, ListRowPresenter())
+		}
+
+		mPresenterSelector.addClassPresenter(DetailsOverviewRow::class.java, detailsPresenter)
 	}
 
 	private fun convertDpToPixel(context: Context, dp: Int): Int {
@@ -202,28 +189,32 @@ class CollectionDetailsFragment : DetailsSupportFragment() {
 		return Math.round(dp.toFloat() * density)
 	}
 
-	private inner class ItemViewClickedListener : OnItemViewClickedListener {
-		override fun onItemClicked(
-			itemViewHolder: Presenter.ViewHolder?,
-			item: Any?,
-			rowViewHolder: RowPresenter.ViewHolder,
-			row: Row
-		) {
-			if (item is Album) {
-				Log.d(TAG, "Item: " + item.toString())
-				val intent = Intent(context!!, DetailsActivity::class.java)
-				intent.putExtra(resources.getString(R.string.collection), mSelectedCollection)
+	override fun onTrackClick(track: Track) {
+		val index = mSelectedCollection!!.tracks()!!.indexOf(track)
+		playCollection(index)
+	}
 
-				val bundle =
-					ActivityOptionsCompat.makeSceneTransitionAnimation(
-						activity!!,
-						(itemViewHolder?.view as ImageCardView).mainImageView,
-						DetailsActivity.SHARED_ELEMENT_NAME
-					)
-						.toBundle()
-				startActivity(intent, bundle)
+	fun playCollection(index: Int = 0) {
+		lifecycleScope.launch {
+			val apiClient = StreamingClient()
+
+			if (mSelectedCollection is Album) {
+				when (val result = apiClient.playAlbum((mSelectedCollection as Album)!!.id!!, index)) {
+					is ApiResult.Success -> {}
+					is ApiResult.Error -> {
+						Log.e(TAG, "Error playing albums: ${result.exception}")
+					}
+				}
+			} else if (mSelectedCollection is Mix) {
+				when (val result = apiClient.playMix((mSelectedCollection as Mix)!!.id!!, index)) {
+					is ApiResult.Success -> {}
+					is ApiResult.Error -> {
+						Log.e(TAG, "Error playing collection: ${result.exception}")
+					}
+				}
 			}
 		}
+
 	}
 
 	companion object {
@@ -238,4 +229,5 @@ class CollectionDetailsFragment : DetailsSupportFragment() {
 
 		private val NUM_COLS = 10
 	}
+
 }

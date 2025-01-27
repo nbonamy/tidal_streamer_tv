@@ -2,6 +2,7 @@ package fr.bonamy.tidalstreamer.api
 
 import fr.bonamy.tidalstreamer.models.Album
 import fr.bonamy.tidalstreamer.models.Mix
+import fr.bonamy.tidalstreamer.models.Track
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -51,6 +52,20 @@ class MetadataClient: ApiClient() {
 			ApiResult.Error(e)
 		}
 	}
+
+	suspend fun fetchAlbumTracks(albumId: String): ApiResult<List<Track>> = withContext(Dispatchers.IO) {
+		try {
+			val response = apiService.getAlbumTracks(albumId)
+			if (response.isSuccessful && response.body()!!.status == "ok") {
+				ApiResult.Success(response.body()!!.result!!.items!!.map { (it as ItemTrack).item!! })
+			} else {
+				ApiResult.Error(Throwable("Error: ${response.code()}"))
+			}
+		} catch (e: Exception) {
+			ApiResult.Error(e)
+		}
+	}
+
 
 	protected val apiService: MetadataService by lazy {
 		ApiRetrofitClient.instance.create(MetadataService::class.java)
