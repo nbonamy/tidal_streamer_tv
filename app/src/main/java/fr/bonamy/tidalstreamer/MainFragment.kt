@@ -30,9 +30,10 @@ import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.SimpleTarget
 import com.bumptech.glide.request.transition.Transition
-import fr.bonamy.tidalstreamer.api.ApiClient
 import fr.bonamy.tidalstreamer.api.ApiResult
+import fr.bonamy.tidalstreamer.api.MetadataClient
 import fr.bonamy.tidalstreamer.models.Album
+import fr.bonamy.tidalstreamer.models.Collection
 import kotlinx.coroutines.launch
 import java.util.Timer
 import java.util.TimerTask
@@ -52,13 +53,9 @@ class MainFragment : BrowseSupportFragment() {
 	override fun onActivityCreated(savedInstanceState: Bundle?) {
 		Log.i(TAG, "onCreate")
 		super.onActivityCreated(savedInstanceState)
-
 		prepareBackgroundManager()
-
 		setupUIElements()
-
 		loadRows()
-
 		setupEventListeners()
 	}
 
@@ -72,7 +69,8 @@ class MainFragment : BrowseSupportFragment() {
 
 		mBackgroundManager = BackgroundManager.getInstance(activity)
 		mBackgroundManager.attach(activity!!.window)
-		mDefaultBackground = ContextCompat.getDrawable(context!!, R.drawable.default_background)
+		mBackgroundManager.color = ContextCompat.getColor(context!!, R.color.default_background)
+		//mDefaultBackground = ContextCompat.getDrawable(context!!, R.drawable.default_background)
 		mMetrics = DisplayMetrics()
 		activity!!.windowManager.defaultDisplay.getMetrics(mMetrics)
 	}
@@ -92,65 +90,117 @@ class MainFragment : BrowseSupportFragment() {
 	private fun loadRows() {
 
 		val rowsAdapter = ArrayObjectAdapter(ListRowPresenter())
-		val cardPresenter = AlbumCardPresenter()
+		val cardPresenter = CardPresenter()
 
+		// add NUM_ROWS placeholders
+		for (i in 0..NUM_ROWS-1) {
+			val listRowAdapter = ArrayObjectAdapter(cardPresenter)
+			rowsAdapter.add(ListRow(HeaderItem(ROWS_TITLE[i]), listRowAdapter))
+		}
 
 		lifecycleScope.launch {
-			val apiClient = ApiClient()
+			val apiClient = MetadataClient()
+			when (val result = apiClient.fetchShortcuts()) {
+
+				is ApiResult.Success -> {
+					var albumsAdapter = ArrayObjectAdapter(cardPresenter)
+					result.data.forEach { album ->
+						albumsAdapter.add(album)
+					}
+					val header = HeaderItem( ROWS_TITLE[0])
+					rowsAdapter.replace(0, ListRow(header, albumsAdapter))
+				}
+
+				is ApiResult.Error -> {
+					// Handle the error here
+					Log.e(TAG, "Error fetching recent albums: ${result.exception}")
+				}
+			}
+		}
+
+		lifecycleScope.launch {
+			val apiClient = MetadataClient()
 			when (val result = apiClient.fetchNewAlbums()) {
 
 				is ApiResult.Success -> {
-					var newAlbumsAdapter = ArrayObjectAdapter(cardPresenter)
+					var albumsAdapter = ArrayObjectAdapter(cardPresenter)
 					result.data.forEach { album ->
-						newAlbumsAdapter.add(album)
+						albumsAdapter.add(album)
 					}
-					val header = HeaderItem(0, "Suggested new albums for you")
-					rowsAdapter.add(ListRow(header, newAlbumsAdapter))
+					val header = HeaderItem(ROWS_TITLE[1])
+					rowsAdapter.replace(1, ListRow(header, albumsAdapter))
 				}
 
 				is ApiResult.Error -> {
 					// Handle the error here
-					Log.e(TAG, "Error fetching new albums: ${result.exception}")
+					Log.e(TAG, "Error fetching recent albums: ${result.exception}")
 				}
 			}
 		}
 
+
 		lifecycleScope.launch {
-			val apiClient = ApiClient()
+			val apiClient = MetadataClient()
 			when (val result = apiClient.fetchRecentAlbums()) {
 
 				is ApiResult.Success -> {
-					var newAlbumsAdapter = ArrayObjectAdapter(cardPresenter)
+					var albumsAdapter = ArrayObjectAdapter(cardPresenter)
 					result.data.forEach { album ->
-						newAlbumsAdapter.add(album)
+						albumsAdapter.add(album)
 					}
-					val header = HeaderItem(1, "Recently played")
-					rowsAdapter.add(ListRow(header, newAlbumsAdapter))
+					val header = HeaderItem(ROWS_TITLE[2])
+					rowsAdapter.replace(2, ListRow(header, albumsAdapter))
 				}
 
 				is ApiResult.Error -> {
 					// Handle the error here
-					Log.e(TAG, "Error fetching new albums: ${result.exception}")
+					Log.e(TAG, "Error fetching recent albums: ${result.exception}")
 				}
 			}
 		}
 
 		lifecycleScope.launch {
-			val apiClient = ApiClient()
+			val apiClient = MetadataClient()
 			when (val result = apiClient.fetchRecommendedAlbums()) {
 
 				is ApiResult.Success -> {
-					var newAlbumsAdapter = ArrayObjectAdapter(cardPresenter)
+					var albumsAdapter = ArrayObjectAdapter(cardPresenter)
 					result.data.forEach { album ->
-						newAlbumsAdapter.add(album)
+						albumsAdapter.add(album)
 					}
-					val header = HeaderItem(1, "Albums you'll enjoy")
-					rowsAdapter.add(ListRow(header, newAlbumsAdapter))
+					val header = HeaderItem(ROWS_TITLE[3])
+					rowsAdapter.replace(3, ListRow(header, albumsAdapter))
 				}
 
 				is ApiResult.Error -> {
 					// Handle the error here
-					Log.e(TAG, "Error fetching new albums: ${result.exception}")
+					Log.e(TAG, "Error fetching recommended albums: ${result.exception}")
+				}
+			}
+		}
+
+		lifecycleScope.launch {
+			val apiClient = MetadataClient()
+			when (val result = apiClient.fetchMixes()) {
+
+				is ApiResult.Success -> {
+					var albumsAdapter = ArrayObjectAdapter(cardPresenter)
+					result.data.forEach { mix ->
+						if (mix.type == "DISCOVERY_MIX") {
+							albumsAdapter.add(0, mix)
+						} else if (mix.type == "NEW_RELEASE_MIX") {
+							albumsAdapter.add(1, mix)
+						} else {
+							albumsAdapter.add(mix)
+						}
+					}
+					val header = HeaderItem(ROWS_TITLE[4])
+					rowsAdapter.replace(4, ListRow(header, albumsAdapter))
+				}
+
+				is ApiResult.Error -> {
+					// Handle the error here
+					Log.e(TAG, "Error fetching recommended albums: ${result.exception}")
 				}
 			}
 		}
@@ -177,10 +227,10 @@ class MainFragment : BrowseSupportFragment() {
 			row: Row
 		) {
 
-			if (item is Album) {
+			if (item is Collection) {
 				Log.d(TAG, "Item: " + item.toString())
 				val intent = Intent(context!!, DetailsActivity::class.java)
-				intent.putExtra(DetailsActivity.ALBUM, item)
+				intent.putExtra(DetailsActivity.COLLECTION, item)
 
 				val bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(
 					activity!!,
@@ -206,8 +256,8 @@ class MainFragment : BrowseSupportFragment() {
 			rowViewHolder: RowPresenter.ViewHolder, row: Row
 		) {
 			if (item is Album) {
-				mBackgroundUri = item.coverUrl()
-				startBackgroundTimer()
+				mBackgroundUri = item.imageUrl()
+				//startBackgroundTimer()
 			}
 		}
 	}
@@ -269,7 +319,14 @@ class MainFragment : BrowseSupportFragment() {
 		private val BACKGROUND_UPDATE_DELAY = 300
 		private val GRID_ITEM_WIDTH = 200
 		private val GRID_ITEM_HEIGHT = 200
-		private val NUM_ROWS = 6
+		private val NUM_ROWS = 5
 		private val NUM_COLS = 15
+		private val ROWS_TITLE = arrayOf(
+			"Shortcuts",
+			"Suggested new albums for you",
+			"Recently played",
+			"Albums you'll enjoy",
+			"Custom mixes"
+		)
 	}
 }

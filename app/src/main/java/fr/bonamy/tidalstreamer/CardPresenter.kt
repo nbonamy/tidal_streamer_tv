@@ -7,14 +7,14 @@ import androidx.core.content.ContextCompat
 import androidx.leanback.widget.ImageCardView
 import androidx.leanback.widget.Presenter
 import com.bumptech.glide.Glide
-import fr.bonamy.tidalstreamer.models.Album
+import fr.bonamy.tidalstreamer.models.Collection
 import kotlin.properties.Delegates
 
 /**
  * A CardPresenter is used to generate Views and bind Objects to them on demand.
  * It contains an ImageCardView.
  */
-class AlbumCardPresenter : Presenter() {
+class CardPresenter : Presenter() {
 	private var mDefaultCardImage: Drawable? = null
 	private var sSelectedBackgroundColor: Int by Delegates.notNull()
 	private var sDefaultBackgroundColor: Int by Delegates.notNull()
@@ -40,15 +40,15 @@ class AlbumCardPresenter : Presenter() {
 	}
 
 	override fun onBindViewHolder(viewHolder: Presenter.ViewHolder, item: Any) {
-		val album = item as Album
+		val cardable = item as Collection
 		val cardView = viewHolder.view as ImageCardView
 
 		Log.d(TAG, "onBindViewHolder")
-		cardView.titleText = album.title
-		cardView.contentText = album.mainArtist()?.name ?: ""
+		cardView.titleText = cardable.title()
+		cardView.contentText = cardable.subtitle()
 		cardView.setMainImageDimensions(CARD_WIDTH, CARD_HEIGHT)
 		Glide.with(viewHolder.view.context)
-			.load(album.coverUrl())
+			.load(cardable.imageUrl())
 			.centerCrop()
 			.error(mDefaultCardImage)
 			.into(cardView.mainImageView)

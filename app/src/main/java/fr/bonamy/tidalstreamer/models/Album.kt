@@ -3,14 +3,26 @@ package fr.bonamy.tidalstreamer.models
 import java.io.Serializable
 
 data class Album(
-	var id: Long = 0,
+	var id: String? = null,
 	var title: String? = null,
 	var artists: List<Artist>? = null,
 	var cover: String? = null,
 	var releaseDate: String? = null,
 	var numberOfVolumes: Int = 0,
 	var numberOfTracks: Int = 0,
-) : Serializable {
+) : Collection() {
+
+	override fun title(): String {
+		return title ?: ""
+	}
+
+	override fun subtitle(): String {
+		return mainArtist()?.name ?: ""
+	}
+
+	override fun imageUrl(): String {
+		return cover?.replace("-", "/")?.let { "https://resources.tidal.com/images/$it/640x640.jpg" } ?: ""
+	}
 
 	override fun toString(): String {
 		return "Album{" +
@@ -24,10 +36,6 @@ data class Album(
 	fun mainArtist(): Artist? {
 		val mainArtist = artists?.find { it.main == true }
 		return mainArtist ?: artists?.firstOrNull()
-	}
-
-	fun coverUrl(): String? {
-		return cover?.replace("-", "/")?.let { "https://resources.tidal.com/images/$it/640x640.jpg" }
 	}
 
 	companion object {

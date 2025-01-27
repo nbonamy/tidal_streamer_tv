@@ -23,18 +23,24 @@ import androidx.leanback.widget.OnItemViewClickedListener
 import androidx.leanback.widget.Presenter
 import androidx.leanback.widget.Row
 import androidx.leanback.widget.RowPresenter
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.SimpleTarget
 import com.bumptech.glide.request.transition.Transition
+import fr.bonamy.tidalstreamer.api.ApiResult
+import fr.bonamy.tidalstreamer.api.StreamingClient
 import fr.bonamy.tidalstreamer.models.Album
+import fr.bonamy.tidalstreamer.models.Collection
+import fr.bonamy.tidalstreamer.models.Mix
+import kotlinx.coroutines.launch
 
 /**
  * A wrapper fragment for leanback details screens.
  * It shows a detailed view of video and its metadata plus related videos.
  */
-class AlbumDetailsFragment : DetailsSupportFragment() {
+class CollectionDetailsFragment : DetailsSupportFragment() {
 
-	private var mSelectedAlbum: Album? = null
+	private var mSelectedCollection: Collection? = null
 
 	private lateinit var mDetailsBackground: DetailsSupportFragmentBackgroundController
 	private lateinit var mPresenterSelector: ClassPresenterSelector
@@ -46,29 +52,29 @@ class AlbumDetailsFragment : DetailsSupportFragment() {
 
 		mDetailsBackground = DetailsSupportFragmentBackgroundController(this)
 
-		mSelectedAlbum = activity!!.intent.getSerializableExtra(DetailsActivity.ALBUM) as Album
-		if (mSelectedAlbum != null) {
+		mSelectedCollection = activity!!.intent.getSerializableExtra(DetailsActivity.COLLECTION) as Collection
+		if (mSelectedCollection != null) {
 			mPresenterSelector = ClassPresenterSelector()
 			mAdapter = ArrayObjectAdapter(mPresenterSelector)
 			setupDetailsOverviewRow()
 			setupDetailsOverviewRowPresenter()
 			setupRelatedAlbumListRow()
 			adapter = mAdapter
-			initializeBackground(mSelectedAlbum)
-			onItemViewClickedListener = ItemViewClickedListener()
+			initializeBackground(mSelectedCollection)
+			//onItemViewClickedListener = ItemViewClickedListener()
 		} else {
 			val intent = Intent(context!!, MainActivity::class.java)
 			startActivity(intent)
 		}
 	}
 
-	private fun initializeBackground(album: Album?) {
+	private fun initializeBackground(collection: Collection?) {
 		mDetailsBackground.enableParallax()
 		Glide.with(context!!)
 			.asBitmap()
 			.centerCrop()
 			.error(R.drawable.default_background)
-			.load(album?.coverUrl())
+			.load(collection?.imageUrl())
 			.into<SimpleTarget<Bitmap>>(object : SimpleTarget<Bitmap>() {
 				override fun onResourceReady(
 					bitmap: Bitmap,
@@ -81,13 +87,13 @@ class AlbumDetailsFragment : DetailsSupportFragment() {
 	}
 
 	private fun setupDetailsOverviewRow() {
-		Log.d(TAG, "doInBackground: " + mSelectedAlbum?.toString())
-		val row = DetailsOverviewRow(mSelectedAlbum)
+		Log.d(TAG, "doInBackground: " + mSelectedCollection?.toString())
+		val row = DetailsOverviewRow(mSelectedCollection)
 		row.imageDrawable = ContextCompat.getDrawable(context!!, R.drawable.default_background)
 		val width = convertDpToPixel(context!!, DETAIL_THUMB_WIDTH)
 		val height = convertDpToPixel(context!!, DETAIL_THUMB_HEIGHT)
 		Glide.with(context!!)
-			.load(mSelectedAlbum?.coverUrl())
+			.load(mSelectedCollection?.imageUrl())
 			.centerCrop()
 			.error(R.drawable.default_background)
 			.into<SimpleTarget<Drawable>>(object : SimpleTarget<Drawable>(width, height) {
@@ -105,23 +111,20 @@ class AlbumDetailsFragment : DetailsSupportFragment() {
 
 		actionAdapter.add(
 			Action(
-				ACTION_WATCH_TRAILER,
-				resources.getString(R.string.watch_trailer_1),
-				resources.getString(R.string.watch_trailer_2)
+				ACTION_PLAY_NOW,
+				resources.getString(R.string.play_now),
 			)
 		)
 		actionAdapter.add(
 			Action(
-				ACTION_RENT,
-				resources.getString(R.string.rent_1),
-				resources.getString(R.string.rent_2)
+				ACTION_PLAY_NEXT,
+				resources.getString(R.string.play_next),
 			)
 		)
 		actionAdapter.add(
 			Action(
-				ACTION_BUY,
-				resources.getString(R.string.buy_1),
-				resources.getString(R.string.buy_2)
+				ACTION_QUEUE,
+				resources.getString(R.string.play_after),
 			)
 		)
 		row.actionsAdapter = actionAdapter
@@ -144,6 +147,30 @@ class AlbumDetailsFragment : DetailsSupportFragment() {
 		detailsPresenter.isParticipatingEntranceTransition = true
 
 		detailsPresenter.onActionClickedListener = OnActionClickedListener { action ->
+
+			if (action.id == ACTION_PLAY_NOW) {
+				lifecycleScope.launch {
+					val apiClient = StreamingClient()
+
+					if (mSelectedCollection is Album) {
+						when (val result = apiClient.playAlbum((mSelectedCollection as Album)!!.id!!)) {
+							is ApiResult.Success -> {}
+							is ApiResult.Error -> {
+								Log.e(TAG, "Error playing albums: ${result.exception}")
+							}
+						}
+					} else if (mSelectedCollection is Mix) {
+						when (val result = apiClient.playMix((mSelectedCollection as Mix)!!.id!!)) {
+							is ApiResult.Success -> {}
+							is ApiResult.Error -> {
+								Log.e(TAG, "Error playing collection: ${result.exception}")
+							}
+						}
+					}
+				}
+				return@OnActionClickedListener
+			}
+
 //			if (action.id == ACTION_WATCH_TRAILER) {
 //				val intent = Intent(context!!, PlaybackActivity::class.java)
 //				intent.putExtra(DetailsActivity.MOVIE, mSelectedMovie)
@@ -185,7 +212,7 @@ class AlbumDetailsFragment : DetailsSupportFragment() {
 			if (item is Album) {
 				Log.d(TAG, "Item: " + item.toString())
 				val intent = Intent(context!!, DetailsActivity::class.java)
-				intent.putExtra(resources.getString(R.string.movie), mSelectedAlbum)
+				intent.putExtra(resources.getString(R.string.collection), mSelectedCollection)
 
 				val bundle =
 					ActivityOptionsCompat.makeSceneTransitionAnimation(
@@ -202,9 +229,9 @@ class AlbumDetailsFragment : DetailsSupportFragment() {
 	companion object {
 		private val TAG = "VideoDetailsFragment"
 
-		private val ACTION_WATCH_TRAILER = 1L
-		private val ACTION_RENT = 2L
-		private val ACTION_BUY = 3L
+		private val ACTION_PLAY_NOW = 1L
+		private val ACTION_PLAY_NEXT = 2L
+		private val ACTION_QUEUE = 3L
 
 		private val DETAIL_THUMB_WIDTH = 274
 		private val DETAIL_THUMB_HEIGHT = 274

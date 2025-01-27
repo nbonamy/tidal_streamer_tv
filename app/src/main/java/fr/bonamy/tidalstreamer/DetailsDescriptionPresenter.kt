@@ -2,6 +2,7 @@ package fr.bonamy.tidalstreamer
 
 import androidx.leanback.widget.AbstractDetailsDescriptionPresenter
 import fr.bonamy.tidalstreamer.models.Album
+import fr.bonamy.tidalstreamer.models.Collection
 
 class DetailsDescriptionPresenter : AbstractDetailsDescriptionPresenter() {
 
@@ -9,10 +10,10 @@ class DetailsDescriptionPresenter : AbstractDetailsDescriptionPresenter() {
 		viewHolder: AbstractDetailsDescriptionPresenter.ViewHolder,
 		item: Any
 	) {
-		val album = item as Album
+		val collection = item as Collection
 
-		viewHolder.title.text = album.title
-		viewHolder.subtitle.text = album.mainArtist()?.name ?: ""
+		viewHolder.title.text = collection.title()
+		viewHolder.subtitle.text = collection.subtitle()
 		//viewHolder.body.text = album.description
 	}
 }
