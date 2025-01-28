@@ -20,6 +20,7 @@ import androidx.leanback.widget.ListRowPresenter
 import androidx.leanback.widget.OnItemViewClickedListener
 import androidx.leanback.widget.OnItemViewSelectedListener
 import androidx.leanback.widget.Presenter
+import androidx.leanback.widget.PresenterSelector
 import androidx.leanback.widget.Row
 import androidx.leanback.widget.RowPresenter
 import androidx.lifecycle.lifecycleScope
@@ -36,6 +37,7 @@ import fr.bonamy.tidalstreamer.search.SearchActivity
 import kotlinx.coroutines.launch
 import java.util.Timer
 import java.util.TimerTask
+
 
 /**
  * Loads a grid of cards with movies to browse.
@@ -78,7 +80,7 @@ class MainFragment : BrowseSupportFragment() {
 		title = getString(R.string.browse_title)
 		// over title
 		headersState = BrowseSupportFragment.HEADERS_ENABLED
-		isHeadersTransitionOnBackEnabled = true
+		isHeadersTransitionOnBackEnabled = false
 
 		// set fastLane (or headers) background color
 		brandColor = ContextCompat.getColor(context!!, R.color.fastlane_background)

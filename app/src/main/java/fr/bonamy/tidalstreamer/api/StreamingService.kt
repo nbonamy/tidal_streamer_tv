@@ -2,6 +2,7 @@ package fr.bonamy.tidalstreamer.api
 
 import fr.bonamy.tidalstreamer.models.Album
 import fr.bonamy.tidalstreamer.models.Queue
+import fr.bonamy.tidalstreamer.models.Status
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -10,6 +11,9 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface StreamingService {
+
+	@GET("/status")
+	suspend fun status(): Response<Status>
 
 	@POST("/play")
 	suspend fun play(): Response<ApiResponse<String>>
