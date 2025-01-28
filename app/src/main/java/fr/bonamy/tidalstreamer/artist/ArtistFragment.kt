@@ -1,11 +1,8 @@
 package fr.bonamy.tidalstreamer.artist
 
 import android.os.Bundle
-import android.util.Log
-import androidx.leanback.widget.ArrayObjectAdapter
 import androidx.leanback.widget.ImageCardView
 import androidx.lifecycle.lifecycleScope
-import fr.bonamy.tidalstreamer.api.ApiResult
 import fr.bonamy.tidalstreamer.api.MetadataClient
 import fr.bonamy.tidalstreamer.collection.CollectionCardPresenter
 import fr.bonamy.tidalstreamer.models.Artist
@@ -38,96 +35,54 @@ class ArtistFragment : BrowserFragment(), TrackCardClickListener {
 		// now load rows
 
 		viewLifecycleOwner.lifecycleScope.launch {
-			when (val result = apiClient.fetchArtistTopTracks(mSelectedArtist.id!!)) {
-
-				is ApiResult.Success -> {
-					val itemAdapter = ArrayObjectAdapter(TrackCardPresenter(this@ArtistFragment))
-					result.data.forEach { track ->
-						itemAdapter.add(track)
-					}
-					updateRowsAdapter(rowsAdapter, 0, ROWS_TITLE, itemAdapter)
-				}
-
-				is ApiResult.Error -> {
-					// Handle the error here
-					Log.e(TAG, "Error fetching artist albums: ${result.exception}")
-				}
-			}
+			loadRow(
+				rowsAdapter,
+				apiClient.fetchArtistTopTracks(mSelectedArtist.id!!),
+				TrackCardPresenter(this@ArtistFragment),
+				ROWS_TITLE,
+				0,
+			)
 		}
 
 		viewLifecycleOwner.lifecycleScope.launch {
-			when (val result = apiClient.fetchArtistAlbums(mSelectedArtist.id!!)) {
-
-				is ApiResult.Success -> {
-					val itemAdapter = ArrayObjectAdapter(CollectionCardPresenter())
-					result.data.forEach { shortcut ->
-						if (shortcut.title != "" && shortcut.mainArtist() != null) {
-							itemAdapter.add(shortcut)
-						}
-					}
-					updateRowsAdapter(rowsAdapter, 1, ROWS_TITLE, itemAdapter)
-				}
-
-				is ApiResult.Error -> {
-					// Handle the error here
-					Log.e(TAG, "Error fetching artist albums: ${result.exception}")
-				}
-			}
+			loadRow(
+				rowsAdapter,
+				apiClient.fetchArtistAlbums(mSelectedArtist.id!!),
+				CollectionCardPresenter(),
+				ROWS_TITLE,
+				1,
+			)
 		}
 
 		viewLifecycleOwner.lifecycleScope.launch {
-			when (val result = apiClient.fetchArtistSingles(mSelectedArtist.id!!)) {
-
-				is ApiResult.Success -> {
-					val itemAdapter = ArrayObjectAdapter(CollectionCardPresenter())
-					result.data.forEach { album ->
-						itemAdapter.add(album)
-					}
-					updateRowsAdapter(rowsAdapter, 2, ROWS_TITLE, itemAdapter)
-				}
-
-				is ApiResult.Error -> {
-					// Handle the error here
-					Log.e(TAG, "Error fetching artist singles: ${result.exception}")
-				}
-			}
+			loadRow(
+				rowsAdapter,
+				apiClient.fetchArtistSingles(mSelectedArtist.id!!),
+				CollectionCardPresenter(),
+				ROWS_TITLE,
+				2,
+			)
 		}
 
 
 		viewLifecycleOwner.lifecycleScope.launch {
-			when (val result = apiClient.fetchArtistCompilations(mSelectedArtist.id!!)) {
-
-				is ApiResult.Success -> {
-					val itemAdapter = ArrayObjectAdapter(CollectionCardPresenter())
-					result.data.forEach { album ->
-						itemAdapter.add(album)
-					}
-					updateRowsAdapter(rowsAdapter, 3, ROWS_TITLE, itemAdapter)
-				}
-
-				is ApiResult.Error -> {
-					// Handle the error here
-					Log.e(TAG, "Error fetching artist compilations: ${result.exception}")
-				}
-			}
+			loadRow(
+				rowsAdapter,
+				apiClient.fetchArtistCompilations(mSelectedArtist.id!!),
+				CollectionCardPresenter(),
+				ROWS_TITLE,
+				3,
+			)
 		}
 
 		viewLifecycleOwner.lifecycleScope.launch {
-			when (val result = apiClient.fetchSimilarArtists(mSelectedArtist.id!!)) {
-
-				is ApiResult.Success -> {
-					val itemAdapter = ArrayObjectAdapter(ArtistCardPresenter())
-					result.data.forEach { artist ->
-						itemAdapter.add(artist)
-					}
-					updateRowsAdapter(rowsAdapter, 4, ROWS_TITLE, itemAdapter)
-				}
-
-				is ApiResult.Error -> {
-					// Handle the error here
-					Log.e(TAG, "Error fetching similar artists: ${result.exception}")
-				}
-			}
+			loadRow(
+				rowsAdapter,
+				apiClient.fetchSimilarArtists(mSelectedArtist.id!!),
+				ArtistCardPresenter(),
+				ROWS_TITLE,
+				4,
+			)
 		}
 
 	}

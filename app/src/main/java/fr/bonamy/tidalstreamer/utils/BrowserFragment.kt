@@ -22,7 +22,8 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.SimpleTarget
 import com.bumptech.glide.request.transition.Transition
 import fr.bonamy.tidalstreamer.R
-import fr.bonamy.tidalstreamer.collection.CollectionCardPresenter
+import fr.bonamy.tidalstreamer.api.ApiResult
+import fr.bonamy.tidalstreamer.models.Album
 import fr.bonamy.tidalstreamer.models.ImageRepresentation
 import fr.bonamy.tidalstreamer.search.SearchActivity
 import kotlinx.coroutines.Dispatchers
@@ -108,20 +109,38 @@ abstract class BrowserFragment : BrowseSupportFragment() {
 
 	protected fun initRowsAdapter(count: Int): ArrayObjectAdapter {
 		val rowsAdapter = ArrayObjectAdapter(ListRowPresenter())
-		val cardPresenter = CollectionCardPresenter()
 		for (i in 0..count - 1) {
-			val listRowAdapter = ArrayObjectAdapter(cardPresenter)
+			val listRowAdapter = ArrayObjectAdapter()
 			rowsAdapter.add(ListRow(HeaderItem(""), listRowAdapter))
 		}
 		return rowsAdapter
 	}
 
-	protected suspend fun updateRowsAdapter(rowsAdapter: ArrayObjectAdapter, index: Int, titles: Array<String>, row: ArrayObjectAdapter) {
-		withContext(Dispatchers.Main) {
-			val header = HeaderItem(titles[index])
-			rowsAdapter.replace(index, ListRow(header, row))
-			rowsAdapter.notifyArrayItemRangeChanged(index, 1)
+	suspend fun <T> loadRow(rowsAdapter: ArrayObjectAdapter, result: ApiResult<List<T>>, presenter: Presenter, titles: Array<String>, index: Int) {
+		when (result) {
+			is ApiResult.Success -> {
+				val rowAdapter = ArrayObjectAdapter(presenter)
+				result.data.forEach { item ->
+					if (item is Album) {
+						if (item.title == null || item.mainArtist() == null) {
+							return@forEach
+						}
+					}
+					rowAdapter.add(item)
+				}
+				withContext(Dispatchers.Main) {
+					val header = HeaderItem(titles[index])
+					rowsAdapter.replace(index, ListRow(header, rowAdapter))
+					rowsAdapter.notifyArrayItemRangeChanged(index, 1)
+				}
+			}
+
+			is ApiResult.Error -> {
+				// Handle the error here
+				Log.e(TAG, "Error fetching artist albums: ${result.exception}")
+			}
 		}
+
 	}
 
 	private inner class ItemViewSelectedListener : OnItemViewSelectedListener {
