@@ -1,10 +1,8 @@
 package fr.bonamy.tidalstreamer
 
 import android.graphics.drawable.Drawable
-import android.util.Log
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
-import androidx.core.view.marginLeft
 import androidx.leanback.widget.ImageCardView
 import androidx.leanback.widget.Presenter
 import com.bumptech.glide.Glide
