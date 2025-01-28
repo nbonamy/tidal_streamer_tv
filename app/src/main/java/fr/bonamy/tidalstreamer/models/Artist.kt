@@ -7,9 +7,9 @@ data class Artist(
 	var name: String? = null,
 	var picture: String? = null,
 	var main: Boolean? = null,
-) : Serializable {
+) : Serializable, ImageRepresentation {
 
-	fun imageUrl(): String {
+	override fun imageUrl(): String {
 		return picture?.replace("-", "/")?.let { "https://resources.tidal.com/images/$it/750x750.jpg" } ?: ""
 	}
 

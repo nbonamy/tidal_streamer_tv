@@ -1,5 +1,7 @@
 package fr.bonamy.tidalstreamer.models
 
+import java.io.Serializable
+
 data class Track(
 	var id: String? = null,
 	var title: String? = null,
@@ -12,9 +14,9 @@ data class Track(
 	var artist: Artist? = null,
 	var artists: List<Artist>? = null,
 	var album: Album? = null,
-) {
+): Serializable, ImageRepresentation {
 
-	fun imageUrl(): String {
+	override fun imageUrl(): String {
 		return album?.cover?.replace("-", "/")?.let { "https://resources.tidal.com/images/$it/640x640.jpg" } ?: ""
 	}
 
