@@ -1,6 +1,7 @@
 package fr.bonamy.tidalstreamer.api
 
 import fr.bonamy.tidalstreamer.models.Album
+import fr.bonamy.tidalstreamer.models.Artist
 import fr.bonamy.tidalstreamer.models.Mix
 import fr.bonamy.tidalstreamer.models.Track
 import kotlinx.coroutines.Dispatchers
@@ -53,6 +54,19 @@ class MetadataClient: ApiClient() {
 		}
 	}
 
+	suspend fun fetchArtistTopTracks(artistId: String): ApiResult<List<Track>> = withContext(Dispatchers.IO) {
+		try {
+			val response = apiService.getArtistTopTracks(artistId)
+			if (response.isSuccessful && response.body()!!.status == "ok") {
+				ApiResult.Success(response.body()!!.result!!.items!!)
+			} else {
+				ApiResult.Error(Throwable("Error: ${response.code()}"))
+			}
+		} catch (e: Exception) {
+			ApiResult.Error(e)
+		}
+	}
+
 	suspend fun fetchArtistAlbums(artistId: String): ApiResult<List<Album>> = withContext(Dispatchers.IO) {
 		try {
 			val response = apiService.getArtistAlbums(artistId)
@@ -82,6 +96,19 @@ class MetadataClient: ApiClient() {
 	suspend fun fetchArtistCompilations(artistId: String): ApiResult<List<Album>> = withContext(Dispatchers.IO) {
 		try {
 			val response = apiService.getArtistCompilations(artistId)
+			if (response.isSuccessful && response.body()!!.status == "ok") {
+				ApiResult.Success(response.body()!!.result!!.items!!)
+			} else {
+				ApiResult.Error(Throwable("Error: ${response.code()}"))
+			}
+		} catch (e: Exception) {
+			ApiResult.Error(e)
+		}
+	}
+
+	suspend fun fetchSimilarArtists(artistId: String): ApiResult<List<Artist>> = withContext(Dispatchers.IO) {
+		try {
+			val response = apiService.getSimilarArtists(artistId)
 			if (response.isSuccessful && response.body()!!.status == "ok") {
 				ApiResult.Success(response.body()!!.result!!.items!!)
 			} else {

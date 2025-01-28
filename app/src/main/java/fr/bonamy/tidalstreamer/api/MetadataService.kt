@@ -1,6 +1,7 @@
 package fr.bonamy.tidalstreamer.api
 
 import fr.bonamy.tidalstreamer.models.Album
+import fr.bonamy.tidalstreamer.models.Artist
 import fr.bonamy.tidalstreamer.models.Mix
 import fr.bonamy.tidalstreamer.models.Track
 import retrofit2.Response
@@ -24,6 +25,9 @@ interface MetadataService {
 	@GET("user/recommended/albums")
 	suspend fun getRecommendedAlbums(): Response<ApiResponse<List<Album>>>
 
+	@GET("info/artist/{id}/toptracks")
+	suspend fun getArtistTopTracks(@Path("id") id: String): Response<ApiResponsePage<Track>>
+
 	@GET("info/artist/{id}/albums")
 	suspend fun getArtistAlbums(@Path("id") id: String): Response<ApiResponsePage<Album>>
 
@@ -32,6 +36,9 @@ interface MetadataService {
 
 	@GET("info/artist/{id}/compilations")
 	suspend fun getArtistCompilations(@Path("id") id: String): Response<ApiResponsePage<Album>>
+
+	@GET("info/artist/{id}/similar")
+	suspend fun getSimilarArtists(@Path("id") id: String): Response<ApiResponsePage<Artist>>
 
 	@GET("info/album/{id}")
 	suspend fun getAlbumTracks(@Path("id") id: String): Response<ApiResponsePage<ItemTrack>>
