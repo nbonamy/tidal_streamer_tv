@@ -9,17 +9,27 @@ android {
 
 	defaultConfig {
 		applicationId = "fr.bonamy.tidalstreamer"
-		minSdk = 31
+		minSdk = 29
 		targetSdk = 35
 		versionCode = 1
 		versionName = "1.0"
 
 	}
 
+	signingConfigs {
+		create("release") {
+			keyAlias = "app"
+			keyPassword = "tidal00"
+			storeFile = file("../keystore.jks")
+			storePassword = "tidal00"
+		}
+	}
+
 	buildTypes {
 		release {
 			isMinifyEnabled = false
 			proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+			signingConfig = signingConfigs.getByName("release")
 		}
 	}
 	compileOptions {
@@ -36,6 +46,7 @@ dependencies {
 	implementation(libs.androidx.core.ktx)
 	implementation(libs.androidx.leanback)
 	implementation(libs.androidx.lifecycle.runtime.ktx)
+	implementation(libs.androidx.palette.ktx)
 	implementation(libs.glide)
 	implementation(libs.retrofit)
 	implementation(libs.converter.gson)

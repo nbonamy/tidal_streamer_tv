@@ -3,12 +3,14 @@ package fr.bonamy.tidalstreamer
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
-import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.ColorUtils
+import androidx.leanback.app.BackgroundManager
 import androidx.leanback.app.DetailsSupportFragment
 import androidx.leanback.app.DetailsSupportFragmentBackgroundController
 import androidx.leanback.widget.Action
@@ -17,13 +19,10 @@ import androidx.leanback.widget.ClassPresenterSelector
 import androidx.leanback.widget.DetailsOverviewRow
 import androidx.leanback.widget.FullWidthDetailsOverviewRowPresenter
 import androidx.leanback.widget.FullWidthDetailsOverviewSharedElementHelper
-import androidx.leanback.widget.ImageCardView
 import androidx.leanback.widget.OnActionClickedListener
-import androidx.leanback.widget.OnItemViewClickedListener
-import androidx.leanback.widget.Presenter
-import androidx.leanback.widget.Row
-import androidx.leanback.widget.RowPresenter
 import androidx.lifecycle.lifecycleScope
+import androidx.palette.graphics.Palette
+import androidx.palette.graphics.Palette.PaletteAsyncListener
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.SimpleTarget
 import com.bumptech.glide.request.transition.Transition
@@ -34,17 +33,19 @@ import fr.bonamy.tidalstreamer.models.Album
 import fr.bonamy.tidalstreamer.models.Collection
 import fr.bonamy.tidalstreamer.models.Mix
 import fr.bonamy.tidalstreamer.models.Track
+import fr.bonamy.tidalstreamer.utils.PaletteUtils
 import kotlinx.coroutines.launch
 
 /**
  * A wrapper fragment for leanback details screens.
  * It shows a detailed view of video and its metadata plus related videos.
  */
-class DetailsFragment : DetailsSupportFragment(), OnTrackClickListener {
+class DetailsFragment : DetailsSupportFragment(), PaletteAsyncListener, OnTrackClickListener {
 
 	private var mSelectedCollection: Collection? = null
-
+	private lateinit var mBackgroundManager: BackgroundManager
 	private lateinit var mDetailsBackground: DetailsSupportFragmentBackgroundController
+	private lateinit var mDetailsPresenter: FullWidthDetailsOverviewRowPresenter
 	private lateinit var mPresenterSelector: ClassPresenterSelector
 	private lateinit var mAdapter: ArrayObjectAdapter
 
@@ -53,8 +54,11 @@ class DetailsFragment : DetailsSupportFragment(), OnTrackClickListener {
 		super.onCreate(savedInstanceState)
 
 		mDetailsBackground = DetailsSupportFragmentBackgroundController(this)
+		mBackgroundManager = BackgroundManager.getInstance(activity)
+		mBackgroundManager.attach(activity!!.window)
 
-		mSelectedCollection = activity!!.intent.getSerializableExtra(DetailsActivity.COLLECTION) as Collection
+		mSelectedCollection =
+			activity!!.intent.getSerializableExtra(DetailsActivity.COLLECTION) as Collection
 		if (mSelectedCollection == null) {
 			val intent = Intent(context!!, MainActivity::class.java)
 			startActivity(intent)
@@ -67,19 +71,32 @@ class DetailsFragment : DetailsSupportFragment(), OnTrackClickListener {
 		adapter = mAdapter
 		initializeBackground(mSelectedCollection)
 
-		if (mSelectedCollection!!.tracks() == null) {
+		if (mSelectedCollection!!.tracks == null) {
 
 			lifecycleScope.launch {
 				val apiClient = MetadataClient()
 				if (mSelectedCollection is Album) {
 					when (val result = apiClient.fetchAlbumTracks((mSelectedCollection as Album).id!!)) {
 						is ApiResult.Success -> {
-							(mSelectedCollection as Album)!!.tracks = result.data
+							mSelectedCollection!!.tracks = result.data
 							mAdapter.notifyArrayItemRangeChanged(0, mAdapter.size())
 						}
+
 						is ApiResult.Error -> {
 							// Handle the error here
 							Log.e(TAG, "Error fetching album tracks: ${result.exception}")
+						}
+					}
+				} else if (mSelectedCollection is Mix) {
+					when (val result = apiClient.fetchMixTracks((mSelectedCollection as Mix).id!!)) {
+						is ApiResult.Success -> {
+							mSelectedCollection!!.tracks = result.data
+							mAdapter.notifyArrayItemRangeChanged(0, mAdapter.size())
+						}
+
+						is ApiResult.Error -> {
+							// Handle the error here
+							Log.e(TAG, "Error fetching mix tracks: ${result.exception}")
 						}
 					}
 				}
@@ -90,7 +107,7 @@ class DetailsFragment : DetailsSupportFragment(), OnTrackClickListener {
 	}
 
 	private fun initializeBackground(collection: Collection?) {
-		mDetailsBackground.enableParallax()
+		//mDetailsBackground.enableParallax()
 		Glide.with(context!!)
 			.asBitmap()
 			.centerCrop()
@@ -101,8 +118,8 @@ class DetailsFragment : DetailsSupportFragment(), OnTrackClickListener {
 					bitmap: Bitmap,
 					transition: Transition<in Bitmap>?
 				) {
-					mDetailsBackground.coverBitmap = bitmap
-					mAdapter.notifyArrayItemRangeChanged(0, mAdapter.size())
+					mBackgroundManager.setBitmap(bitmap)
+					//Palette.from(bitmap).generate(this@DetailsFragment)
 				}
 			})
 	}
@@ -116,7 +133,7 @@ class DetailsFragment : DetailsSupportFragment(), OnTrackClickListener {
 		Glide.with(context!!)
 			.load(mSelectedCollection?.imageUrl())
 			.centerCrop()
-			.error(R.drawable.default_background)
+			.error(R.drawable.album)
 			.into<SimpleTarget<Drawable>>(object : SimpleTarget<Drawable>(width, height) {
 				override fun onResourceReady(
 					drawable: Drawable,
@@ -157,19 +174,22 @@ class DetailsFragment : DetailsSupportFragment(), OnTrackClickListener {
 	private fun setupDetailsOverviewRowPresenter() {
 
 		// Set detail background.
-		val detailsPresenter = FullWidthDetailsOverviewRowPresenter(DetailsPresenter(this))
-		detailsPresenter.backgroundColor =
-			ContextCompat.getColor(context!!, R.color.selected_background)
+		mDetailsPresenter =
+			FullWidthDetailsOverviewRowPresenter(DetailsPresenter(mSelectedCollection!!, this))
+		mDetailsPresenter.backgroundColor =
+			ColorUtils.setAlphaComponent(ContextCompat.getColor(context!!, R.color.details_background), ALPHA_VALUE)
+		mDetailsPresenter.actionsBackgroundColor =
+			ContextCompat.getColor(context!!, R.color.details_background)
 
 		// Hook up transition element.
 		val sharedElementHelper = FullWidthDetailsOverviewSharedElementHelper()
 		sharedElementHelper.setSharedElementEnterTransition(
 			activity, DetailsActivity.SHARED_ELEMENT_NAME
 		)
-		detailsPresenter.setListener(sharedElementHelper)
-		detailsPresenter.isParticipatingEntranceTransition = true
+		mDetailsPresenter.setListener(sharedElementHelper)
+		mDetailsPresenter.isParticipatingEntranceTransition = true
 
-		detailsPresenter.onActionClickedListener = OnActionClickedListener { action ->
+		mDetailsPresenter.onActionClickedListener = OnActionClickedListener { action ->
 
 			if (action.id == ACTION_PLAY_NOW) {
 				playCollection()
@@ -181,7 +201,7 @@ class DetailsFragment : DetailsSupportFragment(), OnTrackClickListener {
 
 		}
 
-		mPresenterSelector.addClassPresenter(DetailsOverviewRow::class.java, detailsPresenter)
+		mPresenterSelector.addClassPresenter(DetailsOverviewRow::class.java, mDetailsPresenter)
 	}
 
 	private fun convertDpToPixel(context: Context, dp: Int): Int {
@@ -190,7 +210,7 @@ class DetailsFragment : DetailsSupportFragment(), OnTrackClickListener {
 	}
 
 	override fun onTrackClick(track: Track) {
-		val index = mSelectedCollection!!.tracks()!!.indexOf(track)
+		val index = mSelectedCollection!!.tracks!!.indexOf(track)
 		playCollection(index)
 	}
 
@@ -217,6 +237,21 @@ class DetailsFragment : DetailsSupportFragment(), OnTrackClickListener {
 
 	}
 
+	override fun onGenerated(palette: Palette?) {
+
+		// get paletteColors
+		val paletteUtils = PaletteUtils(palette!!)
+		val actionsBgColor: Int = Color.RED
+			//ColorUtils.setAlphaComponent(paletteUtils.getTitleBgColor(), ALPHA_VALUE)
+		val contentBgColor: Int = Color.GREEN//ColorUtils.setAlphaComponent(paletteUtils.getContentBgColor(), ALPHA_VALUE)
+
+		// background
+		mDetailsPresenter.setActionsBackgroundColor(actionsBgColor)
+		mDetailsPresenter.setBackgroundColor(contentBgColor)
+		mAdapter.notifyArrayItemRangeChanged(0, mAdapter.size())
+	}
+
+
 	companion object {
 		private val TAG = "VideoDetailsFragment"
 
@@ -226,6 +261,8 @@ class DetailsFragment : DetailsSupportFragment(), OnTrackClickListener {
 
 		private val DETAIL_THUMB_WIDTH = 274
 		private val DETAIL_THUMB_HEIGHT = 274
+
+		private const val ALPHA_VALUE = 224
 
 		private val NUM_COLS = 10
 	}

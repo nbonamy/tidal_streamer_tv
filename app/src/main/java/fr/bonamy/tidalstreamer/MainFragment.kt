@@ -89,14 +89,20 @@ class MainFragment : BrowseSupportFragment() {
 
 	private fun loadRows() {
 
+		// init
 		val rowsAdapter = ArrayObjectAdapter(ListRowPresenter())
 		val cardPresenter = CollectionPresenter()
 
-		// add NUM_ROWS placeholders
+		// add placeholders
 		for (i in 0..NUM_ROWS-1) {
 			val listRowAdapter = ArrayObjectAdapter(cardPresenter)
 			rowsAdapter.add(ListRow(HeaderItem(ROWS_TITLE[i]), listRowAdapter))
 		}
+
+		// save it as is
+		adapter = rowsAdapter
+
+		// now load rows
 
 		lifecycleScope.launch {
 			val apiClient = MetadataClient()
@@ -111,6 +117,7 @@ class MainFragment : BrowseSupportFragment() {
 					}
 					val header = HeaderItem(ROWS_TITLE[0])
 					rowsAdapter.replace(0, ListRow(header, itemAdapter))
+					rowsAdapter.notifyArrayItemRangeChanged(0, 1)
 				}
 
 				is ApiResult.Error -> {
@@ -131,6 +138,7 @@ class MainFragment : BrowseSupportFragment() {
 					}
 					val header = HeaderItem(ROWS_TITLE[1])
 					rowsAdapter.replace(1, ListRow(header, itemAdapter))
+					rowsAdapter.notifyArrayItemRangeChanged(1, 1)
 				}
 
 				is ApiResult.Error -> {
@@ -208,7 +216,6 @@ class MainFragment : BrowseSupportFragment() {
 		}
 
 
-		adapter = rowsAdapter
 	}
 
 	private fun setupEventListeners() {
@@ -296,31 +303,10 @@ class MainFragment : BrowseSupportFragment() {
 		}
 	}
 
-	private inner class GridItemPresenter : Presenter() {
-		override fun onCreateViewHolder(parent: ViewGroup): Presenter.ViewHolder {
-			val view = TextView(parent.context)
-			view.layoutParams = ViewGroup.LayoutParams(GRID_ITEM_WIDTH, GRID_ITEM_HEIGHT)
-			view.isFocusable = true
-			view.isFocusableInTouchMode = true
-			view.setBackgroundColor(ContextCompat.getColor(context!!, R.color.default_background))
-			view.setTextColor(Color.WHITE)
-			view.gravity = Gravity.CENTER
-			return Presenter.ViewHolder(view)
-		}
-
-		override fun onBindViewHolder(viewHolder: Presenter.ViewHolder, item: Any) {
-			(viewHolder.view as TextView).text = item as String
-		}
-
-		override fun onUnbindViewHolder(viewHolder: Presenter.ViewHolder) {}
-	}
-
 	companion object {
 		private val TAG = "MainFragment"
 
 		private val BACKGROUND_UPDATE_DELAY = 300
-		private val GRID_ITEM_WIDTH = 200
-		private val GRID_ITEM_HEIGHT = 200
 		private val NUM_ROWS = 5
 		private val NUM_COLS = 15
 		private val ROWS_TITLE = arrayOf(

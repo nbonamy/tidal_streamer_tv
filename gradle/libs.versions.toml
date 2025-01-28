@@ -6,12 +6,14 @@ kotlinxCoroutinesCore = "1.7.3"
 leanback = "1.0.0"
 glide = "4.11.0"
 lifecycleRuntimeKtx = "2.8.7"
+paletteKtx = "1.0.0"
 retrofit = "2.9.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-leanback = { group = "androidx.leanback", name = "leanback", version.ref = "leanback" }
 androidx-lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
+androidx-palette-ktx = { module = "androidx.palette:palette-ktx", version.ref = "paletteKtx" }
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
 glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "glide" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesCore" }

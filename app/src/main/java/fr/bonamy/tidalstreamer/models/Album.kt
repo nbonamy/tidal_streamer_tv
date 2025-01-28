@@ -8,7 +8,6 @@ data class Album(
 	var releaseDate: String? = null,
 	var numberOfVolumes: Int = 0,
 	var numberOfTracks: Int = 0,
-	var tracks : List<Track>? = null,
 ) : Collection() {
 
 	override fun title(): String {
@@ -21,10 +20,6 @@ data class Album(
 
 	override fun imageUrl(): String {
 		return cover?.replace("-", "/")?.let { "https://resources.tidal.com/images/$it/640x640.jpg" } ?: ""
-	}
-
-	override fun tracks(): List<Track>? {
-		return tracks
 	}
 
 	override fun toString(): String {

@@ -57,7 +57,7 @@ class MetadataClient: ApiClient() {
 		try {
 			val response = apiService.getAlbumTracks(albumId)
 			if (response.isSuccessful && response.body()!!.status == "ok") {
-				ApiResult.Success(response.body()!!.result!!.items!!.map { (it as ItemTrack).item!! })
+				ApiResult.Success(response.body()!!.result!!.items!!.map { it.item!! })
 			} else {
 				ApiResult.Error(Throwable("Error: ${response.code()}"))
 			}
@@ -66,8 +66,16 @@ class MetadataClient: ApiClient() {
 		}
 	}
 
+	suspend fun fetchMixTracks(mixId: String): ApiResult<List<Track>> = withContext(Dispatchers.IO) {
+		try {
+			val response = apiService.getMixTracks(mixId)
+			fetchResponse(response)
+		} catch (e: Exception) {
+			ApiResult.Error(e)
+		}
+	}
 
-	protected val apiService: MetadataService by lazy {
+	private val apiService: MetadataService by lazy {
 		ApiRetrofitClient.instance.create(MetadataService::class.java)
 	}
 

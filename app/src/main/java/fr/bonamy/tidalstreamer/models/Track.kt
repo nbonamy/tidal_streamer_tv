@@ -8,6 +8,8 @@ data class Track(
 	var duration: Int = 0,
 	var copyright: String? = null,
 	var audioQuality: String? = null,
+	var artist: Artist? = null,
+	var artists: List<Artist>? = null,
 ) {
 
 	fun durationString(): String {
