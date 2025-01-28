@@ -1,19 +1,20 @@
-package fr.bonamy.tidalstreamer
+package fr.bonamy.tidalstreamer.collection
 
 import android.os.Bundle
-import androidx.fragment.app.FragmentActivity
+import fr.bonamy.tidalstreamer.R
+import fr.bonamy.tidalstreamer.utils.TidalActivity
 
 /**
- * Details activity class that loads [DetailsFragment] class.
+ * Details activity class that loads [CollectionFragment] class.
  */
-class DetailsActivity : FragmentActivity() {
+class CollectionActivity : TidalActivity() {
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		setContentView(R.layout.activity_details)
 		if (savedInstanceState == null) {
 			supportFragmentManager.beginTransaction()
-				.replace(R.id.details_fragment, DetailsFragment())
+				.replace(R.id.details_fragment, CollectionFragment())
 				.commitNow()
 		}
 	}

@@ -8,9 +8,15 @@ data class Track(
 	var duration: Int = 0,
 	var copyright: String? = null,
 	var audioQuality: String? = null,
+	var audioModes: List<String>? = null,
 	var artist: Artist? = null,
 	var artists: List<Artist>? = null,
+	var album: Album? = null,
 ) {
+
+	fun imageUrl(): String {
+		return album?.cover?.replace("-", "/")?.let { "https://resources.tidal.com/images/$it/640x640.jpg" } ?: ""
+	}
 
 	fun durationString(): String {
 		val minutes = duration / 60

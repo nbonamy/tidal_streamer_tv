@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
     <uses-feature
         android:name="android.hardware.touchscreen"
@@ -32,7 +33,10 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".DetailsActivity"
+            android:name=".collection.CollectionActivity"
+            android:exported="false" />
+        <activity
+            android:name=".search.SearchActivity"
             android:exported="false" />
         <activity
             android:name=".BrowseErrorActivity"

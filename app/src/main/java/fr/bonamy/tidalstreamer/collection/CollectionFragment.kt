@@ -1,4 +1,4 @@
-package fr.bonamy.tidalstreamer
+package fr.bonamy.tidalstreamer.collection
 
 import android.content.Context
 import android.content.Intent
@@ -26,6 +26,8 @@ import androidx.palette.graphics.Palette.PaletteAsyncListener
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.SimpleTarget
 import com.bumptech.glide.request.transition.Transition
+import fr.bonamy.tidalstreamer.MainActivity
+import fr.bonamy.tidalstreamer.R
 import fr.bonamy.tidalstreamer.api.ApiResult
 import fr.bonamy.tidalstreamer.api.MetadataClient
 import fr.bonamy.tidalstreamer.api.StreamingClient
@@ -40,7 +42,7 @@ import kotlinx.coroutines.launch
  * A wrapper fragment for leanback details screens.
  * It shows a detailed view of video and its metadata plus related videos.
  */
-class DetailsFragment : DetailsSupportFragment(), PaletteAsyncListener, OnTrackClickListener {
+class CollectionFragment : DetailsSupportFragment(), PaletteAsyncListener, OnTrackClickListener {
 
 	private var mSelectedCollection: Collection? = null
 	private lateinit var mBackgroundManager: BackgroundManager
@@ -58,7 +60,7 @@ class DetailsFragment : DetailsSupportFragment(), PaletteAsyncListener, OnTrackC
 		mBackgroundManager.attach(activity!!.window)
 
 		mSelectedCollection =
-			activity!!.intent.getSerializableExtra(DetailsActivity.COLLECTION) as Collection
+			activity!!.intent.getSerializableExtra(CollectionActivity.COLLECTION) as Collection
 		if (mSelectedCollection == null) {
 			val intent = Intent(context!!, MainActivity::class.java)
 			startActivity(intent)
@@ -184,7 +186,7 @@ class DetailsFragment : DetailsSupportFragment(), PaletteAsyncListener, OnTrackC
 		// Hook up transition element.
 		val sharedElementHelper = FullWidthDetailsOverviewSharedElementHelper()
 		sharedElementHelper.setSharedElementEnterTransition(
-			activity, DetailsActivity.SHARED_ELEMENT_NAME
+			activity, CollectionActivity.SHARED_ELEMENT_NAME
 		)
 		mDetailsPresenter.setListener(sharedElementHelper)
 		mDetailsPresenter.isParticipatingEntranceTransition = true
@@ -262,7 +264,7 @@ class DetailsFragment : DetailsSupportFragment(), PaletteAsyncListener, OnTrackC
 		private val DETAIL_THUMB_WIDTH = 274
 		private val DETAIL_THUMB_HEIGHT = 274
 
-		private const val ALPHA_VALUE = 224
+		private const val ALPHA_VALUE = 232
 
 		private val NUM_COLS = 10
 	}

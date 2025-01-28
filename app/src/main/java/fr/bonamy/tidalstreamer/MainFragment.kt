@@ -28,8 +28,11 @@ import com.bumptech.glide.request.target.SimpleTarget
 import com.bumptech.glide.request.transition.Transition
 import fr.bonamy.tidalstreamer.api.ApiResult
 import fr.bonamy.tidalstreamer.api.MetadataClient
+import fr.bonamy.tidalstreamer.collection.CollectionActivity
+import fr.bonamy.tidalstreamer.collection.CollectionCardPresenter
 import fr.bonamy.tidalstreamer.models.Album
 import fr.bonamy.tidalstreamer.models.Collection
+import fr.bonamy.tidalstreamer.search.SearchActivity
 import kotlinx.coroutines.launch
 import java.util.Timer
 import java.util.TimerTask
@@ -87,7 +90,7 @@ class MainFragment : BrowseSupportFragment() {
 
 		// init
 		val rowsAdapter = ArrayObjectAdapter(ListRowPresenter())
-		val cardPresenter = CollectionPresenter()
+		val cardPresenter = CollectionCardPresenter()
 
 		// add placeholders
 		for (i in 0..NUM_ROWS-1) {
@@ -216,8 +219,8 @@ class MainFragment : BrowseSupportFragment() {
 
 	private fun setupEventListeners() {
 		setOnSearchClickedListener {
-			Toast.makeText(context!!, "Implement your own in-app search", Toast.LENGTH_LONG)
-				.show()
+			val intent = Intent(context!!, SearchActivity::class.java)
+			startActivity(intent)
 		}
 
 		onItemViewClickedListener = ItemViewClickedListener()
@@ -234,13 +237,13 @@ class MainFragment : BrowseSupportFragment() {
 
 			if (item is Collection) {
 				Log.d(TAG, "Item: " + item.toString())
-				val intent = Intent(context!!, DetailsActivity::class.java)
-				intent.putExtra(DetailsActivity.COLLECTION, item)
+				val intent = Intent(context!!, CollectionActivity::class.java)
+				intent.putExtra(CollectionActivity.COLLECTION, item)
 
 				val bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(
 					activity!!,
 					(itemViewHolder.view as ImageCardView).mainImageView,
-					DetailsActivity.SHARED_ELEMENT_NAME
+					CollectionActivity.SHARED_ELEMENT_NAME
 				)
 					.toBundle()
 				startActivity(intent, bundle)

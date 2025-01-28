@@ -3,6 +3,7 @@ package fr.bonamy.tidalstreamer.api
 import fr.bonamy.tidalstreamer.models.Album
 import fr.bonamy.tidalstreamer.models.Queue
 import retrofit2.Response
+import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
@@ -30,6 +31,9 @@ interface StreamingService {
 
 	@POST("/volume/down")
 	suspend fun volumeDown(): Response<ApiResponse<String>>
+
+	@POST("/play/tracks")
+	suspend fun playTracks(@Body tracks: Any): Response<ApiResponse<Queue>>
 
 	@GET("/play/album/{id}")
 	suspend fun playAlbum(@Path("id") id: String, @Query("position") position: Int): Response<ApiResponse<Album>>

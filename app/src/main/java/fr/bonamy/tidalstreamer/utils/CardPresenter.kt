@@ -1,20 +1,17 @@
-package fr.bonamy.tidalstreamer
+package fr.bonamy.tidalstreamer.utils
 
-import android.graphics.drawable.Drawable
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.leanback.widget.ImageCardView
 import androidx.leanback.widget.Presenter
-import com.bumptech.glide.Glide
-import fr.bonamy.tidalstreamer.models.Collection
+import fr.bonamy.tidalstreamer.R
 import kotlin.properties.Delegates
 
 /**
  * A CardPresenter is used to generate Views and bind Objects to them on demand.
  * It contains an ImageCardView.
  */
-class CollectionPresenter : Presenter() {
-	private var mDefaultCardImage: Drawable? = null
+abstract class CardPresenter : Presenter() {
 	private var sSelectedBackgroundColor: Int by Delegates.notNull()
 	private var sDefaultBackgroundColor: Int by Delegates.notNull()
 
@@ -23,7 +20,6 @@ class CollectionPresenter : Presenter() {
 
 		sDefaultBackgroundColor = ContextCompat.getColor(parent.context, R.color.default_background)
 		sSelectedBackgroundColor = ContextCompat.getColor(parent.context, R.color.selected_background)
-		mDefaultCardImage = ContextCompat.getDrawable(parent.context, R.drawable.album)
 
 		val cardView = object : ImageCardView(parent.context) {
 			override fun setSelected(selected: Boolean) {
@@ -38,20 +34,7 @@ class CollectionPresenter : Presenter() {
 		return Presenter.ViewHolder(cardView)
 	}
 
-	override fun onBindViewHolder(viewHolder: Presenter.ViewHolder, item: Any) {
-		val cardable = item as Collection
-		val cardView = viewHolder.view as ImageCardView
-
-		//Log.d(TAG, "onBindViewHolder")
-		cardView.titleText = cardable.title()
-		cardView.contentText = cardable.subtitle()
-		cardView.setMainImageDimensions(CARD_WIDTH, CARD_HEIGHT)
-		Glide.with(viewHolder.view.context)
-			.load(cardable.imageUrl())
-			.centerCrop()
-			.error(mDefaultCardImage)
-			.into(cardView.mainImageView)
-	}
+	abstract override fun onBindViewHolder(viewHolder: Presenter.ViewHolder, item: Any)
 
 	override fun onUnbindViewHolder(viewHolder: Presenter.ViewHolder) {
 		//Log.d(TAG, "onUnbindViewHolder")
@@ -71,7 +54,7 @@ class CollectionPresenter : Presenter() {
 
 	companion object {
 		private val TAG = "CardPresenter"
-		private val CARD_WIDTH = 250
-		private val CARD_HEIGHT = 250
+		public val CARD_WIDTH = 250
+		public val CARD_HEIGHT = 250
 	}
 }
