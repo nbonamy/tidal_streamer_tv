@@ -1,6 +1,5 @@
 package fr.bonamy.tidalstreamer.utils
 
-import android.graphics.Color
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.leanback.widget.ImageCardView

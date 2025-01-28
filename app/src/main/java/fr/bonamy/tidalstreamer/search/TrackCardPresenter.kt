@@ -13,9 +13,18 @@ interface TrackCardClickListener {
 	fun onTrackLongClicked(track: Track, cardView: ImageCardView)
 }
 
-class TrackCardPresenter(private var listener: TrackCardClickListener) : CardPresenter() {
+class TrackCardPresenter(private var mTrackPlayback: TrackPlayback, private var mListener: TrackCardClickListener) : CardPresenter() {
+
+	enum class TrackPlayback {
+		SINGLE,
+		ALL,
+	}
 
 	private var mDefaultCardImage: Drawable? = null
+
+	fun getTrackPlayback(): TrackPlayback {
+		return mTrackPlayback
+	}
 
 	override fun onCreateViewHolder(parent: ViewGroup): ViewHolder {
 		mDefaultCardImage = ContextCompat.getDrawable(parent.context, R.drawable.album)
@@ -27,7 +36,7 @@ class TrackCardPresenter(private var listener: TrackCardClickListener) : CardPre
 		val cardView = viewHolder.view as ImageCardView
 
 		viewHolder.view.setOnLongClickListener {
-			listener.onTrackLongClicked(track, cardView)
+			mListener.onTrackLongClicked(track, cardView)
 			true
 		}
 

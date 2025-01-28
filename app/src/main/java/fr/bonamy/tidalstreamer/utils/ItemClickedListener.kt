@@ -4,7 +4,9 @@ import android.content.Intent
 import android.util.Log
 import androidx.core.app.ActivityOptionsCompat
 import androidx.fragment.app.FragmentActivity
+import androidx.leanback.widget.ArrayObjectAdapter
 import androidx.leanback.widget.ImageCardView
+import androidx.leanback.widget.ListRow
 import androidx.leanback.widget.OnItemViewClickedListener
 import androidx.leanback.widget.Presenter
 import androidx.leanback.widget.Row
@@ -17,6 +19,7 @@ import fr.bonamy.tidalstreamer.collection.CollectionActivity
 import fr.bonamy.tidalstreamer.models.Artist
 import fr.bonamy.tidalstreamer.models.Collection
 import fr.bonamy.tidalstreamer.models.Track
+import fr.bonamy.tidalstreamer.search.TrackCardPresenter
 import kotlinx.coroutines.launch
 
 class ItemClickedListener(private val activity: FragmentActivity) : OnItemViewClickedListener {
@@ -27,6 +30,7 @@ class ItemClickedListener(private val activity: FragmentActivity) : OnItemViewCl
     rowViewHolder: RowPresenter.ViewHolder?,
     row: Row?
   ) {
+
     if (item is Collection) {
       val intent = Intent(activity, CollectionActivity::class.java)
       intent.putExtra(CollectionActivity.COLLECTION, item)
@@ -49,15 +53,37 @@ class ItemClickedListener(private val activity: FragmentActivity) : OnItemViewCl
 
     if (item is Track) {
 
-      activity.lifecycleScope.launch {
-        val apiClient = StreamingClient()
-        when (val result = apiClient.playTracks((arrayOf(item)))) {
-          is ApiResult.Success -> {}
-          is ApiResult.Error -> {
-            Log.e(TAG, "Error playing track: ${result.exception}")
+      val presenter = (row as ListRow).adapter.presenterSelector.getPresenter(item) as TrackCardPresenter
+      if (presenter.getTrackPlayback() == TrackCardPresenter.TrackPlayback.SINGLE) {
+
+        activity.lifecycleScope.launch {
+          val apiClient = StreamingClient()
+          when (val result = apiClient.playTracks((arrayOf(item)))) {
+            is ApiResult.Success -> {}
+            is ApiResult.Error -> {
+              Log.e(TAG, "Error playing track: ${result.exception}")
+            }
           }
         }
+
+      } else if (presenter.getTrackPlayback() == TrackCardPresenter.TrackPlayback.ALL) {
+
+        val tracks = (row.adapter as ArrayObjectAdapter).unmodifiableList<Track>().toTypedArray()
+        val position = tracks.indexOf(item)
+
+        activity.lifecycleScope.launch {
+          val apiClient = StreamingClient()
+          when (val result = apiClient.playTracks(tracks, position)) {
+            is ApiResult.Success -> {}
+            is ApiResult.Error -> {
+              Log.e(TAG, "Error playing track: ${result.exception}")
+            }
+          }
+        }
+
       }
+
+
 
       return
     }

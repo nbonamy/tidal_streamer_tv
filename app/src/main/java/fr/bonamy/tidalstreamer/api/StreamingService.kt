@@ -37,7 +37,7 @@ interface StreamingService {
 	suspend fun volumeDown(): Response<ApiResponse<String>>
 
 	@POST("/play/tracks")
-	suspend fun playTracks(@Body tracks: Any): Response<ApiResponse<Queue>>
+	suspend fun playTracks(@Body tracks: Any, @Query("position") position: Int): Response<ApiResponse<Queue>>
 
 	@GET("/play/album/{id}")
 	suspend fun playAlbum(@Path("id") id: String, @Query("position") position: Int): Response<ApiResponse<Album>>

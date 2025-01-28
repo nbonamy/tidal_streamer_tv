@@ -145,7 +145,7 @@ class SearchFragment : SearchSupportFragment(), SearchSupportFragment.SearchResu
 		viewLifecycleOwner.lifecycleScope.launch {
 			when (val result = apiClient.searchTracks(query)) {
 				is ApiResult.Success -> {
-					val listRowAdapter = ArrayObjectAdapter(TrackCardPresenter(this@SearchFragment))
+					val listRowAdapter = ArrayObjectAdapter(TrackCardPresenter(TrackCardPresenter.TrackPlayback.SINGLE, this@SearchFragment))
 					listRowAdapter.addAll(0, result.data)
 					val header = HeaderItem("Tracks")
 					mRowsAdapter.replace(2, ListRow(header, listRowAdapter))

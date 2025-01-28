@@ -94,10 +94,10 @@ class StreamingClient: ApiClient() {
 		}
 	}
 
-	suspend fun playTracks(tracks: Array<Track>): ApiResult<Queue> = withContext(Dispatchers.IO) {
+	suspend fun playTracks(tracks: Array<Track>, position: Int = 0): ApiResult<Queue> = withContext(Dispatchers.IO) {
 		try {
 			Log.i(TAG, "playTracks")
-			val response = apiService.playTracks(mapOf("items" to tracks))
+			val response = apiService.playTracks(mapOf("items" to tracks), position)
 			fetchResponse(response)
 		} catch (e: Exception) {
 			ApiResult.Error(e)

@@ -38,7 +38,7 @@ class ArtistFragment : BrowserFragment(), TrackCardClickListener {
 			loadRow(
 				rowsAdapter,
 				apiClient.fetchArtistTopTracks(mSelectedArtist.id!!),
-				TrackCardPresenter(this@ArtistFragment),
+				TrackCardPresenter(TrackCardPresenter.TrackPlayback.ALL, this@ArtistFragment),
 				ROWS_TITLE,
 				0,
 			)
@@ -92,7 +92,7 @@ class ArtistFragment : BrowserFragment(), TrackCardClickListener {
 	}
 
 	companion object {
-		private const val TAG = "ArtistFragment"
+		//private const val TAG = "ArtistFragment"
 		private val ROWS_TITLE = arrayOf(
 			"Top tracks",
 			"Albums",
