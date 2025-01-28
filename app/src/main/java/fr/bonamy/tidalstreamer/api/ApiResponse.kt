@@ -1,5 +1,6 @@
 package fr.bonamy.tidalstreamer.api
 
+import fr.bonamy.tidalstreamer.models.Artist
 import fr.bonamy.tidalstreamer.models.Track
 
 data class ApiResponse<out T>(
@@ -22,4 +23,9 @@ data class ApiResponsePage<out T>(
 data class ItemTrack(
 	var type: String = "track",
 	var item: Track? = null,
+)
+
+data class ItemArtist(
+	var created: String? = null,
+	var item: Artist? = null,
 )

@@ -16,6 +16,9 @@ interface MetadataService {
 	@GET("user/mixes")
 	suspend fun getMixes(): Response<ApiResponse<List<Mix>>>
 
+	@GET("user/artists")
+	suspend fun getFavoriteArtists(): Response<ApiResponsePage<ItemArtist>>
+
 	@GET("user/new/albums")
 	suspend fun getNewAlbums(): Response<ApiResponse<List<Album>>>
 

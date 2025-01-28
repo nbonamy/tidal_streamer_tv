@@ -27,6 +27,19 @@ class MetadataClient: ApiClient() {
 		}
 	}
 
+	suspend fun fetchFavoriteArtists(): ApiResult<List<Artist>> = withContext(Dispatchers.IO) {
+		try {
+			val response = apiService.getFavoriteArtists()
+			if (response.isSuccessful && response.body()!!.status == "ok") {
+				ApiResult.Success(response.body()!!.result!!.items!!.sortedByDescending { it.created }.map { it.item!! })
+			} else {
+				ApiResult.Error(Throwable("Error: ${response.code()}"))
+			}
+		} catch (e: Exception) {
+			ApiResult.Error(e)
+		}
+	}
+
 	suspend fun fetchNewAlbums(): ApiResult<List<Album>> = withContext(Dispatchers.IO) {
 		try {
 			val response = apiService.getNewAlbums()
@@ -57,11 +70,7 @@ class MetadataClient: ApiClient() {
 	suspend fun fetchArtistTopTracks(artistId: String): ApiResult<List<Track>> = withContext(Dispatchers.IO) {
 		try {
 			val response = apiService.getArtistTopTracks(artistId)
-			if (response.isSuccessful && response.body()!!.status == "ok") {
-				ApiResult.Success(response.body()!!.result!!.items!!)
-			} else {
-				ApiResult.Error(Throwable("Error: ${response.code()}"))
-			}
+			fetchPagedResponse(response)
 		} catch (e: Exception) {
 			ApiResult.Error(e)
 		}
@@ -70,11 +79,7 @@ class MetadataClient: ApiClient() {
 	suspend fun fetchArtistAlbums(artistId: String): ApiResult<List<Album>> = withContext(Dispatchers.IO) {
 		try {
 			val response = apiService.getArtistAlbums(artistId)
-			if (response.isSuccessful && response.body()!!.status == "ok") {
-				ApiResult.Success(response.body()!!.result!!.items!!)
-			} else {
-				ApiResult.Error(Throwable("Error: ${response.code()}"))
-			}
+			fetchPagedResponse(response)
 		} catch (e: Exception) {
 			ApiResult.Error(e)
 		}
@@ -83,11 +88,7 @@ class MetadataClient: ApiClient() {
 	suspend fun fetchArtistSingles(artistId: String): ApiResult<List<Album>> = withContext(Dispatchers.IO) {
 		try {
 			val response = apiService.getArtistSingles(artistId)
-			if (response.isSuccessful && response.body()!!.status == "ok") {
-				ApiResult.Success(response.body()!!.result!!.items!!)
-			} else {
-				ApiResult.Error(Throwable("Error: ${response.code()}"))
-			}
+			fetchPagedResponse(response)
 		} catch (e: Exception) {
 			ApiResult.Error(e)
 		}
@@ -96,11 +97,7 @@ class MetadataClient: ApiClient() {
 	suspend fun fetchArtistCompilations(artistId: String): ApiResult<List<Album>> = withContext(Dispatchers.IO) {
 		try {
 			val response = apiService.getArtistCompilations(artistId)
-			if (response.isSuccessful && response.body()!!.status == "ok") {
-				ApiResult.Success(response.body()!!.result!!.items!!)
-			} else {
-				ApiResult.Error(Throwable("Error: ${response.code()}"))
-			}
+			fetchPagedResponse(response)
 		} catch (e: Exception) {
 			ApiResult.Error(e)
 		}
@@ -109,11 +106,7 @@ class MetadataClient: ApiClient() {
 	suspend fun fetchSimilarArtists(artistId: String): ApiResult<List<Artist>> = withContext(Dispatchers.IO) {
 		try {
 			val response = apiService.getSimilarArtists(artistId)
-			if (response.isSuccessful && response.body()!!.status == "ok") {
-				ApiResult.Success(response.body()!!.result!!.items!!)
-			} else {
-				ApiResult.Error(Throwable("Error: ${response.code()}"))
-			}
+			fetchPagedResponse(response)
 		} catch (e: Exception) {
 			ApiResult.Error(e)
 		}

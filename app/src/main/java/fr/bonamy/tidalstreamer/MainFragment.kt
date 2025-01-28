@@ -3,6 +3,7 @@ package fr.bonamy.tidalstreamer
 import android.annotation.SuppressLint
 import androidx.lifecycle.lifecycleScope
 import fr.bonamy.tidalstreamer.api.MetadataClient
+import fr.bonamy.tidalstreamer.artist.ArtistCardPresenter
 import fr.bonamy.tidalstreamer.collection.CollectionCardPresenter
 import fr.bonamy.tidalstreamer.utils.BrowserFragment
 import kotlinx.coroutines.launch
@@ -67,13 +68,23 @@ class MainFragment : BrowserFragment() {
       )
     }
 
-		viewLifecycleOwner.lifecycleScope.launch {
+    viewLifecycleOwner.lifecycleScope.launch {
       loadRow(
         rowsAdapter,
         apiClient.fetchMixes(),
         CollectionCardPresenter(),
         ROWS_TITLE,
         4,
+      )
+    }
+
+    viewLifecycleOwner.lifecycleScope.launch {
+      loadRow(
+        rowsAdapter,
+        apiClient.fetchFavoriteArtists(),
+        ArtistCardPresenter(),
+        ROWS_TITLE,
+        5,
       )
     }
 
@@ -86,7 +97,8 @@ class MainFragment : BrowserFragment() {
       "Suggested new albums for you",
       "Recently played",
       "Albums you'll enjoy",
-      "Custom mixes"
+      "Custom mixes",
+      "Your favorite artists",
     )
   }
 }
