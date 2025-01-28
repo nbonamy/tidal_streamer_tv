@@ -1,5 +1,6 @@
 package fr.bonamy.tidalstreamer.utils
 
+import android.graphics.Color
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.leanback.widget.ImageCardView
@@ -48,13 +49,13 @@ abstract class CardPresenter : Presenter() {
 		val color = if (selected) sSelectedBackgroundColor else sDefaultBackgroundColor
 		// Both background colors should be set because the view"s background is temporarily visible
 		// during animations.
-		view.setBackgroundColor(color)
+		view.setBackgroundColor(sDefaultBackgroundColor)//color)
 		view.setInfoAreaBackgroundColor(color)
 	}
 
 	companion object {
 		private val TAG = "CardPresenter"
-		public val CARD_WIDTH = 250
-		public val CARD_HEIGHT = 250
+		val CARD_WIDTH = 250
+		val CARD_HEIGHT = 250
 	}
 }

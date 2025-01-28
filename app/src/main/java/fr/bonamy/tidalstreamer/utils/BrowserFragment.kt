@@ -34,8 +34,8 @@ import java.util.TimerTask
 
 abstract class BrowserFragment : BrowseSupportFragment() {
 
-	abstract open fun title(): String
-	abstract open fun loadRows()
+	abstract fun title(): String
+	abstract fun loadRows()
 
 	open fun headersState(): Int {
 		return HEADERS_DISABLED
@@ -109,7 +109,7 @@ abstract class BrowserFragment : BrowseSupportFragment() {
 
 	protected fun initRowsAdapter(count: Int): ArrayObjectAdapter {
 		val rowsAdapter = ArrayObjectAdapter(ListRowPresenter())
-		for (i in 0..count - 1) {
+		for (i in 0..<count) {
 			val listRowAdapter = ArrayObjectAdapter()
 			rowsAdapter.add(ListRow(HeaderItem(""), listRowAdapter))
 		}
@@ -189,7 +189,7 @@ abstract class BrowserFragment : BrowseSupportFragment() {
 
 	companion object {
 		private const val TAG = "BrowserFragment"
-		private val BACKGROUND_UPDATE_DELAY = 300
+		private const val BACKGROUND_UPDATE_DELAY = 300
 	}
 
 }
