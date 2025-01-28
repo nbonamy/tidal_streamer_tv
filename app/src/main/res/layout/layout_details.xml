@@ -1,23 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
     <TextView
         android:id="@+id/details_title"
+        style="?attr/detailsDescriptionTitleStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@color/item_fg_selected"
-        style="?attr/detailsDescriptionTitleStyle"
-        />
+        android:textColor="@color/item_fg_selected" />
+
     <TextView
         android:id="@+id/details_subtitle"
+        style="?attr/detailsDescriptionSubtitleStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@color/item_fg_selected"
-        style="?attr/detailsDescriptionSubtitleStyle"
-        />
+        android:textColor="@color/item_fg_selected" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/details_tracks"
         android:layout_width="match_parent"
@@ -31,5 +32,4 @@
         android:focusedByDefault="true"
         tools:itemCount="5"
         tools:listitem="@layout/item_track" />
-        />
 </LinearLayout>

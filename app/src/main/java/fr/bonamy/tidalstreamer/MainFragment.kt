@@ -1,5 +1,6 @@
 package fr.bonamy.tidalstreamer
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.leanback.widget.ArrayObjectAdapter
 import androidx.lifecycle.lifecycleScope
@@ -19,6 +20,7 @@ class MainFragment : BrowserFragment() {
     return "TIDAL"
   }
 
+  @SuppressLint("SuspiciousIndentation")
   override fun loadRows() {
 
     // init
@@ -28,7 +30,7 @@ class MainFragment : BrowserFragment() {
 
     // now load rows
 
-		viewLifecycleOwner.lifecycleScope.launch {
+    viewLifecycleOwner.lifecycleScope.launch {
       when (val result = apiClient.fetchShortcuts()) {
 
         is ApiResult.Success -> {
