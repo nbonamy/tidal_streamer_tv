@@ -1,13 +1,13 @@
 package fr.bonamy.tidalstreamer.models
 
 data class Album(
-	var id: String? = null,
-	var title: String? = null,
-	var artists: List<Artist>? = null,
-	var cover: String? = null,
-	var releaseDate: String? = null,
-	var numberOfVolumes: Int = 0,
-	var numberOfTracks: Int = 0,
+  var id: String? = null,
+  var title: String? = null,
+  var artists: Array<Artist>? = null,
+  var cover: String? = null,
+  var releaseDate: String? = null,
+  var numberOfVolumes: Int = 0,
+  var numberOfTracks: Int = 0,
 ) : Collection() {
 
 	override fun title(): String {

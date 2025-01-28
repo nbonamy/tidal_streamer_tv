@@ -7,8 +7,9 @@ import android.os.Handler
 import android.os.Looper
 import android.speech.RecognizerIntent
 import android.util.Log
-import android.widget.Toast
 import androidx.core.app.ActivityOptionsCompat
+import androidx.core.content.ContextCompat
+import androidx.leanback.app.BackgroundManager
 import androidx.leanback.app.SearchSupportFragment
 import androidx.leanback.widget.ArrayObjectAdapter
 import androidx.leanback.widget.HeaderItem
@@ -16,25 +17,21 @@ import androidx.leanback.widget.ImageCardView
 import androidx.leanback.widget.ListRow
 import androidx.leanback.widget.ListRowPresenter
 import androidx.leanback.widget.ObjectAdapter
-import androidx.leanback.widget.OnItemViewClickedListener
-import androidx.leanback.widget.Presenter
-import androidx.leanback.widget.Row
-import androidx.leanback.widget.RowPresenter
 import androidx.lifecycle.lifecycleScope
+import fr.bonamy.tidalstreamer.R
 import fr.bonamy.tidalstreamer.api.ApiResult
 import fr.bonamy.tidalstreamer.api.SearchClient
-import fr.bonamy.tidalstreamer.api.StreamingClient
 import fr.bonamy.tidalstreamer.artist.ArtistCardPresenter
 import fr.bonamy.tidalstreamer.collection.CollectionActivity
 import fr.bonamy.tidalstreamer.collection.CollectionCardPresenter
-import fr.bonamy.tidalstreamer.models.Album
-import fr.bonamy.tidalstreamer.models.Artist
 import fr.bonamy.tidalstreamer.models.Track
+import fr.bonamy.tidalstreamer.utils.ItemClickedListener
 import kotlinx.coroutines.launch
 
 
 class SearchFragment : SearchSupportFragment(), SearchSupportFragment.SearchResultProvider, TrackCardClickListener {
 
+	private lateinit var mBackgroundManager: BackgroundManager
 	private lateinit var mRowsAdapter: ArrayObjectAdapter
 	private var mLastQuery: String = ""
 	private val mHandler = Handler(Looper.getMainLooper())
@@ -42,10 +39,10 @@ class SearchFragment : SearchSupportFragment(), SearchSupportFragment.SearchResu
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-
+		prepareBackgroundManager()
 		mRowsAdapter = ArrayObjectAdapter(ListRowPresenter())
 		setSearchResultProvider(this)
-		setOnItemViewClickedListener(ItemViewClickedListener())
+		setOnItemViewClickedListener(ItemClickedListener(activity!!))
 
 //		if (!AndroidUtils.hasPermission(context!!, Manifest.permission.RECORD_AUDIO)) {
 //			// SpeechRecognitionCallback is not required and if not provided recognition will be handled
@@ -59,6 +56,12 @@ class SearchFragment : SearchSupportFragment(), SearchSupportFragment.SearchResu
 //				}
 //			}
 //		}
+	}
+
+	private fun prepareBackgroundManager() {
+		mBackgroundManager = BackgroundManager.getInstance(activity)
+		mBackgroundManager.attach(activity!!.window)
+		mBackgroundManager.color = ContextCompat.getColor(context!!, R.color.default_background)
 	}
 
 	override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -105,7 +108,7 @@ class SearchFragment : SearchSupportFragment(), SearchSupportFragment.SearchResu
 		mRowsAdapter.add(ListRow(ArrayObjectAdapter(ListRowPresenter())))
 		mRowsAdapter.add(ListRow(ArrayObjectAdapter(ListRowPresenter())))
 
-		lifecycleScope.launch {
+		viewLifecycleOwner.lifecycleScope.launch {
 			when (val result = apiClient.searchAlbums(query)) {
 				is ApiResult.Success -> {
 					val listRowAdapter = ArrayObjectAdapter(CollectionCardPresenter())
@@ -122,7 +125,7 @@ class SearchFragment : SearchSupportFragment(), SearchSupportFragment.SearchResu
 			}
 		}
 
-		lifecycleScope.launch {
+		viewLifecycleOwner.lifecycleScope.launch {
 			when (val result = apiClient.searchArtists(query)) {
 				is ApiResult.Success -> {
 					val listRowAdapter = ArrayObjectAdapter(ArtistCardPresenter())
@@ -139,7 +142,7 @@ class SearchFragment : SearchSupportFragment(), SearchSupportFragment.SearchResu
 			}
 		}
 
-		lifecycleScope.launch {
+		viewLifecycleOwner.lifecycleScope.launch {
 			when (val result = apiClient.searchTracks(query)) {
 				is ApiResult.Success -> {
 					val listRowAdapter = ArrayObjectAdapter(TrackCardPresenter(this@SearchFragment))
@@ -153,49 +156,6 @@ class SearchFragment : SearchSupportFragment(), SearchSupportFragment.SearchResu
 				is ApiResult.Error -> {
 					Log.e(TAG, "Error playing collection: ${result.exception}")
 				}
-			}
-		}
-
-	}
-
-	private inner class ItemViewClickedListener : OnItemViewClickedListener {
-		override fun onItemClicked(
-			itemViewHolder: Presenter.ViewHolder?,
-			item: Any?,
-			rowViewHolder: RowPresenter.ViewHolder?,
-			row: Row?
-		) {
-			if (item is Album) {
-				val intent = Intent(context!!, CollectionActivity::class.java)
-				intent.putExtra(CollectionActivity.COLLECTION, item)
-				val bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(
-					activity!!,
-					(itemViewHolder!!.view as ImageCardView).mainImageView,
-					CollectionActivity.SHARED_ELEMENT_NAME
-				)
-					.toBundle()
-				startActivity(intent, bundle)
-				return
-			}
-
-			if (item is Artist) {
-				Toast.makeText(context, "Clicked on artist: ${item.name}", Toast.LENGTH_SHORT).show()
-				return
-			}
-
-			if (item is Track) {
-
-				lifecycleScope.launch {
-					val apiClient = StreamingClient()
-					when (val result = apiClient.playTracks((arrayOf(item)))) {
-						is ApiResult.Success -> {}
-						is ApiResult.Error -> {
-							Log.e(TAG, "Error playing track: ${result.exception}")
-						}
-					}
-				}
-
-				return
 			}
 		}
 

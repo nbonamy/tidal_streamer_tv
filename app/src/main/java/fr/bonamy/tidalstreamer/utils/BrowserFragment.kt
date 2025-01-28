@@ -7,31 +7,26 @@ import android.os.Handler
 import android.os.Looper
 import android.util.DisplayMetrics
 import android.util.Log
-import android.widget.Toast
-import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.ContextCompat
 import androidx.leanback.app.BackgroundManager
 import androidx.leanback.app.BrowseSupportFragment
-import androidx.leanback.widget.ImageCardView
-import androidx.leanback.widget.OnItemViewClickedListener
+import androidx.leanback.widget.ArrayObjectAdapter
+import androidx.leanback.widget.HeaderItem
+import androidx.leanback.widget.ListRow
+import androidx.leanback.widget.ListRowPresenter
 import androidx.leanback.widget.OnItemViewSelectedListener
 import androidx.leanback.widget.Presenter
 import androidx.leanback.widget.Row
 import androidx.leanback.widget.RowPresenter
-import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.SimpleTarget
 import com.bumptech.glide.request.transition.Transition
 import fr.bonamy.tidalstreamer.R
-import fr.bonamy.tidalstreamer.api.ApiResult
-import fr.bonamy.tidalstreamer.api.StreamingClient
-import fr.bonamy.tidalstreamer.collection.CollectionActivity
-import fr.bonamy.tidalstreamer.models.Album
-import fr.bonamy.tidalstreamer.models.Artist
+import fr.bonamy.tidalstreamer.collection.CollectionCardPresenter
 import fr.bonamy.tidalstreamer.models.ImageRepresentation
-import fr.bonamy.tidalstreamer.models.Track
 import fr.bonamy.tidalstreamer.search.SearchActivity
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.util.Timer
 import java.util.TimerTask
 
@@ -40,6 +35,10 @@ abstract class BrowserFragment : BrowseSupportFragment() {
 
 	abstract open fun title(): String
 	abstract open fun loadRows()
+
+	open fun headersState(): Int {
+		return HEADERS_DISABLED
+	}
 
 	open fun searchEnabled(): Boolean {
 		return true
@@ -56,10 +55,14 @@ abstract class BrowserFragment : BrowseSupportFragment() {
 	private var mBackgroundTimer: Timer? = null
 	private var mBackgroundUri: String? = null
 
+	override fun onCreate(savedInstanceState: Bundle?) {
+		super.onCreate(savedInstanceState)
+		setupUIElements()
+		prepareBackgroundManager()
+	}
+
 	override fun onActivityCreated(savedInstanceState: Bundle?) {
 		super.onActivityCreated(savedInstanceState)
-		prepareBackgroundManager()
-		setupUIElements()
 		loadRows()
 		setupEventListeners()
 	}
@@ -81,7 +84,7 @@ abstract class BrowserFragment : BrowseSupportFragment() {
 
 	private fun setupUIElements() {
 		title = title()
-		headersState = HEADERS_ENABLED
+		headersState = headersState()
 		isHeadersTransitionOnBackEnabled = false
 		brandColor = ContextCompat.getColor(context!!, R.color.fastlane_background)
 		searchAffordanceColor = ContextCompat.getColor(context!!, R.color.search_opaque)
@@ -89,7 +92,7 @@ abstract class BrowserFragment : BrowseSupportFragment() {
 
 	private fun setupEventListeners() {
 
-		onItemViewClickedListener = ItemViewClickedListener()
+		onItemViewClickedListener = ItemClickedListener(activity!!)
 		if (updateBackground()) {
 			onItemViewSelectedListener = ItemViewSelectedListener()
 		}
@@ -103,47 +106,22 @@ abstract class BrowserFragment : BrowseSupportFragment() {
 
 	}
 
-	private inner class ItemViewClickedListener : OnItemViewClickedListener {
-		override fun onItemClicked(
-			itemViewHolder: Presenter.ViewHolder?,
-			item: Any?,
-			rowViewHolder: RowPresenter.ViewHolder?,
-			row: Row?
-		) {
-			if (item is Album) {
-				val intent = Intent(context!!, CollectionActivity::class.java)
-				intent.putExtra(CollectionActivity.COLLECTION, item)
-				val bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(
-					activity!!,
-					(itemViewHolder!!.view as ImageCardView).mainImageView,
-					CollectionActivity.SHARED_ELEMENT_NAME
-				)
-					.toBundle()
-				startActivity(intent, bundle)
-				return
-			}
-
-			if (item is Artist) {
-				Toast.makeText(context, "Clicked on artist: ${item.name}", Toast.LENGTH_SHORT).show()
-				return
-			}
-
-			if (item is Track) {
-
-				lifecycleScope.launch {
-					val apiClient = StreamingClient()
-					when (val result = apiClient.playTracks((arrayOf(item)))) {
-						is ApiResult.Success -> {}
-						is ApiResult.Error -> {
-							Log.e(TAG, "Error playing track: ${result.exception}")
-						}
-					}
-				}
-
-				return
-			}
+	protected fun initRowsAdapter(count: Int): ArrayObjectAdapter {
+		val rowsAdapter = ArrayObjectAdapter(ListRowPresenter())
+		val cardPresenter = CollectionCardPresenter()
+		for (i in 0..count - 1) {
+			val listRowAdapter = ArrayObjectAdapter(cardPresenter)
+			rowsAdapter.add(ListRow(HeaderItem(""), listRowAdapter))
 		}
+		return rowsAdapter
+	}
 
+	protected suspend fun updateRowsAdapter(rowsAdapter: ArrayObjectAdapter, index: Int, titles: Array<String>, row: ArrayObjectAdapter) {
+		withContext(Dispatchers.Main) {
+			val header = HeaderItem(titles[index])
+			rowsAdapter.replace(index, ListRow(header, row))
+			rowsAdapter.notifyArrayItemRangeChanged(index, 1)
+		}
 	}
 
 	private inner class ItemViewSelectedListener : OnItemViewSelectedListener {
@@ -157,7 +135,6 @@ abstract class BrowserFragment : BrowseSupportFragment() {
 			}
 		}
 	}
-
 
 	private fun updateBackground(uri: String?) {
 		val width = mMetrics.widthPixels

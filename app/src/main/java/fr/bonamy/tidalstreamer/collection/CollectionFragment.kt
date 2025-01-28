@@ -72,7 +72,6 @@ class CollectionFragment : DetailsSupportFragment(), PaletteAsyncListener, OnTra
 		setupDetailsOverviewRow()
 		setupDetailsOverviewRowPresenter()
 		adapter = mAdapter
-		initializeBackground(mSelectedCollection)
 
 		if (mSelectedCollection!!.tracks == null) {
 
@@ -107,6 +106,11 @@ class CollectionFragment : DetailsSupportFragment(), PaletteAsyncListener, OnTra
 
 		}
 
+	}
+
+	override fun onResume() {
+		super.onResume()
+		initializeBackground(mSelectedCollection)
 	}
 
 	private fun initializeBackground(collection: Collection?) {
