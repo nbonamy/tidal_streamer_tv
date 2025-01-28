@@ -36,6 +36,9 @@
             android:name=".collection.CollectionActivity"
             android:exported="false" />
         <activity
+            android:name=".artist.ArtistActivity"
+            android:exported="false" />
+        <activity
             android:name=".search.SearchActivity"
             android:exported="false" />
         <activity

@@ -24,6 +24,15 @@ interface MetadataService {
 	@GET("user/recommended/albums")
 	suspend fun getRecommendedAlbums(): Response<ApiResponse<List<Album>>>
 
+	@GET("info/artist/{id}/albums")
+	suspend fun getArtistAlbums(@Path("id") id: String): Response<ApiResponsePage<Album>>
+
+	@GET("info/artist/{id}/singles")
+	suspend fun getArtistSingles(@Path("id") id: String): Response<ApiResponsePage<Album>>
+
+	@GET("info/artist/{id}/compilations")
+	suspend fun getArtistCompilations(@Path("id") id: String): Response<ApiResponsePage<Album>>
+
 	@GET("info/album/{id}")
 	suspend fun getAlbumTracks(@Path("id") id: String): Response<ApiResponsePage<ItemTrack>>
 

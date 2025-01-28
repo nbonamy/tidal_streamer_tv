@@ -3,7 +3,7 @@ package fr.bonamy.tidalstreamer.models
 import java.io.Serializable
 
 data class Artist(
-	var id: Long = 0,
+	var id: String? = null,
 	var name: String? = null,
 	var picture: String? = null,
 	var main: Boolean? = null,

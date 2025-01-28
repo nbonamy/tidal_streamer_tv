@@ -20,7 +20,6 @@ import androidx.leanback.widget.ListRowPresenter
 import androidx.leanback.widget.OnItemViewClickedListener
 import androidx.leanback.widget.OnItemViewSelectedListener
 import androidx.leanback.widget.Presenter
-import androidx.leanback.widget.PresenterSelector
 import androidx.leanback.widget.Row
 import androidx.leanback.widget.RowPresenter
 import androidx.lifecycle.lifecycleScope
@@ -306,10 +305,8 @@ class MainFragment : BrowseSupportFragment() {
 
 	companion object {
 		private val TAG = "MainFragment"
-
 		private val BACKGROUND_UPDATE_DELAY = 300
 		private val NUM_ROWS = 5
-		private val NUM_COLS = 15
 		private val ROWS_TITLE = arrayOf(
 			"Shortcuts",
 			"Suggested new albums for you",

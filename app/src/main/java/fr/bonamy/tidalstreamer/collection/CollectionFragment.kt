@@ -31,6 +31,7 @@ import fr.bonamy.tidalstreamer.R
 import fr.bonamy.tidalstreamer.api.ApiResult
 import fr.bonamy.tidalstreamer.api.MetadataClient
 import fr.bonamy.tidalstreamer.api.StreamingClient
+import fr.bonamy.tidalstreamer.artist.ArtistActivity
 import fr.bonamy.tidalstreamer.models.Album
 import fr.bonamy.tidalstreamer.models.Collection
 import fr.bonamy.tidalstreamer.models.Mix
@@ -168,6 +169,15 @@ class CollectionFragment : DetailsSupportFragment(), PaletteAsyncListener, OnTra
 //			)
 //		)
 
+		if (mSelectedCollection is Album && (mSelectedCollection as Album).mainArtist() != null) {
+			actionAdapter.add(
+				Action(
+					ACTION_GO_TO_ARTIST,
+					resources.getString(R.string.go_to_artist),
+				)
+			)
+		}
+
 		row.actionsAdapter = actionAdapter
 
 		mAdapter.add(row)
@@ -195,6 +205,14 @@ class CollectionFragment : DetailsSupportFragment(), PaletteAsyncListener, OnTra
 
 			if (action.id == ACTION_PLAY_NOW) {
 				playCollection()
+				return@OnActionClickedListener
+			}
+
+			if (action.id == ACTION_GO_TO_ARTIST) {
+				Intent(context!!, ArtistActivity::class.java).apply {
+					putExtra(ArtistActivity.ARTIST, (mSelectedCollection!! as Album).mainArtist()!!)
+					startActivity(this)
+				}
 				return@OnActionClickedListener
 			}
 
@@ -260,6 +278,7 @@ class CollectionFragment : DetailsSupportFragment(), PaletteAsyncListener, OnTra
 		private val ACTION_PLAY_NOW = 1L
 		private val ACTION_PLAY_NEXT = 2L
 		private val ACTION_QUEUE = 3L
+		private val ACTION_GO_TO_ARTIST = 4L
 
 		private val DETAIL_THUMB_WIDTH = 274
 		private val DETAIL_THUMB_HEIGHT = 274
