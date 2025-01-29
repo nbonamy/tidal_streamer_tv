@@ -101,7 +101,7 @@ class SearchFragment : SearchSupportFragment(), SearchSupportFragment.SearchResu
 			return
 		}
 
-		val apiClient = SearchClient()
+		val searchClient = SearchClient()
 
 		mRowsAdapter.clear()
 		mRowsAdapter.add(ListRow(ArrayObjectAdapter(ListRowPresenter())))
@@ -109,7 +109,7 @@ class SearchFragment : SearchSupportFragment(), SearchSupportFragment.SearchResu
 		mRowsAdapter.add(ListRow(ArrayObjectAdapter(ListRowPresenter())))
 
 		viewLifecycleOwner.lifecycleScope.launch {
-			when (val result = apiClient.searchAlbums(query)) {
+			when (val result = searchClient.searchAlbums(query)) {
 				is ApiResult.Success -> {
 					val listRowAdapter = ArrayObjectAdapter(CollectionCardPresenter())
 					listRowAdapter.addAll(0, result.data)
@@ -126,7 +126,7 @@ class SearchFragment : SearchSupportFragment(), SearchSupportFragment.SearchResu
 		}
 
 		viewLifecycleOwner.lifecycleScope.launch {
-			when (val result = apiClient.searchArtists(query)) {
+			when (val result = searchClient.searchArtists(query)) {
 				is ApiResult.Success -> {
 					val listRowAdapter = ArrayObjectAdapter(ArtistCardPresenter())
 					listRowAdapter.addAll(0, result.data)
@@ -143,7 +143,7 @@ class SearchFragment : SearchSupportFragment(), SearchSupportFragment.SearchResu
 		}
 
 		viewLifecycleOwner.lifecycleScope.launch {
-			when (val result = apiClient.searchTracks(query)) {
+			when (val result = searchClient.searchTracks(query)) {
 				is ApiResult.Success -> {
 					val listRowAdapter = ArrayObjectAdapter(TrackCardPresenter(TrackCardPresenter.TrackPlayback.SINGLE, this@SearchFragment))
 					listRowAdapter.addAll(0, result.data)

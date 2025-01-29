@@ -10,24 +10,6 @@ import retrofit2.http.Path
 
 interface MetadataService {
 
-	@GET("user/shortcuts")
-	suspend fun getShortcuts(): Response<ApiResponse<List<Album>>>
-
-	@GET("user/mixes")
-	suspend fun getMixes(): Response<ApiResponse<List<Mix>>>
-
-	@GET("user/artists")
-	suspend fun getFavoriteArtists(): Response<ApiResponsePage<ItemArtist>>
-
-	@GET("user/new/albums")
-	suspend fun getNewAlbums(): Response<ApiResponse<List<Album>>>
-
-	@GET("user/recent/albums")
-	suspend fun getRecentAlbums(): Response<ApiResponse<List<Album>>>
-
-	@GET("user/recommended/albums")
-	suspend fun getRecommendedAlbums(): Response<ApiResponse<List<Album>>>
-
 	@GET("info/artist/{id}/toptracks")
 	suspend fun getArtistTopTracks(@Path("id") id: String): Response<ApiResponsePage<Track>>
 

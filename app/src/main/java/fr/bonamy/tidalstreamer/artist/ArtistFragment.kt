@@ -29,7 +29,7 @@ class ArtistFragment : BrowserFragment(), TrackCardClickListener {
 
 		// init
 		val rowsAdapter = initRowsAdapter(ROWS_TITLE.size)
-		val apiClient = MetadataClient()
+		val metadataClient = MetadataClient()
 		adapter = rowsAdapter
 
 		// now load rows
@@ -37,7 +37,7 @@ class ArtistFragment : BrowserFragment(), TrackCardClickListener {
 		viewLifecycleOwner.lifecycleScope.launch {
 			loadRow(
 				rowsAdapter,
-				apiClient.fetchArtistTopTracks(mSelectedArtist.id!!),
+				metadataClient.fetchArtistTopTracks(mSelectedArtist.id!!),
 				TrackCardPresenter(TrackCardPresenter.TrackPlayback.ALL, this@ArtistFragment),
 				ROWS_TITLE,
 				0,
@@ -47,7 +47,7 @@ class ArtistFragment : BrowserFragment(), TrackCardClickListener {
 		viewLifecycleOwner.lifecycleScope.launch {
 			loadRow(
 				rowsAdapter,
-				apiClient.fetchArtistAlbums(mSelectedArtist.id!!),
+				metadataClient.fetchArtistAlbums(mSelectedArtist.id!!),
 				CollectionCardPresenter(),
 				ROWS_TITLE,
 				1,
@@ -57,7 +57,7 @@ class ArtistFragment : BrowserFragment(), TrackCardClickListener {
 		viewLifecycleOwner.lifecycleScope.launch {
 			loadRow(
 				rowsAdapter,
-				apiClient.fetchArtistSingles(mSelectedArtist.id!!),
+				metadataClient.fetchArtistSingles(mSelectedArtist.id!!),
 				CollectionCardPresenter(),
 				ROWS_TITLE,
 				2,
@@ -68,7 +68,7 @@ class ArtistFragment : BrowserFragment(), TrackCardClickListener {
 		viewLifecycleOwner.lifecycleScope.launch {
 			loadRow(
 				rowsAdapter,
-				apiClient.fetchArtistCompilations(mSelectedArtist.id!!),
+				metadataClient.fetchArtistCompilations(mSelectedArtist.id!!),
 				CollectionCardPresenter(),
 				ROWS_TITLE,
 				3,
@@ -78,7 +78,7 @@ class ArtistFragment : BrowserFragment(), TrackCardClickListener {
 		viewLifecycleOwner.lifecycleScope.launch {
 			loadRow(
 				rowsAdapter,
-				apiClient.fetchSimilarArtists(mSelectedArtist.id!!),
+				metadataClient.fetchSimilarArtists(mSelectedArtist.id!!),
 				ArtistCardPresenter(),
 				ROWS_TITLE,
 				4,

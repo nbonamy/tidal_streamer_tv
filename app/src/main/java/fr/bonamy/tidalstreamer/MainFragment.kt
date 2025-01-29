@@ -3,6 +3,7 @@ package fr.bonamy.tidalstreamer
 import android.annotation.SuppressLint
 import androidx.lifecycle.lifecycleScope
 import fr.bonamy.tidalstreamer.api.MetadataClient
+import fr.bonamy.tidalstreamer.api.UserClient
 import fr.bonamy.tidalstreamer.artist.ArtistCardPresenter
 import fr.bonamy.tidalstreamer.collection.CollectionCardPresenter
 import fr.bonamy.tidalstreamer.utils.BrowserFragment
@@ -18,12 +19,11 @@ class MainFragment : BrowserFragment() {
     return "TIDAL"
   }
 
-  @SuppressLint("SuspiciousIndentation")
   override fun loadRows() {
 
     // init
     val rowsAdapter = initRowsAdapter(ROWS_TITLE.size)
-    val apiClient = MetadataClient()
+    var userClient = UserClient()
     adapter = rowsAdapter
 
     // now load rows
@@ -31,7 +31,7 @@ class MainFragment : BrowserFragment() {
     viewLifecycleOwner.lifecycleScope.launch {
       loadRow(
         rowsAdapter,
-        apiClient.fetchShortcuts(),
+        userClient.fetchShortcuts(),
         CollectionCardPresenter(),
         ROWS_TITLE,
         0,
@@ -41,7 +41,7 @@ class MainFragment : BrowserFragment() {
 		viewLifecycleOwner.lifecycleScope.launch {
       loadRow(
         rowsAdapter,
-        apiClient.fetchNewAlbums(),
+        userClient.fetchNewAlbums(),
         CollectionCardPresenter(),
         ROWS_TITLE,
         1,
@@ -51,7 +51,7 @@ class MainFragment : BrowserFragment() {
 		viewLifecycleOwner.lifecycleScope.launch {
       loadRow(
         rowsAdapter,
-        apiClient.fetchRecentAlbums(),
+        userClient.fetchRecentAlbums(),
         CollectionCardPresenter(),
         ROWS_TITLE,
         2,
@@ -61,7 +61,7 @@ class MainFragment : BrowserFragment() {
 		viewLifecycleOwner.lifecycleScope.launch {
       loadRow(
         rowsAdapter,
-        apiClient.fetchRecommendedAlbums(),
+        userClient.fetchRecommendedAlbums(),
         CollectionCardPresenter(),
         ROWS_TITLE,
         3,
@@ -71,7 +71,7 @@ class MainFragment : BrowserFragment() {
     viewLifecycleOwner.lifecycleScope.launch {
       loadRow(
         rowsAdapter,
-        apiClient.fetchMixes(),
+        userClient.fetchMixes(),
         CollectionCardPresenter(),
         ROWS_TITLE,
         4,
@@ -81,7 +81,7 @@ class MainFragment : BrowserFragment() {
     viewLifecycleOwner.lifecycleScope.launch {
       loadRow(
         rowsAdapter,
-        apiClient.fetchFavoriteArtists(),
+        userClient.fetchRecentArtists(),
         ArtistCardPresenter(),
         ROWS_TITLE,
         5,
