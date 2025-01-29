@@ -13,7 +13,7 @@ interface TrackCardClickListener {
 	fun onTrackLongClicked(track: Track, cardView: ImageCardView)
 }
 
-class TrackCardPresenter(private var mTrackPlayback: TrackPlayback, private var mListener: TrackCardClickListener) : CardPresenter() {
+class TrackCardPresenter(private var mTrackPlayback: TrackPlayback, private var mListener: TrackCardClickListener? = null) : CardPresenter() {
 
 	enum class TrackPlayback {
 		SINGLE,
@@ -36,8 +36,12 @@ class TrackCardPresenter(private var mTrackPlayback: TrackPlayback, private var 
 		val cardView = viewHolder.view as ImageCardView
 
 		viewHolder.view.setOnLongClickListener {
-			mListener.onTrackLongClicked(track, cardView)
-			true
+			if (mListener != null) {
+				mListener!!.onTrackLongClicked(track, cardView)
+				true
+			} else {
+				false
+			}
 		}
 
 		//Log.d(TAG, "onBindViewHolder")
