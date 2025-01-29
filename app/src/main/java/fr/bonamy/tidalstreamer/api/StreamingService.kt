@@ -45,4 +45,7 @@ interface StreamingService {
 	@GET("/play/mix/{id}")
 	suspend fun playMix(@Path("id") id: String, @Query("position") position: Int): Response<ApiResponse<Queue>>
 
+	@GET("/play/playlist/{id}")
+	suspend fun playPlaylist(@Path("id") id: String, @Query("position") position: Int): Response<ApiResponse<Queue>>
+
 }

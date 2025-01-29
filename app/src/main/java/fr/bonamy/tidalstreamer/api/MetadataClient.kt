@@ -77,6 +77,19 @@ class MetadataClient: ApiClient() {
 		}
 	}
 
+	suspend fun fetchPlaylistTracks(playlistId: String): ApiResult<List<Track>> = withContext(Dispatchers.IO) {
+		try {
+			val response = apiService.getPlaylistTracks(playlistId)
+			if (response.isSuccessful && response.body()!!.status == "ok") {
+				ApiResult.Success(response.body()!!.result!!.items!!.map { it.item!! })
+			} else {
+				ApiResult.Error(Throwable("Error: ${response.code()}"))
+			}
+		} catch (e: Exception) {
+			ApiResult.Error(e)
+		}
+	}
+
 	private val apiService: MetadataService by lazy {
 		ApiRetrofitClient.instance.create(MetadataService::class.java)
 	}

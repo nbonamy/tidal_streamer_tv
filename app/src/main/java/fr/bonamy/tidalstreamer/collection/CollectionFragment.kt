@@ -35,6 +35,7 @@ import fr.bonamy.tidalstreamer.artist.ArtistActivity
 import fr.bonamy.tidalstreamer.models.Album
 import fr.bonamy.tidalstreamer.models.Collection
 import fr.bonamy.tidalstreamer.models.Mix
+import fr.bonamy.tidalstreamer.models.Playlist
 import fr.bonamy.tidalstreamer.models.Track
 import fr.bonamy.tidalstreamer.utils.PaletteUtils
 import kotlinx.coroutines.launch
@@ -99,6 +100,18 @@ class CollectionFragment : DetailsSupportFragment(), PaletteAsyncListener, OnTra
 						is ApiResult.Error -> {
 							// Handle the error here
 							Log.e(TAG, "Error fetching mix tracks: ${result.exception}")
+						}
+					}
+				} else if (mSelectedCollection is Playlist) {
+					when (val result = apiClient.fetchPlaylistTracks((mSelectedCollection as Playlist).uuid!!)) {
+						is ApiResult.Success -> {
+							mSelectedCollection!!.tracks = result.data
+							mAdapter.notifyArrayItemRangeChanged(0, mAdapter.size())
+						}
+
+						is ApiResult.Error -> {
+							// Handle the error here
+							Log.e(TAG, "Error fetching playlist tracks: ${result.exception}")
 						}
 					}
 				}
@@ -251,6 +264,13 @@ class CollectionFragment : DetailsSupportFragment(), PaletteAsyncListener, OnTra
 				}
 			} else if (mSelectedCollection is Mix) {
 				when (val result = apiClient.playMix((mSelectedCollection as Mix)!!.id!!, index)) {
+					is ApiResult.Success -> {}
+					is ApiResult.Error -> {
+						Log.e(TAG, "Error playing collection: ${result.exception}")
+					}
+				}
+			} else if (mSelectedCollection is Playlist) {
+				when (val result = apiClient.playPlaylist((mSelectedCollection as Playlist)!!.uuid!!, index)) {
 					is ApiResult.Success -> {}
 					is ApiResult.Error -> {
 						Log.e(TAG, "Error playing collection: ${result.exception}")

@@ -124,6 +124,16 @@ class StreamingClient: ApiClient() {
 		}
 	}
 
+	suspend fun playPlaylist(playlistId: String, position: Int): ApiResult<Queue> = withContext(Dispatchers.IO) {
+		try {
+			Log.i(TAG, "playPlaylist")
+			val response = apiService.playPlaylist(playlistId, position)
+			fetchResponse(response)
+		} catch (e: Exception) {
+			ApiResult.Error(e)
+		}
+	}
+
 	protected val apiService: StreamingService by lazy {
 		ApiRetrofitClient.instance.create(StreamingService::class.java)
 	}

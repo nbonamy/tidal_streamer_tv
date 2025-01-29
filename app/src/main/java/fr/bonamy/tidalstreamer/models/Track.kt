@@ -7,6 +7,7 @@ data class Track(
 	var title: String? = null,
 	var volumeNumber: Int = 0,
 	var trackNumber: Int = 0,
+	var index: Int? = null,
 	var duration: Int = 0,
 	var copyright: String? = null,
 	var audioQuality: String? = null,

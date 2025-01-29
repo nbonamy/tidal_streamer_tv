@@ -11,34 +11,34 @@ import retrofit2.http.Path
 
 interface UserService {
 
-	@GET("user/shortcuts")
+	@GET("/user/shortcuts")
 	suspend fun getShortcuts(): Response<ApiResponse<List<Album>>>
 
-	@GET("user/mixes")
+	@GET("/user/mixes")
 	suspend fun getMixes(): Response<ApiResponse<List<Mix>>>
 
-	@GET("user/albums")
+	@GET("/user/albums")
 	suspend fun getFavoriteAlbums(): Response<ApiResponsePage<ItemAlbum>>
 
-	@GET("user/artists")
+	@GET("/user/artists")
 	suspend fun getFavoriteArtists(): Response<ApiResponsePage<ItemArtist>>
 
-	@GET("user/tracks")
+	@GET("/user/tracks")
 	suspend fun getFavoriteTracks(): Response<ApiResponsePage<ItemTrack>>
 
-	@GET("user/playlists")
+	@GET("/user/playlists")
 	suspend fun getPlaylists(): Response<ApiResponsePage<Playlist>>
 
-	@GET("user/new/albums")
+	@GET("/user/new/albums")
 	suspend fun getNewAlbums(): Response<ApiResponse<List<Album>>>
 
-	@GET("user/recent/albums")
+	@GET("/user/recent/albums")
 	suspend fun getRecentAlbums(): Response<ApiResponse<List<Album>>>
 
-	@GET("user/recent/artists")
+	@GET("/user/recent/artists")
 	suspend fun getRecentArtists(): Response<ApiResponse<List<Artist>>>
 
-	@GET("user/recommended/albums")
+	@GET("/user/recommended/albums")
 	suspend fun getRecommendedAlbums(): Response<ApiResponse<List<Album>>>
 
 }

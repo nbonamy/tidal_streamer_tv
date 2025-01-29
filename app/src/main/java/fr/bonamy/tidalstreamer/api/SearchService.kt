@@ -9,13 +9,13 @@ import retrofit2.http.Query
 
 interface SearchService {
 
-	@GET("search/album")
+	@GET("/search/album")
 	suspend fun searchAlbums(@Query("query") query: String): Response<ApiResponsePage<Album>>
 
-	@GET("search/track")
+	@GET("/search/track")
 	suspend fun searchTracks(@Query("query") query: String): Response<ApiResponsePage<Track>>
 
-	@GET("search/artist")
+	@GET("/search/artist")
 	suspend fun searchArtists(@Query("query") query: String): Response<ApiResponsePage<Artist>>
 
 }

@@ -80,7 +80,7 @@ class DetailsPresenter(private val mCollection: Collection, private val mListene
 			}
 
 			// title
-			if (track.artist == null && track.artists != null) {
+			if ((track.artist == null && track.artists != null) || track.index != null) {
 				holder.title.text = track.title + " - " + track.artists!!.map { it.name }.joinToString(", ")
 			} else {
 				holder.title.text = track.title
