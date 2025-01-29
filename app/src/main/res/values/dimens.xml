@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <dimen name="artist_title_height">110dp</dimen>
+    <dimen name="artist_title_start_padding">54dp</dimen>
+
+</resources>

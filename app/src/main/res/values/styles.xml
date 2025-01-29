@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.TIDALStreamer" parent="@style/Theme.Leanback.Browse" />
+    <style name="AppTheme.Leanback.Artist" parent="@style/Theme.TIDALStreamer">
+        <item name="browseTitleViewLayout">@layout/artist_title_view</item>
+    </style>
+</resources>

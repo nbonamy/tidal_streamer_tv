@@ -1,6 +1,7 @@
 package fr.bonamy.tidalstreamer.artist
 
 import android.os.Bundle
+import android.view.View
 import androidx.lifecycle.lifecycleScope
 import fr.bonamy.tidalstreamer.api.MetadataClient
 import fr.bonamy.tidalstreamer.collection.CollectionCardPresenter
@@ -14,12 +15,34 @@ class ArtistFragment : BrowserFragment() {
 
 	private lateinit var mSelectedArtist: Artist
 
-	override fun title(): String { return mSelectedArtist.name!! }
+	override fun title(): String {
+		return mSelectedArtist.name!!
+	}
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		mSelectedArtist =
 			activity!!.intent.getSerializableExtra(ArtistActivity.ARTIST) as Artist
 		super.onCreate(savedInstanceState)
+	}
+
+	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+		super.onViewCreated(view, savedInstanceState)
+//		titleView = ArtistTitleView(activity!!)
+//
+//		Glide.with(requireContext())
+//			.load(mSelectedArtist.imageUrl())
+//			//.error(mDefaultCardImage)
+//			.into(object : CustomTarget<Drawable>() {
+//				override fun onResourceReady(
+//					drawable: Drawable,
+//					transition: com.bumptech.glide.request.transition.Transition<in Drawable?>?
+//				) {
+//					(titleView as ArtistTitleView).setBadgeDrawable(drawable)
+//				}
+//
+//				override fun onLoadCleared(placeholder: Drawable?) {}
+//			})
+
 	}
 
 	override fun loadRows() {
@@ -35,7 +58,10 @@ class ArtistFragment : BrowserFragment() {
 			loadRow(
 				rowsAdapter,
 				metadataClient.fetchArtistTopTracks(mSelectedArtist.id!!),
-				TrackCardPresenter(TrackCardPresenter.TrackPlayback.ALL, TrackLongClickListener(activity!!)),
+				TrackCardPresenter(
+					TrackCardPresenter.TrackPlayback.ALL,
+					TrackLongClickListener(activity!!)
+				),
 				ROWS_TITLE,
 				0,
 			)

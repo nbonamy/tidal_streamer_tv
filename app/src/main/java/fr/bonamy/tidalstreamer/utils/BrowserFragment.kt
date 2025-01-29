@@ -19,7 +19,7 @@ import androidx.leanback.widget.Presenter
 import androidx.leanback.widget.Row
 import androidx.leanback.widget.RowPresenter
 import com.bumptech.glide.Glide
-import com.bumptech.glide.request.target.SimpleTarget
+import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import fr.bonamy.tidalstreamer.R
 import fr.bonamy.tidalstreamer.api.ApiResult
@@ -162,14 +162,15 @@ abstract class BrowserFragment : BrowseSupportFragment() {
 			.load(uri)
 			.centerCrop()
 			.error(mDefaultBackground)
-			.into<SimpleTarget<Drawable>>(
-				object : SimpleTarget<Drawable>(width, height) {
+			.into(
+				object : CustomTarget<Drawable>() {
 					override fun onResourceReady(
 						drawable: Drawable,
-						transition: Transition<in Drawable>?
+						transition: Transition<in Drawable?>?
 					) {
 						mBackgroundManager.drawable = drawable
 					}
+					override fun onLoadCleared(placeholder: Drawable?) {}
 				})
 		mBackgroundTimer?.cancel()
 	}
