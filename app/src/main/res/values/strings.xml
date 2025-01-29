@@ -10,6 +10,7 @@
     <string name="play_after">Add to Queue</string>
     <string name="go_to_album">Go to Album</string>
     <string name="go_to_artist">Go to Artist</string>
+    <string name="go_to_prefix">Go to</string>
     <string name="collection">Collection</string>
 
     <!-- Error messages -->

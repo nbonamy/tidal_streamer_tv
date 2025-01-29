@@ -41,10 +41,21 @@ class TrackLongClickListener(private val mActivity: FragmentActivity) : ITrackLo
     menuItems.add(mActivity.getString(R.string.play_now))
     menuItems.add(mActivity.getString(R.string.play_next))
     menuItems.add(mActivity.getString(R.string.play_after))
+
+    // album needs a cardView to transition to
     if (cardView != null && track.album != null) {
       menuItems.add(mActivity.getString(R.string.go_to_album))
     }
-    if (track.artist != null) {
+
+    // artist
+    if (track.artists != null && track.artists!!.isNotEmpty()) {
+      track.artists!!.forEach() {
+        if (it.name != null) {
+          menuItems.add(mActivity.getString(R.string.go_to_prefix) + " " + it.name!!)
+        }
+      }
+    }
+    else if (track.artist != null) {
       menuItems.add(mActivity.getString(R.string.go_to_artist))
     }
 
@@ -98,6 +109,12 @@ class TrackLongClickListener(private val mActivity: FragmentActivity) : ITrackLo
       } else if (menuChosen.equals(mActivity.getString(R.string.go_to_artist), ignoreCase = true)) {
         val intent = Intent(mActivity, ArtistActivity::class.java)
         intent.putExtra(ArtistActivity.ARTIST, track.artist)
+        mActivity.startActivity(intent)
+      } else if (menuChosen.startsWith(mActivity.getString(R.string.go_to_prefix), ignoreCase = true)) {
+        val artistName = menuChosen.substring(mActivity.getString(R.string.go_to_prefix).length + 1)
+        val artist = track.artists!!.find { it.name == artistName }
+        val intent = Intent(mActivity, ArtistActivity::class.java)
+        intent.putExtra(ArtistActivity.ARTIST, artist)
         mActivity.startActivity(intent)
       }
     }
