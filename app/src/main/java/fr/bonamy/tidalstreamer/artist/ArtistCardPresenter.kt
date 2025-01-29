@@ -16,7 +16,7 @@ class ArtistCardPresenter : CardPresenter() {
 	private var mDefaultCardImage: Drawable? = null
 
 	override fun onCreateViewHolder(parent: ViewGroup): ViewHolder {
-		mDefaultCardImage = ContextCompat.getDrawable(parent.context, R.drawable.album)
+		mDefaultCardImage = ContextCompat.getDrawable(parent.context, R.drawable.artist)
 		return super.onCreateViewHolder(parent)
 	}
 
