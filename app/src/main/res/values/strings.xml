@@ -8,6 +8,7 @@
     <string name="play_now">Play Now</string>
     <string name="play_next">Play Next</string>
     <string name="play_after">Add to Queue</string>
+    <string name="go_to_album">Go to Album</string>
     <string name="go_to_artist">Go to Artist</string>
     <string name="collection">Collection</string>
 

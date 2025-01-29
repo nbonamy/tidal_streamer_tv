@@ -8,6 +8,7 @@ import fr.bonamy.tidalstreamer.artist.ArtistCardPresenter
 import fr.bonamy.tidalstreamer.collection.CollectionCardPresenter
 import fr.bonamy.tidalstreamer.search.TrackCardPresenter
 import fr.bonamy.tidalstreamer.utils.BrowserFragment
+import fr.bonamy.tidalstreamer.utils.TrackLongClickListener
 import kotlinx.coroutines.launch
 
 class UserFragment : BrowserFragment() {
@@ -63,7 +64,7 @@ class UserFragment : BrowserFragment() {
       loadRow(
         rowsAdapter,
         userClient.fetchFavoriteTracks(),
-        TrackCardPresenter(TrackCardPresenter.TrackPlayback.SINGLE),
+        TrackCardPresenter(TrackCardPresenter.TrackPlayback.SINGLE, TrackLongClickListener(activity!!)),
         ROWS_TITLE,
         3,
       )

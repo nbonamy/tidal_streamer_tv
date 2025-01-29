@@ -39,6 +39,9 @@ interface StreamingService {
 	@POST("/play/tracks")
 	suspend fun playTracks(@Body tracks: Any, @Query("position") position: Int): Response<ApiResponse<Queue>>
 
+	@POST("/enqueue/{position}")
+	suspend fun enqueue(@Body tracks: Any, @Path("position") position: String): Response<ApiResponse<String>>
+
 	@GET("/play/album/{id}")
 	suspend fun playAlbum(@Path("id") id: String, @Query("position") position: Int): Response<ApiResponse<Album>>
 

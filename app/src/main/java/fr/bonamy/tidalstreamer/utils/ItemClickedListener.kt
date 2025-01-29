@@ -22,7 +22,7 @@ import fr.bonamy.tidalstreamer.models.Track
 import fr.bonamy.tidalstreamer.search.TrackCardPresenter
 import kotlinx.coroutines.launch
 
-class ItemClickedListener(private val activity: FragmentActivity) : OnItemViewClickedListener {
+class ItemClickedListener(private val mActivity: FragmentActivity) : OnItemViewClickedListener {
 
   override fun onItemClicked(
     itemViewHolder: Presenter.ViewHolder?,
@@ -32,22 +32,22 @@ class ItemClickedListener(private val activity: FragmentActivity) : OnItemViewCl
   ) {
 
     if (item is Collection) {
-      val intent = Intent(activity, CollectionActivity::class.java)
+      val intent = Intent(mActivity, CollectionActivity::class.java)
       intent.putExtra(CollectionActivity.COLLECTION, item)
       val bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(
-        activity,
+        mActivity,
         (itemViewHolder!!.view as ImageCardView).mainImageView,
         CollectionActivity.SHARED_ELEMENT_NAME
       )
         .toBundle()
-      activity.startActivity(intent, bundle)
+      mActivity.startActivity(intent, bundle)
       return
     }
 
     if (item is Artist) {
-      val intent = Intent(activity, ArtistActivity::class.java)
+      val intent = Intent(mActivity, ArtistActivity::class.java)
       intent.putExtra(ArtistActivity.ARTIST, item)
-      activity.startActivity(intent)
+      mActivity.startActivity(intent)
       return
     }
 
@@ -56,7 +56,7 @@ class ItemClickedListener(private val activity: FragmentActivity) : OnItemViewCl
       val presenter = (row as ListRow).adapter.presenterSelector.getPresenter(item) as TrackCardPresenter
       if (presenter.getTrackPlayback() == TrackCardPresenter.TrackPlayback.SINGLE) {
 
-        activity.lifecycleScope.launch {
+        mActivity.lifecycleScope.launch {
           val apiClient = StreamingClient()
           when (val result = apiClient.playTracks((arrayOf(item)))) {
             is ApiResult.Success -> {}
@@ -71,7 +71,7 @@ class ItemClickedListener(private val activity: FragmentActivity) : OnItemViewCl
         val tracks = (row.adapter as ArrayObjectAdapter).unmodifiableList<Track>().toTypedArray()
         val position = tracks.indexOf(item)
 
-        activity.lifecycleScope.launch {
+        mActivity.lifecycleScope.launch {
           val apiClient = StreamingClient()
           when (val result = apiClient.playTracks(tracks, position)) {
             is ApiResult.Success -> {}

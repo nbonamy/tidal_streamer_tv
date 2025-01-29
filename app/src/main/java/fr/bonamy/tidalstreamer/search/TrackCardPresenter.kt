@@ -8,12 +8,9 @@ import com.bumptech.glide.Glide
 import fr.bonamy.tidalstreamer.R
 import fr.bonamy.tidalstreamer.models.Track
 import fr.bonamy.tidalstreamer.utils.CardPresenter
+import fr.bonamy.tidalstreamer.utils.ITrackLongClickListener
 
-interface TrackCardClickListener {
-	fun onTrackLongClicked(track: Track, cardView: ImageCardView)
-}
-
-class TrackCardPresenter(private var mTrackPlayback: TrackPlayback, private var mListener: TrackCardClickListener? = null) : CardPresenter() {
+class TrackCardPresenter(private var mTrackPlayback: TrackPlayback, private var mListener: ITrackLongClickListener) : CardPresenter() {
 
 	enum class TrackPlayback {
 		SINGLE,
@@ -36,12 +33,8 @@ class TrackCardPresenter(private var mTrackPlayback: TrackPlayback, private var 
 		val cardView = viewHolder.view as ImageCardView
 
 		viewHolder.view.setOnLongClickListener {
-			if (mListener != null) {
-				mListener!!.onTrackLongClicked(track, cardView)
-				true
-			} else {
-				false
-			}
+			mListener.onTrackLongClicked(track, cardView)
+			true
 		}
 
 		//Log.d(TAG, "onBindViewHolder")

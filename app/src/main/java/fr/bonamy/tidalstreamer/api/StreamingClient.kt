@@ -7,6 +7,12 @@ import fr.bonamy.tidalstreamer.models.Status
 import fr.bonamy.tidalstreamer.models.Track
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.util.Locale
+
+enum class EnqueuePosition {
+	NEXT,
+	END,
+}
 
 class StreamingClient: ApiClient() {
 
@@ -98,6 +104,16 @@ class StreamingClient: ApiClient() {
 		try {
 			Log.i(TAG, "playTracks")
 			val response = apiService.playTracks(mapOf("items" to tracks), position)
+			fetchResponse(response)
+		} catch (e: Exception) {
+			ApiResult.Error(e)
+		}
+	}
+
+	suspend fun enqueueTracks(tracks: Array<Track>, position: EnqueuePosition): ApiResult<String> = withContext(Dispatchers.IO) {
+		try {
+			Log.i(TAG, "enqueueTracks")
+			val response = apiService.enqueue(tracks, position.name.lowercase())
 			fetchResponse(response)
 		} catch (e: Exception) {
 			ApiResult.Error(e)

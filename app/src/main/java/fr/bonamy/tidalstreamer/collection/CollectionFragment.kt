@@ -1,6 +1,8 @@
 package fr.bonamy.tidalstreamer.collection
 
+import android.app.AlertDialog
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Color
@@ -29,6 +31,7 @@ import com.bumptech.glide.request.transition.Transition
 import fr.bonamy.tidalstreamer.MainActivity
 import fr.bonamy.tidalstreamer.R
 import fr.bonamy.tidalstreamer.api.ApiResult
+import fr.bonamy.tidalstreamer.api.EnqueuePosition
 import fr.bonamy.tidalstreamer.api.MetadataClient
 import fr.bonamy.tidalstreamer.api.StreamingClient
 import fr.bonamy.tidalstreamer.artist.ArtistActivity
@@ -37,7 +40,10 @@ import fr.bonamy.tidalstreamer.models.Collection
 import fr.bonamy.tidalstreamer.models.Mix
 import fr.bonamy.tidalstreamer.models.Playlist
 import fr.bonamy.tidalstreamer.models.Track
+import fr.bonamy.tidalstreamer.utils.ItemClickedListener
+import fr.bonamy.tidalstreamer.utils.ItemClickedListener.Companion
 import fr.bonamy.tidalstreamer.utils.PaletteUtils
+import fr.bonamy.tidalstreamer.utils.TrackLongClickListener
 import kotlinx.coroutines.launch
 
 /**
@@ -251,6 +257,10 @@ class CollectionFragment : DetailsSupportFragment(), PaletteAsyncListener, OnTra
 		playCollection(index)
 	}
 
+	override fun onTrackLongClick(track: Track) {
+		TrackLongClickListener(activity!!).onTrackLongClicked(track, null)
+	}
+
 	fun playCollection(index: Int = 0) {
 		lifecycleScope.launch {
 			val apiClient = StreamingClient()
@@ -280,6 +290,7 @@ class CollectionFragment : DetailsSupportFragment(), PaletteAsyncListener, OnTra
 		}
 
 	}
+
 
 	override fun onGenerated(palette: Palette?) {
 

@@ -14,6 +14,7 @@ import fr.bonamy.tidalstreamer.models.Track
 
 interface OnTrackClickListener {
 	fun onTrackClick(track: Track)
+	fun onTrackLongClick(track: Track)
 }
 
 class DetailsPresenter(private val mCollection: Collection, private val mListener: OnTrackClickListener) : Presenter(){
@@ -69,6 +70,10 @@ class DetailsPresenter(private val mCollection: Collection, private val mListene
 			val track = mList[position]
 			holder.itemView.setOnClickListener {
 				listener.onTrackClick(track)
+			}
+			holder.itemView.setOnLongClickListener {
+				listener.onTrackLongClick(track)
+				true
 			}
 
 			// index

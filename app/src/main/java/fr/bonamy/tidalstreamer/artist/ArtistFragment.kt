@@ -7,12 +7,12 @@ import fr.bonamy.tidalstreamer.api.MetadataClient
 import fr.bonamy.tidalstreamer.collection.CollectionCardPresenter
 import fr.bonamy.tidalstreamer.models.Artist
 import fr.bonamy.tidalstreamer.models.Track
-import fr.bonamy.tidalstreamer.search.TrackCardClickListener
 import fr.bonamy.tidalstreamer.search.TrackCardPresenter
 import fr.bonamy.tidalstreamer.utils.BrowserFragment
+import fr.bonamy.tidalstreamer.utils.TrackLongClickListener
 import kotlinx.coroutines.launch
 
-class ArtistFragment : BrowserFragment(), TrackCardClickListener {
+class ArtistFragment : BrowserFragment() {
 
 	private lateinit var mSelectedArtist: Artist
 
@@ -38,7 +38,7 @@ class ArtistFragment : BrowserFragment(), TrackCardClickListener {
 			loadRow(
 				rowsAdapter,
 				metadataClient.fetchArtistTopTracks(mSelectedArtist.id!!),
-				TrackCardPresenter(TrackCardPresenter.TrackPlayback.ALL, this@ArtistFragment),
+				TrackCardPresenter(TrackCardPresenter.TrackPlayback.ALL, TrackLongClickListener(activity!!)),
 				ROWS_TITLE,
 				0,
 			)
@@ -85,10 +85,6 @@ class ArtistFragment : BrowserFragment(), TrackCardClickListener {
 			)
 		}
 
-	}
-
-	override fun onTrackLongClicked(track: Track, cardView: ImageCardView) {
-		TODO("Not yet implemented")
 	}
 
 	companion object {

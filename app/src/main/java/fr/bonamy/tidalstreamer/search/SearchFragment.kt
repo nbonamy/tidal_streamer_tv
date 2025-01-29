@@ -26,10 +26,11 @@ import fr.bonamy.tidalstreamer.collection.CollectionActivity
 import fr.bonamy.tidalstreamer.collection.CollectionCardPresenter
 import fr.bonamy.tidalstreamer.models.Track
 import fr.bonamy.tidalstreamer.utils.ItemClickedListener
+import fr.bonamy.tidalstreamer.utils.TrackLongClickListener
 import kotlinx.coroutines.launch
 
 
-class SearchFragment : SearchSupportFragment(), SearchSupportFragment.SearchResultProvider, TrackCardClickListener {
+class SearchFragment : SearchSupportFragment(), SearchSupportFragment.SearchResultProvider {
 
 	private lateinit var mBackgroundManager: BackgroundManager
 	private lateinit var mRowsAdapter: ArrayObjectAdapter
@@ -145,7 +146,7 @@ class SearchFragment : SearchSupportFragment(), SearchSupportFragment.SearchResu
 		viewLifecycleOwner.lifecycleScope.launch {
 			when (val result = searchClient.searchTracks(query)) {
 				is ApiResult.Success -> {
-					val listRowAdapter = ArrayObjectAdapter(TrackCardPresenter(TrackCardPresenter.TrackPlayback.SINGLE, this@SearchFragment))
+					val listRowAdapter = ArrayObjectAdapter(TrackCardPresenter(TrackCardPresenter.TrackPlayback.SINGLE, TrackLongClickListener(activity!!)))
 					listRowAdapter.addAll(0, result.data)
 					val header = HeaderItem("Tracks")
 					mRowsAdapter.replace(2, ListRow(header, listRowAdapter))
@@ -159,19 +160,6 @@ class SearchFragment : SearchSupportFragment(), SearchSupportFragment.SearchResu
 			}
 		}
 
-	}
-
-	override fun onTrackLongClicked(track: Track, cardView: ImageCardView) {
-		val intent = Intent(context!!, CollectionActivity::class.java)
-		intent.putExtra(CollectionActivity.COLLECTION, track.album)
-		val bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(
-			activity!!,
-			cardView.mainImageView,
-			CollectionActivity.SHARED_ELEMENT_NAME
-		)
-			.toBundle()
-		startActivity(intent, bundle)
-		return
 	}
 
 	companion object {
