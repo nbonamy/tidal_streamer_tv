@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">TIDAL Streamer</string>
     <string name="browse_title">TIDAL</string>
+    <string name="browse_user_title">Collection</string>
     <string name="play_now">Play Now</string>
     <string name="play_next">Play Next</string>
     <string name="play_after">Add to Queue</string>

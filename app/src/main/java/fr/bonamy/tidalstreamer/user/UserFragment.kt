@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 class UserFragment : BrowserFragment() {
 
   override fun title(): String {
-    return getString(R.string.browse_title)
+    return getString(R.string.browse_user_title)
   }
 
   override fun loadRows() {
