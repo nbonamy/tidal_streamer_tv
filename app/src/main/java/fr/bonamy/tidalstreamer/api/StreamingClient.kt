@@ -7,7 +7,6 @@ import fr.bonamy.tidalstreamer.models.Status
 import fr.bonamy.tidalstreamer.models.Track
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.util.Locale
 
 enum class EnqueuePosition {
 	NEXT,

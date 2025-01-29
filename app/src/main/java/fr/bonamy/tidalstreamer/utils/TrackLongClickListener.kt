@@ -6,13 +6,7 @@ import android.content.Intent
 import android.util.Log
 import androidx.core.app.ActivityOptionsCompat
 import androidx.fragment.app.FragmentActivity
-import androidx.leanback.widget.ArrayObjectAdapter
 import androidx.leanback.widget.ImageCardView
-import androidx.leanback.widget.ListRow
-import androidx.leanback.widget.OnItemViewClickedListener
-import androidx.leanback.widget.Presenter
-import androidx.leanback.widget.Row
-import androidx.leanback.widget.RowPresenter
 import androidx.lifecycle.lifecycleScope
 import fr.bonamy.tidalstreamer.R
 import fr.bonamy.tidalstreamer.api.ApiResult
@@ -20,12 +14,7 @@ import fr.bonamy.tidalstreamer.api.EnqueuePosition
 import fr.bonamy.tidalstreamer.api.StreamingClient
 import fr.bonamy.tidalstreamer.artist.ArtistActivity
 import fr.bonamy.tidalstreamer.collection.CollectionActivity
-import fr.bonamy.tidalstreamer.collection.CollectionFragment
-import fr.bonamy.tidalstreamer.collection.CollectionFragment.Companion
-import fr.bonamy.tidalstreamer.models.Artist
-import fr.bonamy.tidalstreamer.models.Collection
 import fr.bonamy.tidalstreamer.models.Track
-import fr.bonamy.tidalstreamer.search.TrackCardPresenter
 import kotlinx.coroutines.launch
 
 interface ITrackLongClickListener {
@@ -102,9 +91,8 @@ class TrackLongClickListener(private val mActivity: FragmentActivity) : ITrackLo
           mActivity,
           cardView!!.mainImageView,
           CollectionActivity.SHARED_ELEMENT_NAME
-        )
-          .toBundle()
-          mActivity.startActivity(intent, bundle)
+        ).toBundle()
+        mActivity.startActivity(intent, bundle)
 
       } else if (menuChosen.equals(mActivity.getString(R.string.go_to_artist), ignoreCase = true)) {
         val intent = Intent(mActivity, ArtistActivity::class.java)

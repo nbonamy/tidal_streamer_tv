@@ -7,13 +7,11 @@ import android.os.Handler
 import android.os.Looper
 import android.speech.RecognizerIntent
 import android.util.Log
-import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.ContextCompat
 import androidx.leanback.app.BackgroundManager
 import androidx.leanback.app.SearchSupportFragment
 import androidx.leanback.widget.ArrayObjectAdapter
 import androidx.leanback.widget.HeaderItem
-import androidx.leanback.widget.ImageCardView
 import androidx.leanback.widget.ListRow
 import androidx.leanback.widget.ListRowPresenter
 import androidx.leanback.widget.ObjectAdapter
@@ -22,9 +20,7 @@ import fr.bonamy.tidalstreamer.R
 import fr.bonamy.tidalstreamer.api.ApiResult
 import fr.bonamy.tidalstreamer.api.SearchClient
 import fr.bonamy.tidalstreamer.artist.ArtistCardPresenter
-import fr.bonamy.tidalstreamer.collection.CollectionActivity
 import fr.bonamy.tidalstreamer.collection.CollectionCardPresenter
-import fr.bonamy.tidalstreamer.models.Track
 import fr.bonamy.tidalstreamer.utils.ItemClickedListener
 import fr.bonamy.tidalstreamer.utils.TrackLongClickListener
 import kotlinx.coroutines.launch

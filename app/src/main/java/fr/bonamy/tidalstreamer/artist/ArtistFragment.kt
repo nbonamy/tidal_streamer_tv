@@ -1,12 +1,10 @@
 package fr.bonamy.tidalstreamer.artist
 
 import android.os.Bundle
-import androidx.leanback.widget.ImageCardView
 import androidx.lifecycle.lifecycleScope
 import fr.bonamy.tidalstreamer.api.MetadataClient
 import fr.bonamy.tidalstreamer.collection.CollectionCardPresenter
 import fr.bonamy.tidalstreamer.models.Artist
-import fr.bonamy.tidalstreamer.models.Track
 import fr.bonamy.tidalstreamer.search.TrackCardPresenter
 import fr.bonamy.tidalstreamer.utils.BrowserFragment
 import fr.bonamy.tidalstreamer.utils.TrackLongClickListener

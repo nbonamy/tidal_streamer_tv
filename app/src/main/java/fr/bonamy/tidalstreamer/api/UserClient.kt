@@ -1,6 +1,5 @@
 package fr.bonamy.tidalstreamer.api
 
-import android.media.MediaRouter.UserRouteInfo
 import fr.bonamy.tidalstreamer.models.Album
 import fr.bonamy.tidalstreamer.models.Artist
 import fr.bonamy.tidalstreamer.models.Mix

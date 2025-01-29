@@ -4,10 +4,8 @@ import fr.bonamy.tidalstreamer.models.Album
 import fr.bonamy.tidalstreamer.models.Artist
 import fr.bonamy.tidalstreamer.models.Mix
 import fr.bonamy.tidalstreamer.models.Playlist
-import fr.bonamy.tidalstreamer.models.Track
 import retrofit2.Response
 import retrofit2.http.GET
-import retrofit2.http.Path
 
 interface UserService {
 

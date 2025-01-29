@@ -11,6 +11,7 @@ import fr.bonamy.tidalstreamer.R
 import fr.bonamy.tidalstreamer.models.Album
 import fr.bonamy.tidalstreamer.models.Collection
 import fr.bonamy.tidalstreamer.models.Track
+import java.util.Locale
 
 interface OnTrackClickListener {
 	fun onTrackClick(track: Track)
@@ -79,7 +80,7 @@ class DetailsPresenter(private val mCollection: Collection, private val mListene
 			// index
 			if (mCollection is Album) {
 				holder.index.visibility = View.VISIBLE
-				holder.index.text = track.trackNumber.toString() + "."
+				holder.index.text = String.format(Locale.getDefault(), "%d.", track.trackNumber)
 			} else {
 				holder.index.visibility = View.GONE
 			}

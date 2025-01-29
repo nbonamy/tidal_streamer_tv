@@ -1,8 +1,7 @@
 package fr.bonamy.tidalstreamer.user
 
-import android.annotation.SuppressLint
 import androidx.lifecycle.lifecycleScope
-import fr.bonamy.tidalstreamer.api.MetadataClient
+import fr.bonamy.tidalstreamer.R
 import fr.bonamy.tidalstreamer.api.UserClient
 import fr.bonamy.tidalstreamer.artist.ArtistCardPresenter
 import fr.bonamy.tidalstreamer.collection.CollectionCardPresenter
@@ -14,7 +13,7 @@ import kotlinx.coroutines.launch
 class UserFragment : BrowserFragment() {
 
   override fun title(): String {
-    return "TIDAL"
+    return getString(R.string.browse_title)
   }
 
   override fun loadRows() {
@@ -46,7 +45,7 @@ class UserFragment : BrowserFragment() {
       )
     }
 
-		viewLifecycleOwner.lifecycleScope.launch {
+    viewLifecycleOwner.lifecycleScope.launch {
       loadRow(
         rowsAdapter,
         userClient.fetchFavoriteArtists(),
@@ -56,7 +55,7 @@ class UserFragment : BrowserFragment() {
       )
     }
 
-		viewLifecycleOwner.lifecycleScope.launch {
+    viewLifecycleOwner.lifecycleScope.launch {
       loadRow(
         rowsAdapter,
         userClient.fetchFavoriteTracks(),

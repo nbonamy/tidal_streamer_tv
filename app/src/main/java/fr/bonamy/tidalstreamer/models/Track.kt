@@ -1,6 +1,7 @@
 package fr.bonamy.tidalstreamer.models
 
 import java.io.Serializable
+import java.util.Locale
 
 data class Track(
 	var id: String? = null,
@@ -24,7 +25,7 @@ data class Track(
 	fun durationString(): String {
 		val minutes = duration / 60
 		val seconds = duration % 60
-		return String.format("%d:%02d", minutes, seconds)
+		return String.format(Locale.getDefault(), "%d:%02d", minutes, seconds)
 	}
 
 	override fun toString(): String {

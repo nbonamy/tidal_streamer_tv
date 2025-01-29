@@ -2,7 +2,6 @@ package fr.bonamy.tidalstreamer.api
 
 import fr.bonamy.tidalstreamer.models.Album
 import fr.bonamy.tidalstreamer.models.Artist
-import fr.bonamy.tidalstreamer.models.Mix
 import fr.bonamy.tidalstreamer.models.Track
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
