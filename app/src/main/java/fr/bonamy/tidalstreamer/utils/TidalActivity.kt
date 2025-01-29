@@ -1,11 +1,13 @@
 package fr.bonamy.tidalstreamer.utils
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.KeyEvent
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import fr.bonamy.tidalstreamer.api.ApiResult
 import fr.bonamy.tidalstreamer.api.StreamingClient
+import fr.bonamy.tidalstreamer.user.UserActivity
 import kotlinx.coroutines.launch
 
 abstract class TidalActivity : FragmentActivity() {
@@ -18,6 +20,12 @@ abstract class TidalActivity : FragmentActivity() {
 	}
 
 	override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+
+		if (keyCode == KeyEvent.KEYCODE_LAST_CHANNEL || keyCode == KeyEvent.KEYCODE_INFO || keyCode == KeyEvent.KEYCODE_J) {
+			val intent = Intent(this, UserActivity::class.java)
+			startActivity(intent)
+			return true
+		}
 
 		if (keyCode == KeyEvent.KEYCODE_MEDIA_PAUSE || keyCode == KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE || keyCode == KeyEvent.KEYCODE_P) {
 			lifecycleScope.launch {
