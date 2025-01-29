@@ -16,7 +16,6 @@ class ArtistFragment : BrowserFragment() {
 
 	private lateinit var mSelectedArtist: Artist
 
-	override fun searchEnabled(): Boolean { return false }
 	override fun title(): String { return mSelectedArtist.name!! }
 
 	override fun onCreate(savedInstanceState: Bundle?) {

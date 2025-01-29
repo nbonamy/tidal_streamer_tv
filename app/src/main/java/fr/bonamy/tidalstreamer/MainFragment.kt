@@ -11,10 +11,6 @@ import kotlinx.coroutines.launch
 
 class MainFragment : BrowserFragment() {
 
-  override fun searchEnabled(): Boolean {
-    return true
-  }
-
   override fun title(): String {
     return "TIDAL"
   }

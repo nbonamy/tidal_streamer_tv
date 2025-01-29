@@ -48,7 +48,7 @@ class TrackLongClickListener(private val mActivity: FragmentActivity) : ITrackLo
     }
 
     // artist
-    if (track.artists != null && track.artists!!.isNotEmpty()) {
+    if (track.artists != null && track.artists!!.size > 1) {
       track.artists!!.forEach() {
         if (it.name != null) {
           menuItems.add(mActivity.getString(R.string.go_to_prefix) + " " + it.name!!)
