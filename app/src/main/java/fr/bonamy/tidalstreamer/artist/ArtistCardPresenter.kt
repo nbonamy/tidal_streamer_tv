@@ -1,6 +1,7 @@
 package fr.bonamy.tidalstreamer.artist
 
 import android.graphics.drawable.Drawable
+import android.view.Gravity
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.content.ContextCompat
@@ -25,6 +26,7 @@ class ArtistCardPresenter : CardPresenter() {
 
 		val titleView: TextView = viewHolder.view.findViewById(androidx.leanback.R.id.title_text)
 		titleView.textAlignment = TextView.TEXT_ALIGNMENT_CENTER
+		titleView.gravity = Gravity.CENTER
 		titleView.minLines = 2
 		titleView.maxLines = 2
 
