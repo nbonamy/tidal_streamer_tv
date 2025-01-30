@@ -216,11 +216,12 @@ class CollectionFragment : DetailsSupportFragment(), PaletteAsyncListener, OnTra
     // need to find the color first
     var color = mCollection?.color() ?: ContextCompat.getColor(requireContext(), R.color.details_background)
     var luminance = ColorUtils.calculateLuminance(color)
-    if (luminance > MAX_LUMINANCE) {
-      color = ColorUtils.blendARGB(Color.BLACK, color, (luminance - MAX_LUMINANCE).toFloat())
+    Log.d(TAG, "Color: $color, Luminance: $luminance")
+    if (luminance > LUMINANCE_THRESHOLD) {
+      color = ColorUtils.blendARGB(Color.BLACK, color, (luminance * 0.9).toFloat())
       luminance = ColorUtils.calculateLuminance(color)
     }
-    val appearance = if (luminance > 0.5) Appearance.DARK else Appearance.LIGHT
+    val appearance = if (luminance > 0.65) Appearance.DARK else Appearance.LIGHT
     Log.d(TAG, "Color: $color, Luminance: $luminance, Appearance: $appearance")
 
     // now set theme activity to style action buttons
@@ -364,7 +365,7 @@ class CollectionFragment : DetailsSupportFragment(), PaletteAsyncListener, OnTra
     private const val DETAIL_THUMB_WIDTH = 274
     private const val DETAIL_THUMB_HEIGHT = 274
 
-    private const val MAX_LUMINANCE = 0.5
+    private const val LUMINANCE_THRESHOLD = 0.25
     private const val ALPHA_VALUE = 232
 
   }
