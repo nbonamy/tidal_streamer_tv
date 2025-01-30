@@ -42,6 +42,7 @@
             android:exported="false" />
         <activity
             android:name=".artist.ArtistActivity"
+            android:theme="@style/Theme.TIDALStreamer.Artist"
             android:exported="false" />
         <activity
             android:name=".search.SearchActivity"

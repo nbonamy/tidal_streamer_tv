@@ -5,7 +5,6 @@ import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.DisplayMetrics
 import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.leanback.app.BackgroundManager
@@ -52,7 +51,6 @@ abstract class BrowserFragment : BrowseSupportFragment() {
 	private val mHandler = Handler(Looper.myLooper()!!)
 	private lateinit var mBackgroundManager: BackgroundManager
 	private var mDefaultBackground: Drawable? = null
-	private lateinit var mMetrics: DisplayMetrics
 	private var mBackgroundTimer: Timer? = null
 	private var mBackgroundUri: String? = null
 
@@ -78,9 +76,6 @@ abstract class BrowserFragment : BrowseSupportFragment() {
 		mBackgroundManager = BackgroundManager.getInstance(activity)
 		mBackgroundManager.attach(activity!!.window)
 		mBackgroundManager.color = ContextCompat.getColor(context!!, R.color.default_background)
-		//mDefaultBackground = ContextCompat.getDrawable(context!!, R.drawable.default_background)
-		mMetrics = DisplayMetrics()
-		activity!!.windowManager.defaultDisplay.getMetrics(mMetrics)
 	}
 
 	private fun setupUIElements() {
@@ -156,8 +151,6 @@ abstract class BrowserFragment : BrowseSupportFragment() {
 	}
 
 	private fun updateBackground(uri: String?) {
-		val width = mMetrics.widthPixels
-		val height = mMetrics.heightPixels
 		Glide.with(context!!)
 			.load(uri)
 			.centerCrop()

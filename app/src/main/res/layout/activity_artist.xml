@@ -1,7 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<fragment xmlns:android="http://schemas.android.com/apk/res/android"
-    android:name="fr.bonamy.tidalstreamer.artist.ArtistFragment"
-    android:id="@+id/artist_fragment"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    />
+    android:background="@color/default_background"
+    android:scrollbars="none">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <fragment
+            android:id="@+id/artist_title"
+            android:name="fr.bonamy.tidalstreamer.artist.ArtistTitleFragment"
+            android:layout_width="match_parent"
+            android:layout_height="250dp" />
+
+        <FrameLayout
+            android:id="@+id/artist_fragment"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+    </LinearLayout>
+
+</ScrollView>

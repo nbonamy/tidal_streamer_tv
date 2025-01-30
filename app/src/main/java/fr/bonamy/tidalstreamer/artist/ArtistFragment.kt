@@ -13,20 +13,23 @@ import kotlinx.coroutines.launch
 
 class ArtistFragment : BrowserFragment() {
 
-	private lateinit var mSelectedArtist: Artist
+	private lateinit var mArtist: Artist
 
 	override fun title(): String {
-		return mSelectedArtist.name!!
+		return ""
 	}
 
 	override fun onCreate(savedInstanceState: Bundle?) {
-		mSelectedArtist =
+		mArtist =
 			activity!!.intent.getSerializableExtra(ArtistActivity.ARTIST) as Artist
 		super.onCreate(savedInstanceState)
 	}
 
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
+		titleView = null
+		showTitle(0)
+		showTitle(false)
 //		titleView = ArtistTitleView(activity!!)
 //
 //		Glide.with(requireContext())
@@ -57,7 +60,7 @@ class ArtistFragment : BrowserFragment() {
 		viewLifecycleOwner.lifecycleScope.launch {
 			loadRow(
 				rowsAdapter,
-				metadataClient.fetchArtistTopTracks(mSelectedArtist.id!!),
+				metadataClient.fetchArtistTopTracks(mArtist.id!!),
 				TrackCardPresenter(
 					TrackCardPresenter.TrackPlayback.ALL,
 					TrackLongClickListener(activity!!)
@@ -70,7 +73,7 @@ class ArtistFragment : BrowserFragment() {
 		viewLifecycleOwner.lifecycleScope.launch {
 			loadRow(
 				rowsAdapter,
-				metadataClient.fetchArtistAlbums(mSelectedArtist.id!!),
+				metadataClient.fetchArtistAlbums(mArtist.id!!),
 				CollectionCardPresenter(),
 				ROWS_TITLE,
 				1,
@@ -80,7 +83,7 @@ class ArtistFragment : BrowserFragment() {
 		viewLifecycleOwner.lifecycleScope.launch {
 			loadRow(
 				rowsAdapter,
-				metadataClient.fetchArtistSingles(mSelectedArtist.id!!),
+				metadataClient.fetchArtistSingles(mArtist.id!!),
 				CollectionCardPresenter(),
 				ROWS_TITLE,
 				2,
@@ -91,7 +94,7 @@ class ArtistFragment : BrowserFragment() {
 		viewLifecycleOwner.lifecycleScope.launch {
 			loadRow(
 				rowsAdapter,
-				metadataClient.fetchArtistCompilations(mSelectedArtist.id!!),
+				metadataClient.fetchArtistCompilations(mArtist.id!!),
 				CollectionCardPresenter(),
 				ROWS_TITLE,
 				3,
@@ -101,7 +104,7 @@ class ArtistFragment : BrowserFragment() {
 		viewLifecycleOwner.lifecycleScope.launch {
 			loadRow(
 				rowsAdapter,
-				metadataClient.fetchSimilarArtists(mSelectedArtist.id!!),
+				metadataClient.fetchSimilarArtists(mArtist.id!!),
 				ArtistCardPresenter(),
 				ROWS_TITLE,
 				4,

@@ -9,6 +9,12 @@ class ArtistActivity: TidalActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_artist)
+    if (savedInstanceState == null) {
+      getSupportFragmentManager().beginTransaction()
+        .replace(R.id.artist_title, ArtistTitleFragment())
+        .replace(R.id.artist_fragment, ArtistFragment())
+        .commitNow()
+    }
   }
 
   companion object {
