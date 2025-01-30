@@ -22,7 +22,7 @@ class CollectionPresenter(private val mCollection: Collection, private val mAppe
 
   private fun onCreateView(parent: ViewGroup): View {
     return LayoutInflater.from(parent.context)
-      .inflate(R.layout.layout_details, parent, false)
+      .inflate(R.layout.fragment_collection, parent, false)
   }
 
   override fun onCreateViewHolder(parent: ViewGroup?): Presenter.ViewHolder {
