@@ -4,7 +4,7 @@ import android.os.Bundle
 import fr.bonamy.tidalstreamer.R
 import fr.bonamy.tidalstreamer.utils.TidalActivity
 
-class ArtistActivity: TidalActivity() {
+class ArtistActivity : TidalActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)

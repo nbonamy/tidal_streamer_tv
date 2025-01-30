@@ -11,23 +11,23 @@ import kotlinx.coroutines.launch
 
 class ArtistFragment : BrowserFragment() {
 
-	private lateinit var mArtist: Artist
+  private lateinit var mArtist: Artist
 
-	override fun title(): String {
-		return ""
-	}
+  override fun title(): String {
+    return ""
+  }
 
-	override fun onCreate(savedInstanceState: Bundle?) {
-		mArtist =
-			requireActivity().intent.getSerializableExtra(ArtistActivity.ARTIST) as Artist
-		super.onCreate(savedInstanceState)
-	}
+  override fun onCreate(savedInstanceState: Bundle?) {
+    mArtist =
+      requireActivity().intent.getSerializableExtra(ArtistActivity.ARTIST) as Artist
+    super.onCreate(savedInstanceState)
+  }
 
-	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-		super.onViewCreated(view, savedInstanceState)
-		titleView = null
-		showTitle(0)
-		showTitle(false)
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+    titleView = null
+    showTitle(0)
+    showTitle(false)
 //		titleView = ArtistTitleView(requireActivity())
 //
 //		Glide.with(requireContext())
@@ -44,75 +44,75 @@ class ArtistFragment : BrowserFragment() {
 //				override fun onLoadCleared(placeholder: Drawable?) {}
 //			})
 
-	}
+  }
 
-	override fun loadRows() {
+  override fun loadRows() {
 
-		// init
-		val rowsAdapter = initRowsAdapter(ROWS_TITLE.size)
-		val metadataClient = MetadataClient()
-		adapter = rowsAdapter
+    // init
+    val rowsAdapter = initRowsAdapter(ROWS_TITLE.size)
+    val metadataClient = MetadataClient()
+    adapter = rowsAdapter
 
-		// now load rows
+    // now load rows
 
-		viewLifecycleOwner.lifecycleScope.launch {
-			loadRow(
-				rowsAdapter,
-				metadataClient.fetchArtistTopTracks(mArtist.id!!),
-				ROWS_TITLE,
-				0,
-				TrackCardPresenter.TrackPlayback.ALL,
-			)
-		}
+    viewLifecycleOwner.lifecycleScope.launch {
+      loadRow(
+        rowsAdapter,
+        metadataClient.fetchArtistTopTracks(mArtist.id!!),
+        ROWS_TITLE,
+        0,
+        TrackCardPresenter.TrackPlayback.ALL,
+      )
+    }
 
-		viewLifecycleOwner.lifecycleScope.launch {
-			loadRow(
-				rowsAdapter,
-				metadataClient.fetchArtistAlbums(mArtist.id!!),
-				ROWS_TITLE,
-				1,
-			)
-		}
+    viewLifecycleOwner.lifecycleScope.launch {
+      loadRow(
+        rowsAdapter,
+        metadataClient.fetchArtistAlbums(mArtist.id!!),
+        ROWS_TITLE,
+        1,
+      )
+    }
 
-		viewLifecycleOwner.lifecycleScope.launch {
-			loadRow(
-				rowsAdapter,
-				metadataClient.fetchArtistSingles(mArtist.id!!),
-				ROWS_TITLE,
-				2,
-			)
-		}
+    viewLifecycleOwner.lifecycleScope.launch {
+      loadRow(
+        rowsAdapter,
+        metadataClient.fetchArtistSingles(mArtist.id!!),
+        ROWS_TITLE,
+        2,
+      )
+    }
 
 
-		viewLifecycleOwner.lifecycleScope.launch {
-			loadRow(
-				rowsAdapter,
-				metadataClient.fetchArtistCompilations(mArtist.id!!),
-				ROWS_TITLE,
-				3,
-			)
-		}
+    viewLifecycleOwner.lifecycleScope.launch {
+      loadRow(
+        rowsAdapter,
+        metadataClient.fetchArtistCompilations(mArtist.id!!),
+        ROWS_TITLE,
+        3,
+      )
+    }
 
-		viewLifecycleOwner.lifecycleScope.launch {
-			loadRow(
-				rowsAdapter,
-				metadataClient.fetchSimilarArtists(mArtist.id!!),
-				ROWS_TITLE,
-				4,
-			)
-		}
+    viewLifecycleOwner.lifecycleScope.launch {
+      loadRow(
+        rowsAdapter,
+        metadataClient.fetchSimilarArtists(mArtist.id!!),
+        ROWS_TITLE,
+        4,
+      )
+    }
 
-	}
+  }
 
-	companion object {
-		//private const val TAG = "ArtistFragment"
-		private val ROWS_TITLE = arrayOf(
-			"Top tracks",
-			"Albums",
-			"EP & Singles",
-			"Compilations",
-			"Fans also like"
-		)
-	}
+  companion object {
+    //private const val TAG = "ArtistFragment"
+    private val ROWS_TITLE = arrayOf(
+      "Top tracks",
+      "Albums",
+      "EP & Singles",
+      "Compilations",
+      "Fans also like"
+    )
+  }
 
 }

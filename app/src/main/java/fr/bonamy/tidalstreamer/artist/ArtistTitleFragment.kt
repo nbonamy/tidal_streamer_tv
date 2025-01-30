@@ -18,44 +18,44 @@ import fr.bonamy.tidalstreamer.search.SearchActivity
 
 class ArtistTitleFragment : Fragment() {
 
-	private lateinit var mArtist: Artist
+  private lateinit var mArtist: Artist
 
-	override fun onCreate(savedInstanceState: Bundle?) {
-		mArtist =
-			requireActivity().intent.getSerializableExtra(ArtistActivity.ARTIST) as Artist
-		super.onCreate(savedInstanceState)
-	}
+  override fun onCreate(savedInstanceState: Bundle?) {
+    mArtist =
+      requireActivity().intent.getSerializableExtra(ArtistActivity.ARTIST) as Artist
+    super.onCreate(savedInstanceState)
+  }
 
-	override fun onCreateView(
-		inflater: LayoutInflater, container: ViewGroup?,
-		savedInstanceState: Bundle?
-	): View? {
-		val view = inflater.inflate(R.layout.fragment_artist_title, container, false)
+  override fun onCreateView(
+    inflater: LayoutInflater, container: ViewGroup?,
+    savedInstanceState: Bundle?
+  ): View? {
+    val view = inflater.inflate(R.layout.fragment_artist_title, container, false)
 
-		// title
-		val title = view.findViewById<TextView>(R.id.title)
-		title.text = mArtist.name
+    // title
+    val title = view.findViewById<TextView>(R.id.title)
+    title.text = mArtist.name
 
-		// description
-		var description = view.findViewById<TextView>(R.id.description)
-		description.text = mArtist.artistRoles?.map { it.category }?.joinToString(", ")
+    // description
+    var description = view.findViewById<TextView>(R.id.description)
+    description.text = mArtist.artistRoles?.map { it.category }?.joinToString(", ")
 
-		// thumbnail
-		val image = view.findViewById<ImageView>(R.id.image)
-		Glide.with(requireContext())
-			.load(mArtist.imageUrl())
-			.into(image)
+    // thumbnail
+    val image = view.findViewById<ImageView>(R.id.image)
+    Glide.with(requireContext())
+      .load(mArtist.imageUrl())
+      .into(image)
 
-		// orb
-		val orb = view.findViewById<SearchOrbView>(R.id.orb)
-		orb.orbColors = SearchOrbView.Colors(ContextCompat.getColor(requireContext(), R.color.search_opaque))
-		orb.setOnOrbClickedListener {
-			val intent = Intent(requireContext(), SearchActivity::class.java)
-			startActivity(intent)
-		}
+    // orb
+    val orb = view.findViewById<SearchOrbView>(R.id.orb)
+    orb.orbColors = SearchOrbView.Colors(ContextCompat.getColor(requireContext(), R.color.search_opaque))
+    orb.setOnOrbClickedListener {
+      val intent = Intent(requireContext(), SearchActivity::class.java)
+      startActivity(intent)
+    }
 
-		// done
-		return view
-	}
+    // done
+    return view
+  }
 
 }

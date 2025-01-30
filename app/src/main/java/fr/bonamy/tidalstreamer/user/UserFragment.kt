@@ -60,7 +60,7 @@ class UserFragment : BrowserFragment() {
   }
 
   companion object {
-//    private const val TAG = "UserFragment"
+    //    private const val TAG = "UserFragment"
     private val ROWS_TITLE = arrayOf(
       "Your playlists",
       "Your albums",

@@ -77,7 +77,7 @@ class MainFragment : BrowserFragment() {
   }
 
   companion object {
-//    private const val TAG = "MainFragment"
+    //    private const val TAG = "MainFragment"
     private val ROWS_TITLE = arrayOf(
       "",
       "Suggested new albums for you",

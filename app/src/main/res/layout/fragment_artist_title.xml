@@ -1,67 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  android:background="#000000"
+  android:baselineAligned="false"
+  android:orientation="horizontal">
+
+  <androidx.leanback.widget.SearchOrbView
+    android:id="@+id/orb"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="54dp"
+    android:layout_marginTop="32dp" />
+
+  <FrameLayout
+    android:layout_width="wrap_content"
     android:layout_height="match_parent"
-    android:background="#000000"
-    android:baselineAligned="false"
-    android:orientation="horizontal">
+    android:layout_marginStart="@dimen/artist_banner_height">
 
-    <androidx.leanback.widget.SearchOrbView
-        android:id="@+id/orb"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="54dp"
-        android:layout_marginTop="32dp" />
+    <ImageView
+      android:id="@+id/image"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:adjustViewBounds="false"
+      android:scaleType="centerCrop"
+      tools:src="@drawable/artist" />
 
-    <FrameLayout
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_marginStart="@dimen/artist_banner_height">
+    <View
+      android:layout_width="100dp"
+      android:layout_height="match_parent"
+      android:layout_gravity="start"
+      android:background="@drawable/fade_edge_left" />
 
-        <ImageView
-            android:id="@+id/image"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:adjustViewBounds="false"
-            android:scaleType="centerCrop"
-            tools:src="@drawable/artist" />
+    <View
+      android:layout_width="match_parent"
+      android:layout_height="@dimen/artist_banner_bottom_fade_height"
+      android:layout_marginTop="@dimen/artist_banner_bottom_fade_offset"
+      android:background="@drawable/fade_edge_bottom" />
+  </FrameLayout>
 
-        <View
-            android:layout_width="100dp"
-            android:layout_height="match_parent"
-            android:layout_gravity="start"
-            android:background="@drawable/fade_edge_left" />
+  <LinearLayout
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="100dp"
+    android:layout_marginStart="50dp"
+    android:orientation="vertical">
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/artist_banner_bottom_fade_height"
-            android:layout_marginTop="@dimen/artist_banner_bottom_fade_offset"
-            android:background="@drawable/fade_edge_bottom" />
-    </FrameLayout>
+    <TextView
+      android:id="@+id/title"
+      style="?attr/browseTitleTextStyle"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      tools:text="Title" />
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="100dp"
-        android:layout_marginStart="50dp"
-        android:orientation="vertical">
+    <TextView
+      android:id="@+id/description"
+      style="?attr/browseTitleTextStyle"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:textSize="16sp"
+      tools:text="Title" />
 
-        <TextView
-            android:id="@+id/title"
-            style="?attr/browseTitleTextStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            tools:text="Title" />
-
-        <TextView
-            android:id="@+id/description"
-            style="?attr/browseTitleTextStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="16sp"
-            tools:text="Title" />
-
-    </LinearLayout>
+  </LinearLayout>
 
 </FrameLayout>

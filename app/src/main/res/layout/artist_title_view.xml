@@ -1,40 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="wrap_content"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:layout_width="wrap_content"
+  android:layout_height="@dimen/artist_title_height"
+  android:paddingStart="@dimen/artist_title_start_padding">
+
+  <ImageView
+    android:id="@+id/title_badge"
+    style="?attr/browseTitleIconStyle"
+    android:layout_width="@dimen/artist_title_height"
     android:layout_height="@dimen/artist_title_height"
-    android:paddingStart="@dimen/artist_title_start_padding"
-    >
+    android:layout_alignParentEnd="true"
+    android:adjustViewBounds="true"
+    android:maxWidth="@dimen/lb_browse_title_icon_max_width"
+    android:src="@drawable/artist"
+    android:visibility="gone"
+    tools:visibility="visible" />
 
-    <ImageView
-        android:id="@+id/title_badge"
-        style="?attr/browseTitleIconStyle"
-        android:layout_width="@dimen/artist_title_height"
-        android:layout_height="@dimen/artist_title_height"
-        android:layout_alignParentEnd="true"
-        android:adjustViewBounds="true"
-        android:maxWidth="@dimen/lb_browse_title_icon_max_width"
-        android:src="@drawable/artist"
-        android:visibility="gone"
-        tools:visibility="visible" />
+  <TextView
+    android:id="@+id/title_text"
+    style="?attr/browseTitleTextStyle"
+    android:layout_width="@dimen/lb_browse_title_icon_max_width"
+    android:layout_height="@dimen/artist_title_height"
+    android:gravity="center_vertical"
+    android:layout_toEndOf="@id/title_orb"
+    android:layout_toStartOf="@id/title_badge"
+    tools:text="Artist Name" />
 
-    <TextView
-        android:id="@+id/title_text"
-        style="?attr/browseTitleTextStyle"
-        android:layout_width="@dimen/lb_browse_title_icon_max_width"
-        android:layout_height="@dimen/artist_title_height"
-        android:gravity="center_vertical"
-        android:layout_toEndOf="@id/title_orb"
-        android:layout_toStartOf="@id/title_badge"
-        tools:text="Artist Name" />
-
-    <androidx.leanback.widget.SearchOrbView
-        android:id="@+id/title_orb"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_centerVertical="true"
-        android:transitionGroup="true"
-        android:visibility="invisible"
-        tools:visibility="visible"/>
+  <androidx.leanback.widget.SearchOrbView
+    android:id="@+id/title_orb"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_alignParentStart="true"
+    android:layout_centerVertical="true"
+    android:transitionGroup="true"
+    android:visibility="invisible"
+    tools:visibility="visible" />
 </RelativeLayout>
