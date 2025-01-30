@@ -21,14 +21,14 @@
                 style="?attr/detailsDescriptionTitleStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/item_fg_selected" />
+                android:textColor="@color/item_light_fg_selected" />
 
             <TextView
                 android:id="@+id/details_subtitle"
                 style="?attr/detailsDescriptionSubtitleStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/item_fg_selected" />
+                android:textColor="@color/item_light_fg_selected" />
 
 
         </LinearLayout>
@@ -44,7 +44,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAlignment="textEnd"
-                android:textColor="@color/item_fg_normal" />
+                android:textColor="@color/item_light_fg_normal" />
 
             <TextView
                 android:id="@+id/details_2"
@@ -52,7 +52,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAlignment="textEnd"
-                android:textColor="@color/item_fg_normal" />
+                android:textColor="@color/item_light_fg_normal" />
 
         </LinearLayout>
 

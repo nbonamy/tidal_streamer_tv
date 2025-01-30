@@ -12,14 +12,13 @@ import fr.bonamy.tidalstreamer.R
 import fr.bonamy.tidalstreamer.models.Album
 import fr.bonamy.tidalstreamer.models.Collection
 import fr.bonamy.tidalstreamer.models.Track
-import java.util.Locale
 
 interface OnTrackClickListener {
   fun onTrackClick(track: Track)
   fun onTrackLongClick(track: Track)
 }
 
-class DetailsPresenter(private val mCollection: Collection, private val mListener: OnTrackClickListener) : Presenter() {
+class CollectionPresenter(private val mCollection: Collection, private val mAppearance: Appearance, private val mListener: OnTrackClickListener) : Presenter() {
 
   private fun onCreateView(parent: ViewGroup): View {
     return LayoutInflater.from(parent.context)
@@ -30,8 +29,18 @@ class DetailsPresenter(private val mCollection: Collection, private val mListene
     val view: View = onCreateView(parent!!)
     val vh = ViewHolder(view)
     vh.tracks.layoutManager = LinearLayoutManager(parent.context)
-    vh.tracks.adapter = TrackAdapter(mCollection, listOf(), mListener)
+    vh.tracks.adapter = TrackAdapter(mCollection, listOf(), mAppearance, mListener)
+    vh.title.setTextColor(view.context.getColor(getSelectedTextColor()))
+    vh.subtitle.setTextColor(view.context.getColor(getSelectedTextColor()))
+    vh.releaseDate.setTextColor(view.context.getColor(getSelectedTextColor()))
+    vh.trackCount.setTextColor(view.context.getColor(getSelectedTextColor()))
     return vh
+  }
+
+  private fun getSelectedTextColor(): Int {
+    return if (mAppearance == Appearance.LIGHT)
+      R.color.item_light_fg_selected else
+      R.color.item_dark_fg_selected
   }
 
   @SuppressLint("SetTextI18n")
@@ -42,14 +51,16 @@ class DetailsPresenter(private val mCollection: Collection, private val mListene
     vh.subtitle.text = collection.subtitle()
     if (collection is Album && collection.releaseDate != null) {
       val tokens = collection.releaseDate!!.split("-")
-      vh.releaseDate.text = tokens.get(0)
+      vh.releaseDate.text = tokens[0]
     }
     if (collection.tracks != null) {
       val trackCount = collection.tracks!!.size
-      val trackCountText = vh.view.getResources().getQuantityString(R.plurals.track_count, trackCount, trackCount)
+      val trackCountText = vh.view.resources.getQuantityString(R.plurals.track_count, trackCount, trackCount)
       vh.trackCount.text = trackCountText
     }
-    vh.trackCount.text = "${collection.tracks?.size?.toString()} tracks" ?: ""
+    if (collection.tracks !== null) {
+      vh.trackCount.text = "${collection.tracks?.size?.toString()} tracks"
+    }
     (vh.tracks.adapter as TrackAdapter).updateData(collection.tracks ?: listOf())
   }
 
@@ -63,65 +74,6 @@ class DetailsPresenter(private val mCollection: Collection, private val mListene
     var releaseDate: TextView = view.findViewById<View>(R.id.details_1) as TextView
     var trackCount = view.findViewById<View>(R.id.details_2) as TextView
     val tracks: RecyclerView = view.findViewById<View>(R.id.details_tracks) as RecyclerView
-  }
-
-  class TrackAdapter(private var mCollection: Collection, private var mList: List<Track>, private val listener: OnTrackClickListener) : RecyclerView.Adapter<TrackAdapter.ViewHolder>() {
-
-    fun updateData(newList: List<Track>) {
-      mList = newList
-      notifyDataSetChanged()
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-      val view = LayoutInflater.from(parent.context)
-        .inflate(R.layout.item_track, parent, false)
-      return ViewHolder(view)
-    }
-
-    // binds the list items to a view
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-
-      // basic
-      val track = mList[position]
-      holder.itemView.setOnClickListener {
-        listener.onTrackClick(track)
-      }
-      holder.itemView.setOnLongClickListener {
-        listener.onTrackLongClick(track)
-        true
-      }
-
-      // index
-      if (mCollection is Album) {
-        holder.index.visibility = View.VISIBLE
-        holder.index.text = String.format(Locale.getDefault(), "%d.", track.trackNumber)
-      } else {
-        holder.index.visibility = View.GONE
-      }
-
-      // title
-      if ((track.artist == null && track.artists != null) || track.index != null) {
-        holder.title.text = track.title + " - " + track.artists!!.map { it.name }.joinToString(", ")
-      } else {
-        holder.title.text = track.title
-      }
-
-      // duration
-      holder.duration.text = track.durationString()
-
-    }
-
-    // return the number of the items in the list
-    override fun getItemCount(): Int {
-      return mList.size
-    }
-
-    // Holds the views for adding it to image and text
-    class ViewHolder(ItemView: View) : RecyclerView.ViewHolder(ItemView) {
-      val index: TextView = itemView.findViewById(R.id.index)
-      val title: TextView = itemView.findViewById(R.id.title)
-      val duration: TextView = itemView.findViewById(R.id.duration)
-    }
   }
 
 }

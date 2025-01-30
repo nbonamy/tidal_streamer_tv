@@ -1,11 +1,14 @@
 package fr.bonamy.tidalstreamer.models
 
+import android.graphics.Color
+
 data class Album(
   var id: String? = null,
   var title: String? = null,
   var artist: Artist? = null,
   var artists: Array<Artist>? = null,
   var cover: String? = null,
+  var vibrantColor: String? = null,
   var releaseDate: String? = null,
   var numberOfVolumes: Int = 0,
   var numberOfTracks: Int = 0,
@@ -23,6 +26,10 @@ data class Album(
   override fun imageUrl(): String {
     return cover?.replace("-", "/")?.let { "https://resources.tidal.com/images/$it/640x640.jpg" }
       ?: ""
+  }
+
+  override fun color(): Int? {
+    return vibrantColor?.let { Color.parseColor(it) }
   }
 
   override fun toString(): String {

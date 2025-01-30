@@ -180,24 +180,54 @@ class CollectionFragment : DetailsSupportFragment(), PaletteAsyncListener, OnTra
 
     val actionAdapter = ArrayObjectAdapter()
 
-    actionAdapter.add(Action(ACTION_PLAY_NOW, resources.getString(R.string.play_now)))
-    actionAdapter.add(Action(ACTION_PLAY_NEXT, resources.getString(R.string.play_next)))
-    actionAdapter.add(Action(ACTION_QUEUE, resources.getString(R.string.play_after)))
+    addAction(actionAdapter, ACTION_PLAY_NOW, resources.getString(R.string.play_now))
+    addAction(actionAdapter, ACTION_PLAY_NEXT, resources.getString(R.string.play_next))
+    addAction(actionAdapter, ACTION_QUEUE, resources.getString(R.string.play_after))
 
     if (mCollection is Album && (mCollection as Album).mainArtist() != null) {
-      actionAdapter.add(Action(ACTION_GO_TO_ARTIST, resources.getString(R.string.go_to_artist)))
+      addAction(actionAdapter, ACTION_GO_TO_ARTIST, resources.getString(R.string.go_to_artist))
     }
 
     row.actionsAdapter = actionAdapter
     mAdapter.add(row)
   }
 
+  private fun addAction(actionAdapter: ArrayObjectAdapter, actionId: Long, label: String) {
+    val parts = splitActionLabel(label)
+    if (parts.second == "") actionAdapter.add(Action(actionId, parts.first))
+    val action = Action(actionId, parts.first, parts.second)
+    actionAdapter.add(action)
+  }
+
+  private fun splitActionLabel(label: String): Pair<String, String> {
+    val parts = label.split(" ")
+    if (parts.size == 1) {
+      return Pair(parts[0], "")
+    } else if (parts.size == 2) {
+      return Pair(parts[0], parts[1])
+    } else {
+      return Pair(parts.subList(0, 2).joinToString(" "), parts.subList(2, parts.size).joinToString(" "))
+    }
+  }
+
   private fun setupDetailsOverviewRowPresenter() {
 
+    // need to find the color first
+    val color = mCollection?.color() ?: ContextCompat.getColor(requireContext(), R.color.details_background)
+    val luminance = ColorUtils.calculateLuminance(color)
+    val appearance = if (luminance > 0.5) Appearance.DARK else Appearance.LIGHT
+    Log.d(TAG, "Color: $color, Luminance: $luminance, Appearance: $appearance")
+
+    // now set theme activity to style action buttons
+    requireActivity().setTheme(
+      if (appearance == Appearance.DARK) R.style.Theme_TIDALStreamer_Details_Dark
+      else R.style.Theme_TIDALStreamer_Details_Light
+    )
+
     // Set detail background.
-    mDetailsPresenter = FullWidthDetailsOverviewRowPresenter(DetailsPresenter(mCollection!!, this))
-    mDetailsPresenter.backgroundColor = ColorUtils.setAlphaComponent(ContextCompat.getColor(requireContext(), R.color.details_background), ALPHA_VALUE)
-    mDetailsPresenter.actionsBackgroundColor = ContextCompat.getColor(requireContext(), R.color.details_background)
+    mDetailsPresenter = FullWidthDetailsOverviewRowPresenter(CollectionPresenter(mCollection!!, appearance, this))
+    mDetailsPresenter.backgroundColor = ColorUtils.setAlphaComponent(color, ALPHA_VALUE)
+    mDetailsPresenter.actionsBackgroundColor = color
 
     // Hook up transition element.
     val sharedElementHelper = FullWidthDetailsOverviewSharedElementHelper()

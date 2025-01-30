@@ -18,7 +18,7 @@
         android:maxLines="1"
         android:textAlignment="viewEnd"
         android:textSize="16sp"
-        android:textColor="@color/track_text"
+        android:textColor="@color/track_light_text"
         tools:text="99." />
 
     <TextView
@@ -30,7 +30,7 @@
         android:ellipsize="end"
         android:maxLines="1"
         android:textSize="16sp"
-        android:textColor="@color/track_text"
+        android:textColor="@color/track_light_text"
         tools:text="With or without you" />
 
     <TextView
@@ -42,7 +42,7 @@
         android:maxLines="1"
         android:textAlignment="viewEnd"
         android:textSize="15sp"
-        android:textColor="@color/track_text"
+        android:textColor="@color/track_light_text"
         tools:text="14:27" />
 
 </LinearLayout>

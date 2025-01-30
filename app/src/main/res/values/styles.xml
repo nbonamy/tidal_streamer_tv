@@ -1,8 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.TIDALStreamer" parent="@style/Theme.Leanback.Browse" />
-    <style name="Theme.TIDALStreamer.Artist" parent="@style/Theme.TIDALStreamer">
-        <item name="browseRowsMarginTop">32dp</item>
-<!--        <item name="browseTitleViewLayout">@layout/artist_title_view</item>-->
-    </style>
+
+  <style name="Theme.TIDALStreamer" parent="@style/Theme.Leanback.Browse" />
+
+  <style name="Theme.TIDALStreamer.Artist" parent="@style/Theme.TIDALStreamer">
+    <item name="browseRowsMarginTop">32dp</item>
+    <!--        <item name="browseTitleViewLayout">@layout/artist_title_view</item>-->
+  </style>
+
+  <style name="Theme.TIDALStreamer.Details.Light" parent="Theme.Leanback.Details">
+    <item name="detailsActionButtonStyle">@style/Theme.Detail.Action.Light</item>
+  </style>
+
+  <style name="Theme.Detail.Action.Light" parent="TextAppearance.Leanback.DetailsActionButton">
+    <item name="android:background">@color/row_action_light_bg</item>
+    <item name="android:textColor">@color/row_action_light_text</item>
+  </style>
+
+  <style name="Theme.TIDALStreamer.Details.Dark" parent="Theme.Leanback.Details">
+    <item name="detailsActionButtonStyle">@style/Theme.Detail.Action.Dark</item>
+  </style>
+
+  <style name="Theme.Detail.Action.Dark" parent="TextAppearance.Leanback.DetailsActionButton">
+    <item name="android:background">@color/row_action_dark_bg</item>
+    <item name="android:textColor">@color/row_action_dark_text</item>
+  </style>
+
 </resources>
