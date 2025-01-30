@@ -23,6 +23,10 @@ data class Mix(
     return thumbnail ?: ""
   }
 
+  override fun largeImageUrl(): String {
+    return imageUrl().replace("640x640", "1280x1280")
+  }
+
   override fun color(): Int? {
     return titleColor?.let { Color.parseColor(it) }
   }

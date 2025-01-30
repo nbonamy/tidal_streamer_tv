@@ -7,28 +7,30 @@
 
   <LinearLayout
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="horizontal">
+    android:layout_height="wrap_content">
 
     <LinearLayout
       android:layout_width="0dp"
       android:layout_height="wrap_content"
       android:layout_weight="1"
-      android:orientation="vertical">
+      android:orientation="vertical"
+      android:layout_alignParentStart="true">
 
       <TextView
         android:id="@+id/details_title"
         style="?attr/detailsDescriptionTitleStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@color/item_light_fg_selected" />
+        android:textColor="@color/item_light_fg_selected"
+        tools:text="Album Title" />
 
       <TextView
         android:id="@+id/details_subtitle"
         style="?attr/detailsDescriptionSubtitleStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@color/item_light_fg_selected" />
+        android:textColor="@color/item_light_fg_selected"
+        tools:text="Artist Name" />
 
 
     </LinearLayout>
@@ -36,27 +38,30 @@
     <LinearLayout
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:orientation="vertical">
+      android:orientation="vertical"
+      android:layout_alignParentEnd="true">
 
       <TextView
         android:id="@+id/details_1"
         style="?attr/detailsDescriptionSubtitleStyle"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAlignment="textEnd"
+        android:layout_gravity="end"
         android:ellipsize="none"
         android:singleLine="true"
-        android:textColor="@color/item_light_fg_normal" />
+        android:textColor="@color/item_light_fg_normal"
+        tools:text="2025" />
 
       <TextView
         android:id="@+id/details_2"
         style="?attr/detailsDescriptionSubtitleStyle"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAlignment="textEnd"
+        android:layout_gravity="end"
         android:ellipsize="none"
         android:singleLine="true"
-        android:textColor="@color/item_light_fg_normal" />
+        android:textColor="@color/item_light_fg_normal"
+        tools:text="14 Tracks" />
 
     </LinearLayout>
 

@@ -18,7 +18,11 @@ interface OnTrackClickListener {
   fun onTrackLongClick(track: Track)
 }
 
-class CollectionPresenter(private val mCollection: Collection, private val mAppearance: Appearance, private val mListener: OnTrackClickListener) : Presenter() {
+class CollectionPresenter(
+  private val mCollection: Collection,
+  private val mAppearance: Appearance,
+  private val mListener: OnTrackClickListener
+) : Presenter() {
 
   private fun onCreateView(parent: ViewGroup): View {
     return LayoutInflater.from(parent.context)
@@ -55,8 +59,11 @@ class CollectionPresenter(private val mCollection: Collection, private val mAppe
     }
     if (collection.tracks != null) {
       val trackCount = collection.tracks!!.size
-      val trackCountText = vh.view.resources.getQuantityString(R.plurals.track_count, trackCount, trackCount)
+      val trackCountText =
+        vh.view.resources.getQuantityString(R.plurals.track_count, trackCount, trackCount)
       vh.trackCount.text = trackCountText
+    } else if (collection is Album) {
+      vh.trackCount.text = "${collection.numberOfTracks} tracks"
     }
     if (collection.tracks !== null) {
       vh.trackCount.text = "${collection.tracks?.size?.toString()} tracks"

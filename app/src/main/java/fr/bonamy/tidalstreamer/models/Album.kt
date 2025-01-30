@@ -28,6 +28,10 @@ data class Album(
       ?: ""
   }
 
+  override fun largeImageUrl(): String {
+    return imageUrl().replace("640x640", "1280x1280")
+  }
+
   override fun color(): Int? {
     return vibrantColor?.let { Color.parseColor(it) }
   }
