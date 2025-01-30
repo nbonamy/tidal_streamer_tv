@@ -10,6 +10,7 @@ import androidx.core.content.ContextCompat
 import androidx.leanback.app.BackgroundManager
 import androidx.leanback.app.BrowseSupportFragment
 import androidx.leanback.widget.ArrayObjectAdapter
+import androidx.leanback.widget.ClassPresenterSelector
 import androidx.leanback.widget.HeaderItem
 import androidx.leanback.widget.ListRow
 import androidx.leanback.widget.ListRowPresenter
@@ -22,9 +23,16 @@ import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import fr.bonamy.tidalstreamer.R
 import fr.bonamy.tidalstreamer.api.ApiResult
+import fr.bonamy.tidalstreamer.artist.ArtistCardPresenter
+import fr.bonamy.tidalstreamer.collection.CollectionCardPresenter
 import fr.bonamy.tidalstreamer.models.Album
+import fr.bonamy.tidalstreamer.models.Artist
+import fr.bonamy.tidalstreamer.models.Collection
 import fr.bonamy.tidalstreamer.models.ImageRepresentation
+import fr.bonamy.tidalstreamer.models.Track
 import fr.bonamy.tidalstreamer.search.SearchActivity
+import fr.bonamy.tidalstreamer.search.TrackCardPresenter
+import fr.bonamy.tidalstreamer.search.TrackCardPresenter.TrackPlayback
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.Timer
@@ -74,28 +82,28 @@ abstract class BrowserFragment : BrowseSupportFragment() {
 
 	private fun prepareBackgroundManager() {
 		mBackgroundManager = BackgroundManager.getInstance(activity)
-		mBackgroundManager.attach(activity!!.window)
-		mBackgroundManager.color = ContextCompat.getColor(context!!, R.color.default_background)
+		mBackgroundManager.attach(requireActivity().window)
+		mBackgroundManager.color = ContextCompat.getColor(requireContext(), R.color.default_background)
 	}
 
 	private fun setupUIElements() {
 		title = title()
 		headersState = headersState()
 		isHeadersTransitionOnBackEnabled = false
-		brandColor = ContextCompat.getColor(context!!, R.color.fastlane_background)
-		searchAffordanceColor = ContextCompat.getColor(context!!, R.color.search_opaque)
+		brandColor = ContextCompat.getColor(requireContext(), R.color.fastlane_background)
+		searchAffordanceColor = ContextCompat.getColor(requireContext(), R.color.search_opaque)
 	}
 
 	private fun setupEventListeners() {
 
-		onItemViewClickedListener = ItemClickedListener(activity!!)
+		onItemViewClickedListener = ItemClickedListener(requireActivity())
 		if (updateBackground()) {
 			onItemViewSelectedListener = ItemViewSelectedListener()
 		}
 
 		if (searchEnabled()) {
 			setOnSearchClickedListener {
-				val intent = Intent(context!!, SearchActivity::class.java)
+				val intent = Intent(requireContext(), SearchActivity::class.java)
 				startActivity(intent)
 			}
 		}
@@ -111,7 +119,15 @@ abstract class BrowserFragment : BrowseSupportFragment() {
 		return rowsAdapter
 	}
 
-	suspend fun <T> loadRow(rowsAdapter: ArrayObjectAdapter, result: ApiResult<List<T>>, presenter: Presenter, titles: Array<String>, index: Int) {
+	suspend fun <T> loadRow(rowsAdapter: ArrayObjectAdapter, result: ApiResult<List<T>>, titles: Array<String>, index: Int, trackPlayback: TrackPlayback = TrackPlayback.SINGLE) {
+
+		// Create the presenter selector
+		val presenter = ClassPresenterSelector()
+		presenter.addClassPresenter(Collection::class.java, CollectionCardPresenter())
+		presenter.addClassPresenter(Artist::class.java, ArtistCardPresenter())
+		presenter.addClassPresenter(Track::class.java, TrackCardPresenter(trackPlayback, TrackLongClickListener(requireActivity())))
+
+		// Load the row
 		when (result) {
 			is ApiResult.Success -> {
 				val rowAdapter = ArrayObjectAdapter(presenter)
@@ -151,7 +167,7 @@ abstract class BrowserFragment : BrowseSupportFragment() {
 	}
 
 	private fun updateBackground(uri: String?) {
-		Glide.with(context!!)
+		Glide.with(requireContext())
 			.load(uri)
 			.centerCrop()
 			.error(mDefaultBackground)

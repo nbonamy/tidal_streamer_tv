@@ -3,11 +3,8 @@ package fr.bonamy.tidalstreamer.user
 import androidx.lifecycle.lifecycleScope
 import fr.bonamy.tidalstreamer.R
 import fr.bonamy.tidalstreamer.api.UserClient
-import fr.bonamy.tidalstreamer.artist.ArtistCardPresenter
-import fr.bonamy.tidalstreamer.collection.CollectionCardPresenter
 import fr.bonamy.tidalstreamer.search.TrackCardPresenter
 import fr.bonamy.tidalstreamer.utils.BrowserFragment
-import fr.bonamy.tidalstreamer.utils.TrackLongClickListener
 import kotlinx.coroutines.launch
 
 class UserFragment : BrowserFragment() {
@@ -20,7 +17,7 @@ class UserFragment : BrowserFragment() {
 
     // init
     val rowsAdapter = initRowsAdapter(ROWS_TITLE.size)
-    var userClient = UserClient()
+    val userClient = UserClient()
     adapter = rowsAdapter
 
     // now load rows
@@ -29,7 +26,6 @@ class UserFragment : BrowserFragment() {
       loadRow(
         rowsAdapter,
         userClient.fetchPlaylists(),
-        CollectionCardPresenter(),
         ROWS_TITLE,
         0,
       )
@@ -39,7 +35,6 @@ class UserFragment : BrowserFragment() {
       loadRow(
         rowsAdapter,
         userClient.fetchFavoriteAlbums(),
-        CollectionCardPresenter(),
         ROWS_TITLE,
         1,
       )
@@ -49,7 +44,6 @@ class UserFragment : BrowserFragment() {
       loadRow(
         rowsAdapter,
         userClient.fetchFavoriteArtists(),
-        ArtistCardPresenter(),
         ROWS_TITLE,
         2,
       )
@@ -59,7 +53,6 @@ class UserFragment : BrowserFragment() {
       loadRow(
         rowsAdapter,
         userClient.fetchFavoriteTracks(),
-        TrackCardPresenter(TrackCardPresenter.TrackPlayback.SINGLE, TrackLongClickListener(activity!!)),
         ROWS_TITLE,
         3,
       )
@@ -68,7 +61,7 @@ class UserFragment : BrowserFragment() {
   }
 
   companion object {
-    private const val TAG = "MainFragment"
+//    private const val TAG = "UserFragment"
     private val ROWS_TITLE = arrayOf(
       "Your playlists",
       "Your albums",

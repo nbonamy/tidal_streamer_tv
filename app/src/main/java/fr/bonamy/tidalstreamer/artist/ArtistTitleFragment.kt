@@ -22,7 +22,7 @@ class ArtistTitleFragment : Fragment() {
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		mArtist =
-			activity!!.intent.getSerializableExtra(ArtistActivity.ARTIST) as Artist
+			requireActivity().intent.getSerializableExtra(ArtistActivity.ARTIST) as Artist
 		super.onCreate(savedInstanceState)
 	}
 
@@ -44,9 +44,9 @@ class ArtistTitleFragment : Fragment() {
 
 		// orb
 		val orb = view.findViewById<SearchOrbView>(R.id.orb)
-		orb.orbColors = SearchOrbView.Colors(ContextCompat.getColor(context!!, R.color.search_opaque))
+		orb.orbColors = SearchOrbView.Colors(ContextCompat.getColor(requireContext(), R.color.search_opaque))
 		orb.setOnOrbClickedListener {
-			val intent = Intent(context!!, SearchActivity::class.java)
+			val intent = Intent(requireContext(), SearchActivity::class.java)
 			startActivity(intent)
 		}
 

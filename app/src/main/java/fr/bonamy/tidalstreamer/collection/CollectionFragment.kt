@@ -58,13 +58,13 @@ class CollectionFragment : DetailsSupportFragment(), PaletteAsyncListener, OnTra
 		super.onCreate(savedInstanceState)
 
 		mDetailsBackground = DetailsSupportFragmentBackgroundController(this)
-		mBackgroundManager = BackgroundManager.getInstance(activity)
-		mBackgroundManager.attach(activity!!.window)
+		mBackgroundManager = BackgroundManager.getInstance(requireActivity())
+		mBackgroundManager.attach(requireActivity().window)
 
 		mSelectedCollection =
-			activity!!.intent.getSerializableExtra(CollectionActivity.COLLECTION) as Collection
+			requireActivity().intent.getSerializableExtra(CollectionActivity.COLLECTION) as Collection
 		if (mSelectedCollection == null) {
-			val intent = Intent(context!!, MainActivity::class.java)
+			val intent = Intent(requireContext(), MainActivity::class.java)
 			startActivity(intent)
 		}
 
@@ -134,7 +134,7 @@ class CollectionFragment : DetailsSupportFragment(), PaletteAsyncListener, OnTra
 
 	private fun initializeBackground(collection: Collection?) {
 		//mDetailsBackground.enableParallax()
-		Glide.with(context!!)
+		Glide.with(requireContext())
 			.asBitmap()
 			.centerCrop()
 			.error(R.drawable.default_background)
@@ -158,10 +158,10 @@ class CollectionFragment : DetailsSupportFragment(), PaletteAsyncListener, OnTra
 	private fun setupDetailsOverviewRow() {
 		Log.d(TAG, "doInBackground: " + mSelectedCollection?.toString())
 		val row = DetailsOverviewRow(mSelectedCollection)
-		row.imageDrawable = ContextCompat.getDrawable(context!!, R.drawable.default_background)
-		val width = convertDpToPixel(context!!, DETAIL_THUMB_WIDTH)
-		val height = convertDpToPixel(context!!, DETAIL_THUMB_HEIGHT)
-		Glide.with(context!!)
+		row.imageDrawable = ContextCompat.getDrawable(requireContext(), R.drawable.default_background)
+		val width = convertDpToPixel(requireContext(), DETAIL_THUMB_WIDTH)
+		val height = convertDpToPixel(requireContext(), DETAIL_THUMB_HEIGHT)
+		Glide.with(requireContext())
 			.load(mSelectedCollection?.imageUrl())
 			.centerCrop()
 			.error(R.drawable.album)
@@ -221,9 +221,9 @@ class CollectionFragment : DetailsSupportFragment(), PaletteAsyncListener, OnTra
 		mDetailsPresenter =
 			FullWidthDetailsOverviewRowPresenter(DetailsPresenter(mSelectedCollection!!, this))
 		mDetailsPresenter.backgroundColor =
-			ColorUtils.setAlphaComponent(ContextCompat.getColor(context!!, R.color.details_background), ALPHA_VALUE)
+			ColorUtils.setAlphaComponent(ContextCompat.getColor(requireContext(), R.color.details_background), ALPHA_VALUE)
 		mDetailsPresenter.actionsBackgroundColor =
-			ContextCompat.getColor(context!!, R.color.details_background)
+			ContextCompat.getColor(requireContext(), R.color.details_background)
 
 		// Hook up transition element.
 		val sharedElementHelper = FullWidthDetailsOverviewSharedElementHelper()
@@ -241,7 +241,7 @@ class CollectionFragment : DetailsSupportFragment(), PaletteAsyncListener, OnTra
 			}
 
 			if (action.id == ACTION_GO_TO_ARTIST) {
-				Intent(context!!, ArtistActivity::class.java).apply {
+				Intent(requireContext(), ArtistActivity::class.java).apply {
 					putExtra(ArtistActivity.ARTIST, (mSelectedCollection!! as Album).mainArtist()!!)
 					startActivity(this)
 				}
@@ -249,7 +249,7 @@ class CollectionFragment : DetailsSupportFragment(), PaletteAsyncListener, OnTra
 			}
 
 			// default for now
-			Toast.makeText(context!!, action.toString(), Toast.LENGTH_SHORT).show()
+			Toast.makeText(requireContext(), action.toString(), Toast.LENGTH_SHORT).show()
 
 		}
 
@@ -267,7 +267,7 @@ class CollectionFragment : DetailsSupportFragment(), PaletteAsyncListener, OnTra
 	}
 
 	override fun onTrackLongClick(track: Track) {
-		TrackLongClickListener(activity!!).onTrackLongClicked(track, null)
+		TrackLongClickListener(requireActivity()).onTrackLongClicked(track, null)
 	}
 
 	private fun playCollection(index: Int = 0) {
@@ -325,8 +325,8 @@ class CollectionFragment : DetailsSupportFragment(), PaletteAsyncListener, OnTra
 		private const val TAG = "VideoDetailsFragment"
 
 		private const val ACTION_PLAY_NOW = 1L
-		private const val ACTION_PLAY_NEXT = 2L
-		private const val ACTION_QUEUE = 3L
+//		private const val ACTION_PLAY_NEXT = 2L
+//		private const val ACTION_QUEUE = 3L
 		private const val ACTION_GO_TO_ARTIST = 4L
 
 		private const val DETAIL_THUMB_WIDTH = 274

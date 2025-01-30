@@ -22,7 +22,4 @@ data class Artist(
 						'}'
 	}
 
-	companion object {
-		internal const val serialVersionUID = 1234567890123456789L
-	}
 }

@@ -4,11 +4,9 @@ import android.os.Bundle
 import android.view.View
 import androidx.lifecycle.lifecycleScope
 import fr.bonamy.tidalstreamer.api.MetadataClient
-import fr.bonamy.tidalstreamer.collection.CollectionCardPresenter
 import fr.bonamy.tidalstreamer.models.Artist
 import fr.bonamy.tidalstreamer.search.TrackCardPresenter
 import fr.bonamy.tidalstreamer.utils.BrowserFragment
-import fr.bonamy.tidalstreamer.utils.TrackLongClickListener
 import kotlinx.coroutines.launch
 
 class ArtistFragment : BrowserFragment() {
@@ -21,7 +19,7 @@ class ArtistFragment : BrowserFragment() {
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		mArtist =
-			activity!!.intent.getSerializableExtra(ArtistActivity.ARTIST) as Artist
+			requireActivity().intent.getSerializableExtra(ArtistActivity.ARTIST) as Artist
 		super.onCreate(savedInstanceState)
 	}
 
@@ -30,7 +28,7 @@ class ArtistFragment : BrowserFragment() {
 		titleView = null
 		showTitle(0)
 		showTitle(false)
-//		titleView = ArtistTitleView(activity!!)
+//		titleView = ArtistTitleView(requireActivity())
 //
 //		Glide.with(requireContext())
 //			.load(mSelectedArtist.imageUrl())
@@ -61,12 +59,9 @@ class ArtistFragment : BrowserFragment() {
 			loadRow(
 				rowsAdapter,
 				metadataClient.fetchArtistTopTracks(mArtist.id!!),
-				TrackCardPresenter(
-					TrackCardPresenter.TrackPlayback.ALL,
-					TrackLongClickListener(activity!!)
-				),
 				ROWS_TITLE,
 				0,
+				TrackCardPresenter.TrackPlayback.ALL,
 			)
 		}
 
@@ -74,7 +69,6 @@ class ArtistFragment : BrowserFragment() {
 			loadRow(
 				rowsAdapter,
 				metadataClient.fetchArtistAlbums(mArtist.id!!),
-				CollectionCardPresenter(),
 				ROWS_TITLE,
 				1,
 			)
@@ -84,7 +78,6 @@ class ArtistFragment : BrowserFragment() {
 			loadRow(
 				rowsAdapter,
 				metadataClient.fetchArtistSingles(mArtist.id!!),
-				CollectionCardPresenter(),
 				ROWS_TITLE,
 				2,
 			)
@@ -95,7 +88,6 @@ class ArtistFragment : BrowserFragment() {
 			loadRow(
 				rowsAdapter,
 				metadataClient.fetchArtistCompilations(mArtist.id!!),
-				CollectionCardPresenter(),
 				ROWS_TITLE,
 				3,
 			)
@@ -105,7 +97,6 @@ class ArtistFragment : BrowserFragment() {
 			loadRow(
 				rowsAdapter,
 				metadataClient.fetchSimilarArtists(mArtist.id!!),
-				ArtistCardPresenter(),
 				ROWS_TITLE,
 				4,
 			)

@@ -37,7 +37,4 @@ data class Track(
 						'}'
 	}
 
-	companion object {
-		internal const val serialVersionUID = 7275654484894960653L
-	}
 }

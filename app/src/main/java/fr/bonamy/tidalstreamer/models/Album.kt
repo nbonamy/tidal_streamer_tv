@@ -36,7 +36,4 @@ data class Album(
 		return mainArtist ?: artists?.firstOrNull()
 	}
 
-	companion object {
-		internal const val serialVersionUID = 727566175075960653L
-	}
 }

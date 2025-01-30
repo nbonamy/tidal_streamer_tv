@@ -2,8 +2,7 @@ package fr.bonamy.tidalstreamer
 
 import androidx.lifecycle.lifecycleScope
 import fr.bonamy.tidalstreamer.api.UserClient
-import fr.bonamy.tidalstreamer.artist.ArtistCardPresenter
-import fr.bonamy.tidalstreamer.collection.CollectionCardPresenter
+import fr.bonamy.tidalstreamer.search.TrackCardPresenter
 import fr.bonamy.tidalstreamer.utils.BrowserFragment
 import kotlinx.coroutines.launch
 
@@ -17,7 +16,7 @@ class MainFragment : BrowserFragment() {
 
     // init
     val rowsAdapter = initRowsAdapter(ROWS_TITLE.size)
-    var userClient = UserClient()
+    val userClient = UserClient()
     adapter = rowsAdapter
 
     // now load rows
@@ -26,7 +25,6 @@ class MainFragment : BrowserFragment() {
       loadRow(
         rowsAdapter,
         userClient.fetchShortcuts(),
-        CollectionCardPresenter(),
         ROWS_TITLE,
         0,
       )
@@ -36,7 +34,6 @@ class MainFragment : BrowserFragment() {
       loadRow(
         rowsAdapter,
         userClient.fetchNewAlbums(),
-        CollectionCardPresenter(),
         ROWS_TITLE,
         1,
       )
@@ -46,7 +43,6 @@ class MainFragment : BrowserFragment() {
       loadRow(
         rowsAdapter,
         userClient.fetchRecentAlbums(),
-        CollectionCardPresenter(),
         ROWS_TITLE,
         2,
       )
@@ -56,7 +52,6 @@ class MainFragment : BrowserFragment() {
       loadRow(
         rowsAdapter,
         userClient.fetchRecommendedAlbums(),
-        CollectionCardPresenter(),
         ROWS_TITLE,
         3,
       )
@@ -66,7 +61,6 @@ class MainFragment : BrowserFragment() {
       loadRow(
         rowsAdapter,
         userClient.fetchMixes(),
-        CollectionCardPresenter(),
         ROWS_TITLE,
         4,
       )
@@ -76,7 +70,6 @@ class MainFragment : BrowserFragment() {
       loadRow(
         rowsAdapter,
         userClient.fetchRecentArtists(),
-        ArtistCardPresenter(),
         ROWS_TITLE,
         5,
       )
@@ -85,7 +78,7 @@ class MainFragment : BrowserFragment() {
   }
 
   companion object {
-    private const val TAG = "MainFragment"
+//    private const val TAG = "MainFragment"
     private val ROWS_TITLE = arrayOf(
       "",
       "Suggested new albums for you",

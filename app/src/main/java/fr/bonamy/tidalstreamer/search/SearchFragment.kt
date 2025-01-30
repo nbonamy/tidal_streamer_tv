@@ -11,6 +11,7 @@ import androidx.core.content.ContextCompat
 import androidx.leanback.app.BackgroundManager
 import androidx.leanback.app.SearchSupportFragment
 import androidx.leanback.widget.ArrayObjectAdapter
+import androidx.leanback.widget.ClassPresenterSelector
 import androidx.leanback.widget.HeaderItem
 import androidx.leanback.widget.ListRow
 import androidx.leanback.widget.ListRowPresenter
@@ -21,6 +22,9 @@ import fr.bonamy.tidalstreamer.api.ApiResult
 import fr.bonamy.tidalstreamer.api.SearchClient
 import fr.bonamy.tidalstreamer.artist.ArtistCardPresenter
 import fr.bonamy.tidalstreamer.collection.CollectionCardPresenter
+import fr.bonamy.tidalstreamer.models.Artist
+import fr.bonamy.tidalstreamer.models.Collection
+import fr.bonamy.tidalstreamer.models.Track
 import fr.bonamy.tidalstreamer.utils.ItemClickedListener
 import fr.bonamy.tidalstreamer.utils.TrackLongClickListener
 import kotlinx.coroutines.launch
@@ -39,9 +43,9 @@ class SearchFragment : SearchSupportFragment(), SearchSupportFragment.SearchResu
 		prepareBackgroundManager()
 		mRowsAdapter = ArrayObjectAdapter(ListRowPresenter())
 		setSearchResultProvider(this)
-		setOnItemViewClickedListener(ItemClickedListener(activity!!))
+		setOnItemViewClickedListener(ItemClickedListener(requireActivity()))
 
-//		if (!AndroidUtils.hasPermission(context!!, Manifest.permission.RECORD_AUDIO)) {
+//		if (!AndroidUtils.hasPermission(requireContext(), Manifest.permission.RECORD_AUDIO)) {
 //			// SpeechRecognitionCallback is not required and if not provided recognition will be handled
 //			// using internal speech recognizer, in which case you must have RECORD_AUDIO permission
 //			setSpeechRecognitionCallback {
@@ -57,8 +61,8 @@ class SearchFragment : SearchSupportFragment(), SearchSupportFragment.SearchResu
 
 	private fun prepareBackgroundManager() {
 		mBackgroundManager = BackgroundManager.getInstance(activity)
-		mBackgroundManager.attach(activity!!.window)
-		mBackgroundManager.color = ContextCompat.getColor(context!!, R.color.default_background)
+		mBackgroundManager.attach(requireActivity().window)
+		mBackgroundManager.color = ContextCompat.getColor(requireContext(), R.color.default_background)
 	}
 
 	override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -105,10 +109,16 @@ class SearchFragment : SearchSupportFragment(), SearchSupportFragment.SearchResu
 		mRowsAdapter.add(ListRow(ArrayObjectAdapter(ListRowPresenter())))
 		mRowsAdapter.add(ListRow(ArrayObjectAdapter(ListRowPresenter())))
 
+		// Create the presenter selector
+		val presenter = ClassPresenterSelector()
+		presenter.addClassPresenter(Collection::class.java, CollectionCardPresenter())
+		presenter.addClassPresenter(Artist::class.java, ArtistCardPresenter())
+		presenter.addClassPresenter(Track::class.java, TrackCardPresenter(TrackCardPresenter.TrackPlayback.SINGLE, TrackLongClickListener(requireActivity())))
+
 		viewLifecycleOwner.lifecycleScope.launch {
 			when (val result = searchClient.searchAlbums(query)) {
 				is ApiResult.Success -> {
-					val listRowAdapter = ArrayObjectAdapter(CollectionCardPresenter())
+					val listRowAdapter = ArrayObjectAdapter(presenter)
 					listRowAdapter.addAll(0, result.data)
 					val header = HeaderItem("Albums")
 					mRowsAdapter.replace(0, ListRow(header, listRowAdapter))
@@ -125,7 +135,7 @@ class SearchFragment : SearchSupportFragment(), SearchSupportFragment.SearchResu
 		viewLifecycleOwner.lifecycleScope.launch {
 			when (val result = searchClient.searchArtists(query)) {
 				is ApiResult.Success -> {
-					val listRowAdapter = ArrayObjectAdapter(ArtistCardPresenter())
+					val listRowAdapter = ArrayObjectAdapter(presenter)
 					listRowAdapter.addAll(0, result.data)
 					val header = HeaderItem("Artists")
 					mRowsAdapter.replace(1, ListRow(header, listRowAdapter))
@@ -142,7 +152,7 @@ class SearchFragment : SearchSupportFragment(), SearchSupportFragment.SearchResu
 		viewLifecycleOwner.lifecycleScope.launch {
 			when (val result = searchClient.searchTracks(query)) {
 				is ApiResult.Success -> {
-					val listRowAdapter = ArrayObjectAdapter(TrackCardPresenter(TrackCardPresenter.TrackPlayback.SINGLE, TrackLongClickListener(activity!!)))
+					val listRowAdapter = ArrayObjectAdapter(presenter)
 					listRowAdapter.addAll(0, result.data)
 					val header = HeaderItem("Tracks")
 					mRowsAdapter.replace(2, ListRow(header, listRowAdapter))

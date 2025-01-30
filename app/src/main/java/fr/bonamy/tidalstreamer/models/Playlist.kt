@@ -37,7 +37,4 @@ data class Playlist(
 						'}'
 	}
 
-	companion object {
-		internal const val serialVersionUID = 727566175075960653L
-	}
 }

@@ -30,7 +30,4 @@ data class Mix(
 						'}'
 	}
 
-	companion object {
-		internal const val serialVersionUID = 72755453695660653L
-	}
 }
