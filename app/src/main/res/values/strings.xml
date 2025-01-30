@@ -9,7 +9,15 @@
     <string name="go_to_artist">Go to Artist</string>
     <string name="go_to_prefix">Go to</string>
 
+
+
     <!-- Error messages -->
     <string name="error_fragment_message">An error occurred</string>
     <string name="dismiss_error">Dismiss</string>
+
+    <plurals name="track_count">
+        <item quantity="one">%d track</item>
+        <item quantity="other">%d tracks</item>
+    </plurals>
+
 </resources>
