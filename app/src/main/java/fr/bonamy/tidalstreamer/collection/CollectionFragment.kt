@@ -62,6 +62,7 @@ class CollectionFragment : DetailsSupportFragment(), PaletteAsyncListener, OnTra
     mDetailsBackground = DetailsSupportFragmentBackgroundController(this)
     mBackgroundManager = BackgroundManager.getInstance(requireActivity())
     mBackgroundManager.attach(requireActivity().window)
+    mBackgroundManager.drawable = resources.getDrawable(R.drawable.default_background)
 
     mCollection =
       requireActivity().intent.getSerializableExtra(CollectionActivity.COLLECTION) as Collection
