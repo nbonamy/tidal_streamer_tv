@@ -1,5 +1,6 @@
 package fr.bonamy.tidalstreamer.collection
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -33,11 +34,16 @@ class DetailsPresenter(private val mCollection: Collection, private val mListene
 		return vh
 	}
 
+	@SuppressLint("SetTextI18n")
 	override fun onBindViewHolder(viewHolder: Presenter.ViewHolder?, item: Any?) {
 		val collection = item as Collection
 		val vh = viewHolder as ViewHolder
 		vh.title.text = collection.title()
 		vh.subtitle.text = collection.subtitle()
+		if (collection is Album && collection.releaseDate != null) {
+			val tokens = collection.releaseDate!!.split("-")
+			vh.releaseDate.text = "${tokens.get(1)}/${tokens.get(0)}"
+		}
 		(vh.tracks.adapter as TrackAdapter).updateData(collection.tracks ?: listOf())
 	}
 
@@ -48,6 +54,7 @@ class DetailsPresenter(private val mCollection: Collection, private val mListene
 		val title: TextView = view.findViewById<View>(R.id.details_title) as TextView
 		val subtitle: TextView =
 			view.findViewById<View>(R.id.details_subtitle) as TextView
+		var releaseDate: TextView = view.findViewById<View>(R.id.details_release_date) as TextView
 		val tracks: RecyclerView = view.findViewById<View>(R.id.details_tracks) as RecyclerView
 	}
 

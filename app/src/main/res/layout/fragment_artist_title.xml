@@ -40,13 +40,28 @@
             android:background="@drawable/fade_edge_bottom" />
     </FrameLayout>
 
-    <TextView
-        android:id="@+id/title"
-        style="?attr/browseTitleTextStyle"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="100dp"
         android:layout_marginStart="50dp"
-        tools:text="Title" />
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/title"
+            style="?attr/browseTitleTextStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="Title" />
+
+        <TextView
+            android:id="@+id/description"
+            style="?attr/browseTitleTextStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            tools:text="Title" />
+
+    </LinearLayout>
 
 </FrameLayout>

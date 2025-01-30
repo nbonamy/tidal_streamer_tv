@@ -1,13 +1,14 @@
 package fr.bonamy.tidalstreamer.models
 
 data class Album(
-  var id: String? = null,
-  var title: String? = null,
-  var artists: Array<Artist>? = null,
-  var cover: String? = null,
-  var releaseDate: String? = null,
-  var numberOfVolumes: Int = 0,
-  var numberOfTracks: Int = 0,
+	var id: String? = null,
+	var title: String? = null,
+	var artists: Array<Artist>? = null,
+	var cover: String? = null,
+	var releaseDate: String? = null,
+	var numberOfVolumes: Int = 0,
+	var numberOfTracks: Int = 0,
+	var popularity: Int? = null,
 ) : Collection() {
 
 	override fun title(): String {
@@ -19,7 +20,8 @@ data class Album(
 	}
 
 	override fun imageUrl(): String {
-		return cover?.replace("-", "/")?.let { "https://resources.tidal.com/images/$it/640x640.jpg" } ?: ""
+		return cover?.replace("-", "/")?.let { "https://resources.tidal.com/images/$it/640x640.jpg" }
+			?: ""
 	}
 
 	override fun toString(): String {

@@ -2,7 +2,6 @@ package fr.bonamy.tidalstreamer
 
 import androidx.lifecycle.lifecycleScope
 import fr.bonamy.tidalstreamer.api.UserClient
-import fr.bonamy.tidalstreamer.search.TrackCardPresenter
 import fr.bonamy.tidalstreamer.utils.BrowserFragment
 import kotlinx.coroutines.launch
 

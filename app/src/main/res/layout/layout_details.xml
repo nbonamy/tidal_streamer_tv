@@ -5,19 +5,51 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/details_title"
-        style="?attr/detailsDescriptionTitleStyle"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@color/item_fg_selected" />
+        android:orientation="horizontal">
 
-    <TextView
-        android:id="@+id/details_subtitle"
-        style="?attr/detailsDescriptionSubtitleStyle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@color/item_fg_selected" />
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/details_title"
+                style="?attr/detailsDescriptionTitleStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/item_fg_selected" />
+
+            <TextView
+                android:id="@+id/details_subtitle"
+                style="?attr/detailsDescriptionSubtitleStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/item_fg_selected" />
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/details_release_date"
+                style="?attr/detailsDescriptionSubtitleStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/item_fg_selected" />
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/details_tracks"

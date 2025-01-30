@@ -46,7 +46,7 @@ import kotlinx.coroutines.launch
  */
 class CollectionFragment : DetailsSupportFragment(), PaletteAsyncListener, OnTrackClickListener {
 
-	private var mSelectedCollection: Collection? = null
+	private var mCollection: Collection? = null
 	private lateinit var mBackgroundManager: BackgroundManager
 	private lateinit var mDetailsBackground: DetailsSupportFragmentBackgroundController
 	private lateinit var mDetailsPresenter: FullWidthDetailsOverviewRowPresenter
@@ -61,9 +61,9 @@ class CollectionFragment : DetailsSupportFragment(), PaletteAsyncListener, OnTra
 		mBackgroundManager = BackgroundManager.getInstance(requireActivity())
 		mBackgroundManager.attach(requireActivity().window)
 
-		mSelectedCollection =
+		mCollection =
 			requireActivity().intent.getSerializableExtra(CollectionActivity.COLLECTION) as Collection
-		if (mSelectedCollection == null) {
+		if (mCollection == null) {
 			val intent = Intent(requireContext(), MainActivity::class.java)
 			startActivity(intent)
 		}
@@ -74,15 +74,15 @@ class CollectionFragment : DetailsSupportFragment(), PaletteAsyncListener, OnTra
 		setupDetailsOverviewRowPresenter()
 		adapter = mAdapter
 
-		if (mSelectedCollection!!.tracks == null) {
+		if (mCollection!!.tracks == null) {
 
 			lifecycleScope.launch {
 				val apiClient = MetadataClient()
-				when (mSelectedCollection) {
+				when (mCollection) {
 					is Album -> {
-						when (val result = apiClient.fetchAlbumTracks((mSelectedCollection as Album).id!!)) {
+						when (val result = apiClient.fetchAlbumTracks((mCollection as Album).id!!)) {
 							is ApiResult.Success -> {
-								mSelectedCollection!!.tracks = result.data
+								mCollection!!.tracks = result.data
 								mAdapter.notifyArrayItemRangeChanged(0, mAdapter.size())
 							}
 
@@ -94,9 +94,9 @@ class CollectionFragment : DetailsSupportFragment(), PaletteAsyncListener, OnTra
 					}
 
 					is Mix -> {
-						when (val result = apiClient.fetchMixTracks((mSelectedCollection as Mix).id!!)) {
+						when (val result = apiClient.fetchMixTracks((mCollection as Mix).id!!)) {
 							is ApiResult.Success -> {
-								mSelectedCollection!!.tracks = result.data
+								mCollection!!.tracks = result.data
 								mAdapter.notifyArrayItemRangeChanged(0, mAdapter.size())
 							}
 
@@ -108,9 +108,9 @@ class CollectionFragment : DetailsSupportFragment(), PaletteAsyncListener, OnTra
 					}
 
 					is Playlist -> {
-						when (val result = apiClient.fetchPlaylistTracks((mSelectedCollection as Playlist).uuid!!)) {
+						when (val result = apiClient.fetchPlaylistTracks((mCollection as Playlist).uuid!!)) {
 							is ApiResult.Success -> {
-								mSelectedCollection!!.tracks = result.data
+								mCollection!!.tracks = result.data
 								mAdapter.notifyArrayItemRangeChanged(0, mAdapter.size())
 							}
 
@@ -129,7 +129,7 @@ class CollectionFragment : DetailsSupportFragment(), PaletteAsyncListener, OnTra
 
 	override fun onResume() {
 		super.onResume()
-		initializeBackground(mSelectedCollection)
+		initializeBackground(mCollection)
 	}
 
 	private fun initializeBackground(collection: Collection?) {
@@ -138,7 +138,7 @@ class CollectionFragment : DetailsSupportFragment(), PaletteAsyncListener, OnTra
 			.asBitmap()
 			.centerCrop()
 			.error(R.drawable.default_background)
-			.load(collection?.imageUrl())
+			.load(collection?.largeImageUrl())
 			.into(object : CustomTarget<Bitmap>() {
 
 				override fun onResourceReady(
@@ -156,13 +156,13 @@ class CollectionFragment : DetailsSupportFragment(), PaletteAsyncListener, OnTra
 	}
 
 	private fun setupDetailsOverviewRow() {
-		Log.d(TAG, "doInBackground: " + mSelectedCollection?.toString())
-		val row = DetailsOverviewRow(mSelectedCollection)
+		Log.d(TAG, "doInBackground: " + mCollection?.toString())
+		val row = DetailsOverviewRow(mCollection)
 		row.imageDrawable = ContextCompat.getDrawable(requireContext(), R.drawable.default_background)
 		val width = convertDpToPixel(requireContext(), DETAIL_THUMB_WIDTH)
 		val height = convertDpToPixel(requireContext(), DETAIL_THUMB_HEIGHT)
 		Glide.with(requireContext())
-			.load(mSelectedCollection?.imageUrl())
+			.load(mCollection?.imageUrl())
 			.centerCrop()
 			.error(R.drawable.album)
 			.into(object : CustomTarget<Drawable>(width, height) {
@@ -201,7 +201,7 @@ class CollectionFragment : DetailsSupportFragment(), PaletteAsyncListener, OnTra
 //			)
 //		)
 
-		if (mSelectedCollection is Album && (mSelectedCollection as Album).mainArtist() != null) {
+		if (mCollection is Album && (mCollection as Album).mainArtist() != null) {
 			actionAdapter.add(
 				Action(
 					ACTION_GO_TO_ARTIST,
@@ -219,7 +219,7 @@ class CollectionFragment : DetailsSupportFragment(), PaletteAsyncListener, OnTra
 
 		// Set detail background.
 		mDetailsPresenter =
-			FullWidthDetailsOverviewRowPresenter(DetailsPresenter(mSelectedCollection!!, this))
+			FullWidthDetailsOverviewRowPresenter(DetailsPresenter(mCollection!!, this))
 		mDetailsPresenter.backgroundColor =
 			ColorUtils.setAlphaComponent(ContextCompat.getColor(requireContext(), R.color.details_background), ALPHA_VALUE)
 		mDetailsPresenter.actionsBackgroundColor =
@@ -242,7 +242,7 @@ class CollectionFragment : DetailsSupportFragment(), PaletteAsyncListener, OnTra
 
 			if (action.id == ACTION_GO_TO_ARTIST) {
 				Intent(requireContext(), ArtistActivity::class.java).apply {
-					putExtra(ArtistActivity.ARTIST, (mSelectedCollection!! as Album).mainArtist()!!)
+					putExtra(ArtistActivity.ARTIST, (mCollection!! as Album).mainArtist()!!)
 					startActivity(this)
 				}
 				return@OnActionClickedListener
@@ -262,7 +262,7 @@ class CollectionFragment : DetailsSupportFragment(), PaletteAsyncListener, OnTra
 	}
 
 	override fun onTrackClick(track: Track) {
-		val index = mSelectedCollection!!.tracks!!.indexOf(track)
+		val index = mCollection!!.tracks!!.indexOf(track)
 		playCollection(index)
 	}
 
@@ -274,9 +274,9 @@ class CollectionFragment : DetailsSupportFragment(), PaletteAsyncListener, OnTra
 		lifecycleScope.launch {
 			val apiClient = StreamingClient()
 
-			when (mSelectedCollection) {
+			when (mCollection) {
 				is Album -> {
-					when (val result = apiClient.playAlbum((mSelectedCollection as Album).id!!, index)) {
+					when (val result = apiClient.playAlbum((mCollection as Album).id!!, index)) {
 						is ApiResult.Success -> {}
 						is ApiResult.Error -> {
 							Log.e(TAG, "Error playing albums: ${result.exception}")
@@ -285,7 +285,7 @@ class CollectionFragment : DetailsSupportFragment(), PaletteAsyncListener, OnTra
 				}
 
 				is Mix -> {
-					when (val result = apiClient.playMix((mSelectedCollection as Mix).id!!, index)) {
+					when (val result = apiClient.playMix((mCollection as Mix).id!!, index)) {
 						is ApiResult.Success -> {}
 						is ApiResult.Error -> {
 							Log.e(TAG, "Error playing collection: ${result.exception}")
@@ -294,7 +294,7 @@ class CollectionFragment : DetailsSupportFragment(), PaletteAsyncListener, OnTra
 				}
 
 				is Playlist -> {
-					when (val result = apiClient.playPlaylist((mSelectedCollection as Playlist).uuid!!, index)) {
+					when (val result = apiClient.playPlaylist((mCollection as Playlist).uuid!!, index)) {
 						is ApiResult.Success -> {}
 						is ApiResult.Error -> {
 							Log.e(TAG, "Error playing collection: ${result.exception}")

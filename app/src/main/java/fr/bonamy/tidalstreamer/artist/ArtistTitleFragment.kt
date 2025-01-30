@@ -36,6 +36,10 @@ class ArtistTitleFragment : Fragment() {
 		val title = view.findViewById<TextView>(R.id.title)
 		title.text = mArtist.name
 
+		// description
+		var description = view.findViewById<TextView>(R.id.description)
+		description.text = mArtist.artistRoles?.map { it.category }?.joinToString(", ")
+
 		// thumbnail
 		val image = view.findViewById<ImageView>(R.id.image)
 		Glide.with(requireContext())
