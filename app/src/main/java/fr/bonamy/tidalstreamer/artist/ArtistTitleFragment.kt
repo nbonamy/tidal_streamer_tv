@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.ScrollView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -41,22 +40,11 @@ class ArtistTitleFragment : Fragment() {
 		val image = view.findViewById<ImageView>(R.id.image)
 		Glide.with(requireContext())
 			.load(mArtist.imageUrl())
-			//.error(mDefaultCardImage)
 			.into(image)
 
 		// orb
 		val orb = view.findViewById<SearchOrbView>(R.id.orb)
 		orb.orbColors = SearchOrbView.Colors(ContextCompat.getColor(context!!, R.color.search_opaque))
-		orb.setOnFocusChangeListener { view, b ->
-			if (!b) return@setOnFocusChangeListener
-			var scrollView = view.parent
-			while (scrollView != null && !(scrollView is ScrollView)) {
-				scrollView = scrollView.parent
-			}
-			if (scrollView != null) {
-				(scrollView as ScrollView).smoothScrollTo(0, 0)
-			}
-		}
 		orb.setOnOrbClickedListener {
 			val intent = Intent(context!!, SearchActivity::class.java)
 			startActivity(intent)

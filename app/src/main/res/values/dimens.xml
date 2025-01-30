@@ -4,4 +4,11 @@
     <dimen name="artist_title_height">110dp</dimen>
     <dimen name="artist_title_start_padding">54dp</dimen>
 
+    <dimen name="artist_banner_height">250dp</dimen>
+    <dimen name="arist_content_vertical_offset">225dp</dimen>
+
+    <!-- the sum of the two below should be equal to artist_banner_height -->
+    <dimen name="artist_banner_bottom_fade_height">75dp</dimen>
+    <dimen name="artist_banner_bottom_fade_offset">175dp</dimen>
+
 </resources>

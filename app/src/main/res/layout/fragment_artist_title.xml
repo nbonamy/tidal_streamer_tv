@@ -1,66 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#000000"
     android:baselineAligned="false"
-    android:orientation="horizontal"
-    >
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:orientation="vertical"
-        android:paddingTop="24dp"
-        android:paddingStart="32dp"
-        android:paddingEnd="32dp"
-        >
-        <androidx.leanback.widget.SearchOrbView
-            android:id="@+id/orb"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="24dp"
-            android:layout_marginStart="22dp"
+    android:orientation="horizontal">
 
-             />
+    <androidx.leanback.widget.SearchOrbView
+        android:id="@+id/orb"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="54dp"
+        android:layout_marginTop="32dp" />
 
-        <TextView
-            android:id="@+id/title"
-            style="?attr/browseTitleTextStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="16dp"
-            tools:text="Title"
-            />
-
-    </LinearLayout>
     <FrameLayout
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_weight="1">
+        android:layout_marginStart="@dimen/artist_banner_height">
 
         <ImageView
             android:id="@+id/image"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:adjustViewBounds="true"
+            android:adjustViewBounds="false"
             android:scaleType="centerCrop"
-            tools:src="@drawable/artist"
-            />
+            tools:src="@drawable/artist" />
+
         <View
-            android:layout_width="75dp"
+            android:layout_width="100dp"
             android:layout_height="match_parent"
             android:layout_gravity="start"
-            android:background="@drawable/fade_edge_left"
-            />
+            android:background="@drawable/fade_edge_left" />
+
         <View
             android:layout_width="match_parent"
-            android:layout_height="75dp"
-            android:layout_gravity="bottom"
-            android:background="@drawable/fade_edge_bottom"
-            />
+            android:layout_height="@dimen/artist_banner_bottom_fade_height"
+            android:layout_marginTop="@dimen/artist_banner_bottom_fade_offset"
+            android:background="@drawable/fade_edge_bottom" />
     </FrameLayout>
 
-</LinearLayout>
+    <TextView
+        android:id="@+id/title"
+        style="?attr/browseTitleTextStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="100dp"
+        android:layout_marginStart="50dp"
+        tools:text="Title" />
+
+</FrameLayout>
