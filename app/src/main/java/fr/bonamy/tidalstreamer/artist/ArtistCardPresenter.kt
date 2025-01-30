@@ -10,37 +10,42 @@ import com.bumptech.glide.Glide
 import fr.bonamy.tidalstreamer.R
 import fr.bonamy.tidalstreamer.models.Artist
 import fr.bonamy.tidalstreamer.utils.CardPresenter
+import fr.bonamy.tidalstreamer.utils.ItemLongClickedListener
 
-class ArtistCardPresenter : CardPresenter() {
+class ArtistCardPresenter(private var mLongClickedListener: ItemLongClickedListener) : CardPresenter() {
 
-	private var mDefaultCardImage: Drawable? = null
+  private var mDefaultCardImage: Drawable? = null
 
-	override fun onCreateViewHolder(parent: ViewGroup): ViewHolder {
-		mDefaultCardImage = ContextCompat.getDrawable(parent.context, R.drawable.artist)
-		return super.onCreateViewHolder(parent)
-	}
+  override fun onCreateViewHolder(parent: ViewGroup): ViewHolder {
+    mDefaultCardImage = ContextCompat.getDrawable(parent.context, R.drawable.artist)
+    return super.onCreateViewHolder(parent)
+  }
 
-	override fun onBindViewHolder(viewHolder: ViewHolder, item: Any) {
-		val artist = item as Artist
-		val cardView = viewHolder.view as ImageCardView
+  override fun onBindViewHolder(viewHolder: ViewHolder, item: Any) {
+    val artist = item as Artist
+    val cardView = viewHolder.view as ImageCardView
+    viewHolder.view.setOnLongClickListener {
+      mLongClickedListener.onItemLongClicked(artist, cardView)
+      true
+    }
 
-		val titleView: TextView = viewHolder.view.findViewById(androidx.leanback.R.id.title_text)
-		titleView.textAlignment = TextView.TEXT_ALIGNMENT_CENTER
-		titleView.gravity = Gravity.CENTER
-		titleView.minLines = 2
-		titleView.maxLines = 2
+    val titleView: TextView = viewHolder.view.findViewById(androidx.leanback.R.id.title_text)
+    titleView.textAlignment = TextView.TEXT_ALIGNMENT_CENTER
+    titleView.gravity = Gravity.CENTER
+    titleView.minLines = 2
+    titleView.maxLines = 2
 
-		val contentView: TextView = viewHolder.view.findViewById(androidx.leanback.R.id.content_text)
-		contentView.visibility = TextView.GONE
+    val contentView: TextView = viewHolder.view.findViewById(androidx.leanback.R.id.content_text)
+    contentView.visibility = TextView.GONE
 
-		//Log.d(TAG, "onBindViewHolder")
-		cardView.titleText = artist.name
-		cardView.setMainImageDimensions(CARD_WIDTH, CARD_HEIGHT)
-		Glide.with(viewHolder.view.context)
-			.load(artist.imageUrl())
-			.circleCrop()
-			.error(mDefaultCardImage)
-			.into(cardView.mainImageView)
-	}
+    //Log.d(TAG, "onBindViewHolder")
+    cardView.titleText = artist.name
+    cardView.setMainImageDimensions(CARD_WIDTH, CARD_HEIGHT)
+    Glide.with(viewHolder.view.context)
+      .load(artist.imageUrl())
+      .circleCrop()
+      .error(mDefaultCardImage)
+      .into(cardView.mainImageView)
+  }
 
 }

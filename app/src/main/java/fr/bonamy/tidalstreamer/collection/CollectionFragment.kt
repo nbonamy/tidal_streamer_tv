@@ -37,8 +37,8 @@ import fr.bonamy.tidalstreamer.models.Collection
 import fr.bonamy.tidalstreamer.models.Mix
 import fr.bonamy.tidalstreamer.models.Playlist
 import fr.bonamy.tidalstreamer.models.Track
+import fr.bonamy.tidalstreamer.utils.ItemLongClickedListener
 import fr.bonamy.tidalstreamer.utils.PaletteUtils
-import fr.bonamy.tidalstreamer.utils.TrackLongClickListener
 import kotlinx.coroutines.launch
 
 /**
@@ -245,7 +245,7 @@ class CollectionFragment : DetailsSupportFragment(), PaletteAsyncListener, OnTra
   }
 
   override fun onTrackLongClick(track: Track) {
-    TrackLongClickListener(requireActivity()).onTrackLongClicked(track, null)
+    ItemLongClickedListener(requireActivity()).onItemLongClicked(track, null)
   }
 
   private fun playCollection(index: Int = 0) {
