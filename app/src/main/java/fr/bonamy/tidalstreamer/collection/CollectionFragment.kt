@@ -168,7 +168,6 @@ class CollectionFragment : DetailsSupportFragment(), PaletteAsyncListener, OnTra
       .error(R.drawable.album)
       .into(object : CustomTarget<Drawable>(width, height) {
         override fun onResourceReady(drawable: Drawable, transition: Transition<in Drawable?>?) {
-          Log.d(TAG, "details overview card image url ready: $drawable")
           row.imageDrawable = drawable
           mAdapter.notifyArrayItemRangeChanged(0, mAdapter.size())
         }
