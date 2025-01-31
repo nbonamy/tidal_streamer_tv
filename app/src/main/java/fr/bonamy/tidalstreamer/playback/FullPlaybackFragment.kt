@@ -2,6 +2,7 @@ package fr.bonamy.tidalstreamer.playback
 
 import android.animation.ObjectAnimator
 import android.os.Bundle
+import android.util.Log
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
@@ -16,6 +17,8 @@ import androidx.transition.TransitionInflater
 import fr.bonamy.tidalstreamer.R
 import fr.bonamy.tidalstreamer.api.ApiResult
 import fr.bonamy.tidalstreamer.api.MetadataClient
+import fr.bonamy.tidalstreamer.api.StreamerEventListener
+import fr.bonamy.tidalstreamer.api.StreamerListener
 import fr.bonamy.tidalstreamer.models.Lyrics
 import fr.bonamy.tidalstreamer.models.STATE_PLAYING
 import fr.bonamy.tidalstreamer.models.Status
@@ -25,7 +28,7 @@ import java.util.TimerTask
 import java.util.regex.Pattern
 import kotlin.math.abs
 
-class FullPlaybackFragment(private var mLayout: PlaybackLayout, private var mStatus: Status?) : PlaybackFragmentBase() {
+class FullPlaybackFragment(private var mLayout: PlaybackLayout, private var mStatus: Status?) : PlaybackFragmentBase(), StreamerEventListener {
 
   class LyricsLine internal constructor(val mPosition: Int, val mWords: String)
 
@@ -36,6 +39,7 @@ class FullPlaybackFragment(private var mLayout: PlaybackLayout, private var mSta
   private var mScrollingLocked = false
   private var mSyncedLyrics = false
   private var mUnlockScrollTimer: Timer? = null
+  private var mStreamerListener = StreamerListener(this)
 
   private val viewModel: PlaybackKeyEventViewModel by activityViewModels()
 
@@ -70,6 +74,16 @@ class FullPlaybackFragment(private var mLayout: PlaybackLayout, private var mSta
     return v
   }
 
+  override fun onResume() {
+    super.onResume()
+    mStreamerListener.start()
+  }
+
+  override fun onPause() {
+    super.onPause()
+    mStreamerListener.stop()
+  }
+
   fun latestStatus(): Status? {
     return mStatus
   }
@@ -79,6 +93,18 @@ class FullPlaybackFragment(private var mLayout: PlaybackLayout, private var mSta
 
   override fun hideSelf() {
     requireActivity().finish()
+  }
+
+  override fun onStatus(status: Status) {
+    cancelUpdate()
+    try {
+      viewLifecycleOwner.lifecycleScope.launch {
+        processStatus(status)
+      }
+    } catch (e: Exception) {
+      Log.e(TAG, "Failed to process status: $e")
+    }
+    scheduleUpdate()
   }
 
   override fun processStatus(status: Status): StatusProcessResult {
@@ -291,7 +317,7 @@ class FullPlaybackFragment(private var mLayout: PlaybackLayout, private var mSta
 
     // done
     mCurrentLine = activeLine
-    scrollView?.post { mLyricsView?.visibility = VISIBLE }
+    scrollView.post { mLyricsView?.visibility = VISIBLE }
   }
 
   private fun setLyricsLine(view: TextView?, current: Boolean) {
@@ -300,6 +326,7 @@ class FullPlaybackFragment(private var mLayout: PlaybackLayout, private var mSta
   }
 
   companion object {
+    const val TAG = "FullPlaybackFragment"
     private var mLyrics: Lyrics? = null
     private val timestampPattern = Pattern.compile("^\\[(\\d\\d):(\\d\\d).(\\d\\d)]")
     private const val TIMESTAMP_LENGTH = 10

@@ -53,6 +53,7 @@ dependencies {
   implementation(libs.androidx.palette.ktx)
   implementation(libs.androidx.transition)
   implementation(libs.glide)
+  implementation(libs.okhttp)
   implementation(libs.retrofit)
   implementation(libs.converter.gson)
 }

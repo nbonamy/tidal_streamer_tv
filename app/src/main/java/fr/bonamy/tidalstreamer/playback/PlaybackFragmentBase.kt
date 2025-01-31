@@ -48,30 +48,40 @@ abstract class PlaybackFragmentBase : Fragment() {
 
   override fun onResume() {
     super.onResume()
-    updateTask.run()
+    runUpdate()
   }
 
   override fun onPause() {
     super.onPause()
+    cancelUpdate()
+  }
+
+  protected fun runUpdate() {
+    updateTask.run()
+  }
+
+  protected fun cancelUpdate() {
     handler.removeCallbacks(updateTask)
   }
 
-  private val updateTask = object : Runnable {
-    override fun run() {
-      viewLifecycleOwner.lifecycleScope.launch {
-        when (val status = apiClient.status()) {
-          is ApiResult.Success -> {
-            processStatus(status.data)
-          }
+  protected fun scheduleUpdate() {
+    handler.postDelayed(updateTask, REFRESH_INTERVAL)
+  }
 
-          is ApiResult.Error -> {
-            hideSelf()
-          }
+  private val updateTask = Runnable {
+    lifecycleScope.launch {
+      when (val status = apiClient.status()) {
+        is ApiResult.Success -> {
+          processStatus(status.data)
+        }
+
+        is ApiResult.Error -> {
+          hideSelf()
         }
       }
-
-      handler.postDelayed(this, REFRESH_INTERVAL)
     }
+
+    scheduleUpdate()
   }
 
   open fun processStatus(status: Status): StatusProcessResult {
@@ -102,7 +112,7 @@ abstract class PlaybackFragmentBase : Fragment() {
     artistView.text = track.mainArtist()?.name ?: ""
 
     // album art
-    Glide.with(this)
+    Glide.with(this@PlaybackFragmentBase)
       .load(track.imageUrl())
       .centerCrop()
       .error(R.drawable.album)
@@ -115,7 +125,7 @@ abstract class PlaybackFragmentBase : Fragment() {
   }
 
   protected fun getTrack(status: Status): Track? {
-    return status.tracks?.get(status.position)?.item ?: null
+    return status.tracks?.get(status.position)?.item
   }
 
   companion object {
