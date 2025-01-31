@@ -17,4 +17,11 @@
     android:layout_marginTop="@dimen/arist_content_vertical_offset"
     android:focusedByDefault="true" />
 
+  <FrameLayout
+    android:id="@+id/playback_fragment"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center|bottom"
+    android:focusable="false" />
+
 </FrameLayout>

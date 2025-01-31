@@ -4,9 +4,6 @@ import android.os.Bundle
 import fr.bonamy.tidalstreamer.R
 import fr.bonamy.tidalstreamer.utils.TidalActivity
 
-/**
- * Details activity class that loads [CollectionFragment] class.
- */
 class CollectionActivity : TidalActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {

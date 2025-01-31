@@ -28,6 +28,11 @@ data class Track(
     return String.format(Locale.getDefault(), "%d:%02d", minutes, seconds)
   }
 
+  fun mainArtist(): Artist? {
+    if (artist != null) return artist
+    return artists?.firstOrNull()
+  }
+
   override fun toString(): String {
     return "Track{" +
         "id=" + id +

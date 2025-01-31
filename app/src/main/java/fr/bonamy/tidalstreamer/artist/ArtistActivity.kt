@@ -10,7 +10,7 @@ class ArtistActivity : TidalActivity() {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_artist)
     if (savedInstanceState == null) {
-      getSupportFragmentManager().beginTransaction()
+      supportFragmentManager.beginTransaction()
         .replace(R.id.artist_title, ArtistTitleFragment())
         .replace(R.id.artist_fragment, ArtistFragment())
         .commitNow()
