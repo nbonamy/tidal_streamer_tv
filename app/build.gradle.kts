@@ -49,6 +49,7 @@ dependencies {
   implementation(libs.androidx.core.ktx)
   implementation(libs.androidx.leanback)
   implementation(libs.androidx.lifecycle.runtime.ktx)
+  implementation(libs.androidx.fragment.ktx)
   implementation(libs.androidx.palette.ktx)
   implementation(libs.glide)
   implementation(libs.retrofit)

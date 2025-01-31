@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:id="@+id/scene_container"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  android:orientation="horizontal"
+  android:padding="64dp"
+  tools:context=".playback.FullPlaybackFragment">
+
+  <LinearLayout
+    android:layout_width="150dp"
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal"
+    android:orientation="vertical">
+
+    <ImageView
+      android:id="@+id/album_art"
+      android:layout_width="150dp"
+      android:layout_height="150dp"
+      android:src="@drawable/album" />
+
+    <Space
+      android:layout_width="0dp"
+      android:layout_height="32dp" />
+
+    <TextView
+      android:id="@+id/title"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:textAlignment="center"
+      android:textSize="24sp"
+      tools:text="I Can Never Say Goodbye" />
+
+    <Space
+      android:layout_width="0dp"
+      android:layout_height="16dp" />
+
+    <TextView
+      android:id="@+id/artist"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:textAlignment="center"
+      android:textSize="16sp"
+      tools:text="The Cure" />
+
+    <Space
+      android:layout_width="0dp"
+      android:layout_height="32dp" />
+
+    <ProgressBar
+      android:id="@+id/progress"
+      style="?android:attr/progressBarStyleHorizontal"
+      android:layout_width="150dp"
+      android:layout_height="4dp"
+      android:indeterminate="false"
+      android:progressDrawable="@drawable/progress_rounded_corners"
+      tools:max="100"
+      tools:progress="50" />
+
+  </LinearLayout>
+
+  <ScrollView
+    android:id="@+id/scroll"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginStart="75dp"
+    android:fadingEdge="vertical"
+    android:fadingEdgeLength="100dp"
+    android:scrollbars="none">
+
+    <LinearLayout
+      android:id="@+id/lyrics"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="vertical" />
+
+  </ScrollView>
+
+</LinearLayout>

@@ -42,8 +42,6 @@ abstract class PlaybackFragmentBase : Fragment() {
     titleView = v.findViewById(R.id.title)
     artistView = v.findViewById(R.id.artist)
     albumArtView = v.findViewById(R.id.album_art)
-
-    // done
     return v
   }
 
