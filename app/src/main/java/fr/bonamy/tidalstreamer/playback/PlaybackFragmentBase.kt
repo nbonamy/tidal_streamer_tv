@@ -1,14 +1,11 @@
 package fr.bonamy.tidalstreamer.playback
 
-import android.animation.ObjectAnimator
-import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -17,27 +14,34 @@ import fr.bonamy.tidalstreamer.R
 import fr.bonamy.tidalstreamer.api.ApiResult
 import fr.bonamy.tidalstreamer.api.StreamingClient
 import fr.bonamy.tidalstreamer.models.Status
+import fr.bonamy.tidalstreamer.models.Track
 import kotlinx.coroutines.launch
 
-class PlaybackFragment : Fragment() {
+enum class StatusProcessResult {
+  NO_TRACK,
+  SAME_TRACK,
+  NEW_TRACK,
+}
+
+abstract class PlaybackFragmentBase : Fragment() {
+
+  abstract fun showSelf()
+  abstract fun hideSelf()
 
   private val apiClient = StreamingClient()
   private lateinit var titleView: TextView
   private lateinit var artistView: TextView
   private lateinit var albumArtView: ImageView
-  private lateinit var progressView: ProgressBar
   private val handler = Handler(Looper.getMainLooper())
   private var currentMediaId: String? = null
 
-  override fun onCreateView(
-    inflater: LayoutInflater, container: ViewGroup?,
-    savedInstanceState: Bundle?
+  protected fun createView(
+    inflater: LayoutInflater, container: ViewGroup?, layoutId: Int
   ): View? {
-    val v = inflater.inflate(R.layout.fragment_playback, container, false)
+    val v = inflater.inflate(layoutId, container, false)
     titleView = v.findViewById(R.id.title)
     artistView = v.findViewById(R.id.artist)
     albumArtView = v.findViewById(R.id.album_art)
-    progressView = v.findViewById(R.id.progress)
 
     // done
     return v
@@ -71,38 +75,30 @@ class PlaybackFragment : Fragment() {
     }
   }
 
-  private fun processStatus(status: Status) {
+  open fun processStatus(status: Status): StatusProcessResult {
 
     // basic checks
     if (status.state == "STOPPED" || status.tracks.isNullOrEmpty() || status.position < 0 || status.position >= status.tracks.size) {
       hideSelf()
-      return
+      currentMediaId = null
+      return StatusProcessResult.NO_TRACK
     }
 
     // get track
-    val track = status.tracks[status.position].item
+    val track = getTrack(status)
     if (track == null) {
       hideSelf()
-      return
-    }
-
-    // progress
-    progressView.max = track.duration * 1000
-    val progress = status.progress
-    if (Math.abs(progressView.progress - progress) > 3000) {
-      progressView.progress = progress
-    } else {
-      val progressAnimator = ObjectAnimator.ofInt(progressView, "progress", progress)
-      progressAnimator.duration = 1000L
-      progressAnimator.start()
+      currentMediaId = null
+      return StatusProcessResult.NO_TRACK
     }
 
     // are we already showing it?
     if (currentMediaId == track.id) {
-      return
+      return StatusProcessResult.SAME_TRACK
     }
 
     // all good!
+    showSelf()
     titleView.text = track.title
     artistView.text = track.mainArtist()?.name ?: ""
 
@@ -115,11 +111,12 @@ class PlaybackFragment : Fragment() {
 
     // update
     currentMediaId = track.id
+    return StatusProcessResult.NEW_TRACK
 
   }
 
-  private fun hideSelf() {
-    requireActivity().finish()
+  protected fun getTrack(status: Status): Track? {
+    return status.tracks?.get(status.position)?.item ?: null
   }
 
   companion object {

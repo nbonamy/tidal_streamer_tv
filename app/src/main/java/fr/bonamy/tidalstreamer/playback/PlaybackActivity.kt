@@ -15,7 +15,7 @@ class PlaybackActivity : TidalActivity() {
     setContentView(R.layout.activity_playback)
     if (savedInstanceState == null) {
       supportFragmentManager.beginTransaction()
-        .replace(R.id.playback_fragment, PlaybackFragment())
+        .replace(R.id.playback_fragment, FullPlaybackFragment())
         .commitNow()
     }
   }

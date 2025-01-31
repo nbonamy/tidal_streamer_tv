@@ -6,7 +6,7 @@
   android:background="@drawable/default_background"
   android:orientation="vertical"
   android:gravity="center_horizontal|center_vertical"
-  tools:context=".playback.PlaybackFragment">
+  tools:context=".playback.FullPlaybackFragment">
 
   <ImageView
     android:id="@+id/album_art"
