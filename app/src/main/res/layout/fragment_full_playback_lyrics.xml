@@ -66,7 +66,8 @@
     android:layout_height="match_parent"
     android:layout_marginStart="75dp"
     android:fadingEdge="vertical"
-    android:fadingEdgeLength="100dp"
+    android:requiresFadingEdge="vertical"
+    android:fadingEdgeLength="50dp"
     android:scrollbars="none">
 
     <LinearLayout

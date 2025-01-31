@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.INVISIBLE
+import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.ScrollView
@@ -30,6 +32,7 @@ class FullPlaybackFragment(private var mLayout: PlaybackLayout) : PlaybackFragme
   private var mStatus: Status? = null
   private var mLyrics: Lyrics? = null
   private var mLyricsLines = mutableListOf<LyricsLine>()
+  private var mLyricsView: ViewGroup? = null
   private val mLinesViews = mutableMapOf<LyricsLine, TextView>()
   private var mCurrentLine: LyricsLine? = null
   private var mScrollingLocked = false
@@ -42,18 +45,25 @@ class FullPlaybackFragment(private var mLayout: PlaybackLayout) : PlaybackFragme
     inflater: LayoutInflater, container: ViewGroup?,
     savedInstanceState: Bundle?
   ): View? {
+
+    // pick right layout
     val layoutId = when (mLayout) {
       PlaybackLayout.NO_LYRICS -> R.layout.fragment_full_playback_no_lyrics
       PlaybackLayout.LYRICS -> R.layout.fragment_full_playback_lyrics
     }
     val v = createView(inflater, container, layoutId) ?: return null
-    v.visibility = View.INVISIBLE
+    mLyricsView = v.findViewById(R.id.lyrics)
+
+    // key events coming from activity
     observeKeyEventChanges()
+
+    // done
+    v.visibility = INVISIBLE
     return v
   }
 
   override fun showSelf() {
-    requireView().visibility = View.VISIBLE
+    requireView().visibility = VISIBLE
   }
 
   override fun hideSelf() {
@@ -75,12 +85,13 @@ class FullPlaybackFragment(private var mLayout: PlaybackLayout) : PlaybackFragme
     val track = super.getTrack(status) ?: return result
 
     // load lyrics
-    if (result == StatusProcessResult.NEW_TRACK) {
+    if (result == StatusProcessResult.NEW_TRACK && mLyricsView != null) {
       lifecycleScope.launch {
         val metadataClient = MetadataClient()
         when (val lyrics = metadataClient.fetchTrackLyrics(track.id!!)) {
           is ApiResult.Success -> {
             updateLyrics(lyrics.data)
+            syncLyrics(status, true)
           }
 
           is ApiResult.Error -> {
@@ -150,8 +161,7 @@ class FullPlaybackFragment(private var mLayout: PlaybackLayout) : PlaybackFragme
     mLinesViews.clear()
 
     // do we have a view?
-    val lyricsView = view?.findViewById<ViewGroup>(R.id.lyrics) ?: return
-    lyricsView.removeAllViews()
+    mLyricsView!!.removeAllViews()
 
     // if no lyrics
     if (mLyrics == null) {
@@ -167,10 +177,10 @@ class FullPlaybackFragment(private var mLayout: PlaybackLayout) : PlaybackFragme
     // create an item per line
     val inflater = LayoutInflater.from(requireContext())
     mLyricsLines.forEach { line ->
-      val lineView = inflater.inflate(R.layout.item_lyrics_line, lyricsView, false) as TextView
+      val lineView = inflater.inflate(R.layout.item_lyrics_line, mLyricsView, false) as TextView
       lineView.text = line.mWords
       setLyricsLine(lineView, false)
-      lyricsView.addView(lineView)
+      mLyricsView!!.addView(lineView)
       mLinesViews[line] = lineView
     }
 
