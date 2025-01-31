@@ -26,7 +26,6 @@ import androidx.palette.graphics.Palette.PaletteAsyncListener
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
-import fr.bonamy.tidalstreamer.MainActivity
 import fr.bonamy.tidalstreamer.R
 import fr.bonamy.tidalstreamer.api.ApiResult
 import fr.bonamy.tidalstreamer.api.EnqueuePosition
@@ -59,17 +58,16 @@ class CollectionFragment : DetailsSupportFragment(), PaletteAsyncListener, OnTra
     Log.d(TAG, "onCreate DetailsFragment")
     super.onCreate(savedInstanceState)
 
+    mCollection =
+      requireActivity().intent.getSerializableExtra(CollectionActivity.COLLECTION) as Collection
+    if (mCollection == null) {
+      requireActivity().finish()
+    }
+
     mDetailsBackground = DetailsSupportFragmentBackgroundController(this)
     mBackgroundManager = BackgroundManager.getInstance(requireActivity())
     mBackgroundManager.attach(requireActivity().window)
     mBackgroundManager.drawable = resources.getDrawable(R.drawable.default_background)
-
-    mCollection =
-      requireActivity().intent.getSerializableExtra(CollectionActivity.COLLECTION) as Collection
-    if (mCollection == null) {
-      val intent = Intent(requireContext(), MainActivity::class.java)
-      startActivity(intent)
-    }
 
     mPresenterSelector = ClassPresenterSelector()
     mAdapter = ArrayObjectAdapter(mPresenterSelector)

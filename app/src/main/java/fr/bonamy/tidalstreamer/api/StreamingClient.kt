@@ -17,7 +17,7 @@ class StreamingClient : ApiClient() {
 
   suspend fun status(): ApiResult<Status> = withContext(Dispatchers.IO) {
     try {
-      Log.i(TAG, "status")
+//      Log.i(TAG, "status")
       val response = apiService.status()
       if (response.isSuccessful) {
         ApiResult.Success(response.body()!!)

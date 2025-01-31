@@ -48,6 +48,10 @@
       android:name=".search.SearchActivity"
       android:exported="false" />
     <activity
+      android:name=".playback.PlaybackActivity"
+      android:launchMode="singleTop"
+      android:exported="false" />
+    <activity
       android:name=".BrowseErrorActivity"
       android:exported="false" />
   </application>

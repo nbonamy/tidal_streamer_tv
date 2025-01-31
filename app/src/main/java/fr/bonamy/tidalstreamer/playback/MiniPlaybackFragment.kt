@@ -1,14 +1,13 @@
 package fr.bonamy.tidalstreamer.playback
 
-import android.animation.ObjectAnimator
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.GONE
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -19,13 +18,12 @@ import fr.bonamy.tidalstreamer.api.StreamingClient
 import fr.bonamy.tidalstreamer.models.Status
 import kotlinx.coroutines.launch
 
-class PlaybackFragment : Fragment() {
+class MiniPlaybackFragment : Fragment() {
 
   private val apiClient = StreamingClient()
   private lateinit var titleView: TextView
   private lateinit var artistView: TextView
   private lateinit var albumArtView: ImageView
-  private lateinit var progressView: ProgressBar
   private val handler = Handler(Looper.getMainLooper())
   private var currentMediaId: String? = null
 
@@ -33,13 +31,13 @@ class PlaybackFragment : Fragment() {
     inflater: LayoutInflater, container: ViewGroup?,
     savedInstanceState: Bundle?
   ): View? {
-    val v = inflater.inflate(R.layout.fragment_playback, container, false)
+    val v = inflater.inflate(R.layout.fragment_mini_playback, container, false)
     titleView = v.findViewById(R.id.title)
     artistView = v.findViewById(R.id.artist)
     albumArtView = v.findViewById(R.id.album_art)
-    progressView = v.findViewById(R.id.progress)
 
-    // done
+    // hide and done
+    v.visibility = GONE
     return v
   }
 
@@ -86,23 +84,13 @@ class PlaybackFragment : Fragment() {
       return
     }
 
-    // progress
-    progressView.max = track.duration * 1000
-    val progress = status.progress
-    if (Math.abs(progressView.progress - progress) > 3000) {
-      progressView.progress = progress
-    } else {
-      val progressAnimator = ObjectAnimator.ofInt(progressView, "progress", progress)
-      progressAnimator.duration = 1000L
-      progressAnimator.start()
-    }
-
     // are we already showing it?
     if (currentMediaId == track.id) {
       return
     }
 
     // all good!
+    view?.visibility = View.VISIBLE
     titleView.text = track.title
     artistView.text = track.mainArtist()?.name ?: ""
 
@@ -115,11 +103,11 @@ class PlaybackFragment : Fragment() {
 
     // update
     currentMediaId = track.id
-
   }
 
   private fun hideSelf() {
-    requireActivity().finish()
+    currentMediaId = null
+    view?.visibility = GONE
   }
 
   companion object {
