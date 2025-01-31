@@ -13,6 +13,7 @@ import com.bumptech.glide.Glide
 import fr.bonamy.tidalstreamer.R
 import fr.bonamy.tidalstreamer.api.ApiResult
 import fr.bonamy.tidalstreamer.api.StreamingClient
+import fr.bonamy.tidalstreamer.models.STATE_STOPPED
 import fr.bonamy.tidalstreamer.models.Status
 import fr.bonamy.tidalstreamer.models.Track
 import kotlinx.coroutines.launch
@@ -76,7 +77,7 @@ abstract class PlaybackFragmentBase : Fragment() {
   open fun processStatus(status: Status): StatusProcessResult {
 
     // basic checks
-    if (status.state == "STOPPED" || status.tracks.isNullOrEmpty() || status.position < 0 || status.position >= status.tracks.size) {
+    if (status.state == STATE_STOPPED || status.tracks.isNullOrEmpty() || status.position < 0 || status.position >= status.tracks.size) {
       hideSelf()
       currentMediaId = null
       return StatusProcessResult.NO_TRACK

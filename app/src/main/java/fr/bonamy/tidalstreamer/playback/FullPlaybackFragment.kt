@@ -15,6 +15,7 @@ import fr.bonamy.tidalstreamer.R
 import fr.bonamy.tidalstreamer.api.ApiResult
 import fr.bonamy.tidalstreamer.api.MetadataClient
 import fr.bonamy.tidalstreamer.models.Lyrics
+import fr.bonamy.tidalstreamer.models.STATE_PLAYING
 import fr.bonamy.tidalstreamer.models.Status
 import kotlinx.coroutines.launch
 import java.util.Timer

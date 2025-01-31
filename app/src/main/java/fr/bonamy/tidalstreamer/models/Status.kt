@@ -1,5 +1,9 @@
 package fr.bonamy.tidalstreamer.models
 
+const val STATE_STOPPED = "STOPPED"
+const val STATE_PLAYING = "PLAYING"
+const val STATE_PAUSED = "PAUSED"
+
 data class StatusTrack(
   val type: String = "track",
   val mediaId: Int? = null,

@@ -9,6 +9,8 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import fr.bonamy.tidalstreamer.api.ApiResult
 import fr.bonamy.tidalstreamer.api.StreamingClient
+import fr.bonamy.tidalstreamer.models.STATE_PAUSED
+import fr.bonamy.tidalstreamer.models.STATE_PLAYING
 import fr.bonamy.tidalstreamer.playback.PlaybackActivity
 import fr.bonamy.tidalstreamer.user.UserActivity
 import kotlinx.coroutines.launch
@@ -67,7 +69,7 @@ abstract class TidalActivity : FragmentActivity() {
       lifecycleScope.launch {
         when (val status = apiClient.status()) {
           is ApiResult.Success -> {
-            if (status.data.state == "PAUSED") {
+            if (status.data.state == STATE_PAUSED) {
               apiClient.stop()
             } else {
               apiClient.pause()
@@ -138,7 +140,7 @@ abstract class TidalActivity : FragmentActivity() {
       lifecycleScope.launch {
         when (val status = apiClient.status()) {
           is ApiResult.Success -> {
-            if (status.data.state == "PLAYING") {
+            if (status.data.state == STATE_PLAYING) {
               startPlaybackActivity()
             }
           }
