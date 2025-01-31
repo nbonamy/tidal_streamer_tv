@@ -194,7 +194,7 @@ class FullPlaybackFragment(private var mLayout: PlaybackLayout) : PlaybackFragme
       for (immutableLine in lines) {
         var line = immutableLine
         val matcher = timestampPattern.matcher(line)
-        if (matcher.find()) line = line.substring(timeStampLength).trim { it <= ' ' }
+        if (matcher.find()) line = line.substring(TIMESTAMP_LENGTH).trim { it <= ' ' }
         this.mLyricsLines.add(LyricsLine(0, line))
       }
       return
@@ -208,7 +208,7 @@ class FullPlaybackFragment(private var mLayout: PlaybackLayout) : PlaybackFragme
       val seconds = matcher.group(2)!!.toInt()
       val milliseconds = matcher.group(3)!!.toInt()
       val position = (minutes * 60 + seconds) * 1000 + milliseconds
-      var words = line.substring(timeStampLength).trim { it <= ' ' }
+      var words = line.substring(TIMESTAMP_LENGTH).trim { it <= ' ' }
       if (words.isEmpty()) words = SYNCED_EMPTY_LINE
       mLyricsLines.add(LyricsLine(position, words))
     }
@@ -267,7 +267,7 @@ class FullPlaybackFragment(private var mLayout: PlaybackLayout) : PlaybackFragme
 
   companion object {
     private val timestampPattern = Pattern.compile("^\\[(\\d\\d):(\\d\\d).(\\d\\d)]")
-    private const val timeStampLength = 10
+    private const val TIMESTAMP_LENGTH = 10
     private const val SYNCED_EMPTY_LINE = "●  ●  ●"
     private const val UNLOCK_SCROLL_DELAY = 3000L
   }
