@@ -11,6 +11,7 @@ import fr.bonamy.tidalstreamer.api.ApiResult
 import fr.bonamy.tidalstreamer.api.StreamingClient
 import fr.bonamy.tidalstreamer.models.STATE_PAUSED
 import fr.bonamy.tidalstreamer.models.STATE_PLAYING
+import fr.bonamy.tidalstreamer.models.STATE_STOPPED
 import fr.bonamy.tidalstreamer.playback.PlaybackActivity
 import fr.bonamy.tidalstreamer.user.UserActivity
 import kotlinx.coroutines.launch
@@ -155,8 +156,19 @@ abstract class TidalActivity : FragmentActivity() {
   }
 
   private fun startPlaybackActivity() {
-    val intent = Intent(this, PlaybackActivity::class.java)
-    startActivity(intent)
+    lifecycleScope.launch {
+      when (val result = apiClient.status()) {
+        is ApiResult.Success -> {
+          if (result.data.state != STATE_STOPPED) {
+            val intent = Intent(this@TidalActivity, PlaybackActivity::class.java)
+            startActivity(intent)
+          }
+        }
+
+        is ApiResult.Error -> {
+        }
+      }
+    }
   }
 
   companion object {
