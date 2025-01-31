@@ -92,6 +92,10 @@ class FullPlaybackFragment(private var mLayout: PlaybackLayout) : PlaybackFragme
 
     // progress
     val progressView = view?.findViewById<ProgressBar>(R.id.progress) ?: return result
+    progressView.progressDrawable = resources.getDrawable(
+      if (status.state == STATE_PLAYING) R.drawable.progress_rounded_corners else
+        R.drawable.progress_disabled_rounded_corners, null
+    )
     val progress = status.progress
     progressView.max = track.duration * 1000
     if (abs(progressView.progress - progress) > 3000) {
