@@ -49,7 +49,7 @@ class ItemLongClickedListener(private val mActivity: FragmentActivity) {
 
     // artist
     if (collection is Album) {
-      if (collection.artists != null && collection.artists!!.size > 1) {
+      if (collection.artists != null && collection.artists!!.size > 0) {
         collection.artists!!.forEach {
           if (it.name != null) {
             menuItems.add(mActivity.getString(R.string.go_to_prefix) + " " + it.name!!)

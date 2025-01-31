@@ -159,7 +159,7 @@ abstract class TidalActivity : FragmentActivity() {
 
   companion object {
     //private const val TAG = "PlaybackFragment"
-    private const val REFRESH_INTERVAL = 10000L
+    private const val REFRESH_INTERVAL = 15000L
   }
 
 }
