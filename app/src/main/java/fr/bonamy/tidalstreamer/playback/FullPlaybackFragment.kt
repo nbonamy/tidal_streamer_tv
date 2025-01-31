@@ -41,9 +41,7 @@ class FullPlaybackFragment : PlaybackFragmentBase() {
     val progress = status.progress
     val track = super.getTrack(status) ?: return result
     progressView.max = track.duration * 1000
-    if (result == StatusProcessResult.NEW_TRACK) {
-      progressView.progress = 0
-    } else if (Math.abs(progressView.progress - progress) > 3000) {
+    if (Math.abs(progressView.progress - progress) > 3000) {
       progressView.progress = progress
     } else {
       val progressAnimator = ObjectAnimator.ofInt(progressView, "progress", progress)

@@ -5,10 +5,8 @@ import android.os.Bundle
 import android.view.KeyEvent
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
-import fr.bonamy.tidalstreamer.R
 import fr.bonamy.tidalstreamer.api.ApiResult
 import fr.bonamy.tidalstreamer.api.StreamingClient
-import fr.bonamy.tidalstreamer.playback.MiniPlaybackFragment
 import fr.bonamy.tidalstreamer.playback.PlaybackActivity
 import fr.bonamy.tidalstreamer.user.UserActivity
 import kotlinx.coroutines.launch
@@ -20,11 +18,11 @@ abstract class TidalActivity : FragmentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     if (savedInstanceState == null) {
-      if (hasMiniPlayback()) {
-        supportFragmentManager.beginTransaction()
-          .replace(R.id.playback_fragment, MiniPlaybackFragment())
-          .commitNow()
-      }
+//      if (hasMiniPlayback()) {
+//        supportFragmentManager.beginTransaction()
+//          .replace(R.id.playback_fragment, MiniPlaybackFragment())
+//          .commitNow()
+//      }
     }
     apiClient = StreamingClient()
   }
