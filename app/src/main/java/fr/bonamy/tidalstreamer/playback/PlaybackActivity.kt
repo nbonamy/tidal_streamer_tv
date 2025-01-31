@@ -57,7 +57,6 @@ class PlaybackActivity : TidalActivity() {
         addSharedElement(findViewById(R.id.artist), findViewById<View>(R.id.artist).transitionName)
         addSharedElement(findViewById(R.id.album_art), findViewById<View>(R.id.album_art).transitionName)
         addSharedElement(findViewById(R.id.progress), findViewById<View>(R.id.progress).transitionName)
-        addToBackStack("playback")
         replace(R.id.playback_fragment, FullPlaybackFragment(currentLayout, currentFragment.latestStatus()))
       }
       return true
