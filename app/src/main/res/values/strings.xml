@@ -11,14 +11,21 @@
   <string name="go_to_artist">Go to Artist</string>
   <string name="go_to_prefix">Go to</string>
 
+  <string name="album_art_description">Album art</string>
 
-  <!-- Error messages -->
-  <string name="error_fragment_message">An error occurred</string>
-  <string name="dismiss_error">Dismiss</string>
+  <string name="playback_album_art_transition_name">album_art</string>
+  <string name="playback_title_transition_name">title</string>
+  <string name="playback_artist_transition_name">artist</string>
+  <string name="playback_progress_transition_name">progress</string>
 
   <plurals name="track_count">
     <item quantity="one">%d track</item>
     <item quantity="other">%d tracks</item>
   </plurals>
+
+  <!-- Error messages -->
+  <string name="error_no_playback">No music is currently playing</string>
+  <string name="error_fragment_message">An error occurred</string>
+  <string name="dismiss_error">Dismiss</string>
 
 </resources>

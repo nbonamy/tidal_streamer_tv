@@ -5,8 +5,10 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.KeyEvent
+import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
+import fr.bonamy.tidalstreamer.R
 import fr.bonamy.tidalstreamer.api.ApiResult
 import fr.bonamy.tidalstreamer.api.StreamingClient
 import fr.bonamy.tidalstreamer.models.STATE_PAUSED
@@ -162,6 +164,8 @@ abstract class TidalActivity : FragmentActivity() {
           if (result.data.state != STATE_STOPPED) {
             val intent = Intent(this@TidalActivity, PlaybackActivity::class.java)
             startActivity(intent)
+          } else {
+            Toast.makeText(this@TidalActivity, getString(R.string.error_no_playback), Toast.LENGTH_SHORT).show()
           }
         }
 
