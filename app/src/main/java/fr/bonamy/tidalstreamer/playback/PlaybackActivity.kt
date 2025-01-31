@@ -2,7 +2,10 @@ package fr.bonamy.tidalstreamer.playback
 
 import android.os.Bundle
 import android.view.KeyEvent
+import android.view.View
 import androidx.activity.viewModels
+import androidx.fragment.app.commit
+import androidx.fragment.app.commitNow
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -34,9 +37,9 @@ class PlaybackActivity : TidalActivity() {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_playback)
     if (savedInstanceState == null) {
-      supportFragmentManager.beginTransaction()
-        .replace(R.id.playback_fragment, FullPlaybackFragment(currentLayout))
-        .commitNow()
+      supportFragmentManager.commitNow {
+        replace(R.id.playback_fragment, FullPlaybackFragment(currentLayout, null))
+      }
     }
   }
 
@@ -44,11 +47,19 @@ class PlaybackActivity : TidalActivity() {
 
     // toggle lyrics
     if (keyCode == KeyEvent.KEYCODE_CAPTIONS || keyCode == KeyEvent.KEYCODE_C) {
-      currentLayout = if (currentLayout == PlaybackLayout.NO_LYRICS) PlaybackLayout.LYRICS else PlaybackLayout.NO_LYRICS
-      supportFragmentManager.beginTransaction()
-        .replace(R.id.playback_fragment, FullPlaybackFragment(currentLayout))
-        .commitNow()
-
+      currentLayout =
+        if (currentLayout == PlaybackLayout.NO_LYRICS) PlaybackLayout.LYRICS
+        else PlaybackLayout.NO_LYRICS
+      val currentFragment = supportFragmentManager.findFragmentById(R.id.playback_fragment) as FullPlaybackFragment
+      supportFragmentManager.commit {
+        setReorderingAllowed(true)
+        addSharedElement(findViewById(R.id.title), findViewById<View>(R.id.title).transitionName)
+        addSharedElement(findViewById(R.id.artist), findViewById<View>(R.id.artist).transitionName)
+        addSharedElement(findViewById(R.id.album_art), findViewById<View>(R.id.album_art).transitionName)
+        addSharedElement(findViewById(R.id.progress), findViewById<View>(R.id.progress).transitionName)
+        addToBackStack("playback")
+        replace(R.id.playback_fragment, FullPlaybackFragment(currentLayout, currentFragment.latestStatus()))
+      }
       return true
     }
 
@@ -63,6 +74,7 @@ class PlaybackActivity : TidalActivity() {
   }
 
   companion object {
+    private const val TAG = "PlaybackActivity"
     var currentLayout = PlaybackLayout.NO_LYRICS
   }
 

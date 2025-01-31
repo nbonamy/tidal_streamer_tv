@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
-import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.ProgressBar
@@ -13,6 +12,7 @@ import android.widget.ScrollView
 import android.widget.TextView
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.transition.TransitionInflater
 import fr.bonamy.tidalstreamer.R
 import fr.bonamy.tidalstreamer.api.ApiResult
 import fr.bonamy.tidalstreamer.api.MetadataClient
@@ -25,12 +25,10 @@ import java.util.TimerTask
 import java.util.regex.Pattern
 import kotlin.math.abs
 
-class FullPlaybackFragment(private var mLayout: PlaybackLayout) : PlaybackFragmentBase() {
+class FullPlaybackFragment(private var mLayout: PlaybackLayout, private var mStatus: Status?) : PlaybackFragmentBase() {
 
   class LyricsLine internal constructor(val mPosition: Int, val mWords: String)
 
-  private var mStatus: Status? = null
-  private var mLyrics: Lyrics? = null
   private var mLyricsLines = mutableListOf<LyricsLine>()
   private var mLyricsView: ViewGroup? = null
   private val mLinesViews = mutableMapOf<LyricsLine, TextView>()
@@ -40,6 +38,12 @@ class FullPlaybackFragment(private var mLayout: PlaybackLayout) : PlaybackFragme
   private var mUnlockScrollTimer: Timer? = null
 
   private val viewModel: PlaybackKeyEventViewModel by activityViewModels()
+
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    sharedElementEnterTransition = TransitionInflater.from(requireContext()).inflateTransition(R.transition.fragment_transition)
+    sharedElementReturnTransition = TransitionInflater.from(requireContext()).inflateTransition(R.transition.fragment_transition)
+  }
 
   override fun onCreateView(
     inflater: LayoutInflater, container: ViewGroup?,
@@ -54,16 +58,23 @@ class FullPlaybackFragment(private var mLayout: PlaybackLayout) : PlaybackFragme
     val v = createView(inflater, container, layoutId) ?: return null
     mLyricsView = v.findViewById(R.id.lyrics)
 
+    // if we have a status
+    if (mStatus != null) {
+      processStatus(mStatus!!)
+    }
+
     // key events coming from activity
     observeKeyEventChanges()
 
     // done
-    v.visibility = INVISIBLE
     return v
   }
 
+  fun latestStatus(): Status? {
+    return mStatus
+  }
+
   override fun showSelf() {
-    requireView().visibility = VISIBLE
   }
 
   override fun hideSelf() {
@@ -86,16 +97,23 @@ class FullPlaybackFragment(private var mLayout: PlaybackLayout) : PlaybackFragme
 
     // load lyrics
     if (result == StatusProcessResult.NEW_TRACK && mLyricsView != null) {
-      lifecycleScope.launch {
-        val metadataClient = MetadataClient()
-        when (val lyrics = metadataClient.fetchTrackLyrics(track.id!!)) {
-          is ApiResult.Success -> {
-            updateLyrics(lyrics.data)
-            syncLyrics(status, true)
-          }
 
-          is ApiResult.Error -> {
-            updateLyrics(null)
+      // do we already have lyrics
+      if (mLyrics != null && mLyrics!!.trackId == track.id) {
+        updateLyrics(mLyrics)
+        syncLyrics(status, true)
+      } else {
+        lifecycleScope.launch {
+          val metadataClient = MetadataClient()
+          when (val lyrics = metadataClient.fetchTrackLyrics(track.id!!)) {
+            is ApiResult.Success -> {
+              updateLyrics(lyrics.data)
+              syncLyrics(status, true)
+            }
+
+            is ApiResult.Error -> {
+              updateLyrics(null)
+            }
           }
         }
       }
@@ -241,6 +259,7 @@ class FullPlaybackFragment(private var mLayout: PlaybackLayout) : PlaybackFragme
         setLyricsLine(mLinesViews[mCurrentLine], false)
         mCurrentLine = null
       }
+      mLyricsView?.visibility = VISIBLE
       return
     }
 
@@ -270,8 +289,9 @@ class FullPlaybackFragment(private var mLayout: PlaybackLayout) : PlaybackFragme
       }
     }
 
-    // store
+    // done
     mCurrentLine = activeLine
+    scrollView?.post { mLyricsView?.visibility = VISIBLE }
   }
 
   private fun setLyricsLine(view: TextView?, current: Boolean) {
@@ -280,6 +300,7 @@ class FullPlaybackFragment(private var mLayout: PlaybackLayout) : PlaybackFragme
   }
 
   companion object {
+    private var mLyrics: Lyrics? = null
     private val timestampPattern = Pattern.compile("^\\[(\\d\\d):(\\d\\d).(\\d\\d)]")
     private const val TIMESTAMP_LENGTH = 10
     private const val SYNCED_EMPTY_LINE = "●  ●  ●"

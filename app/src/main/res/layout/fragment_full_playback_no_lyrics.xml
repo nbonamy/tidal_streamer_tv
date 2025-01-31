@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
   xmlns:tools="http://schemas.android.com/tools"
-  android:id="@+id/scene_container"
   android:layout_width="match_parent"
   android:layout_height="match_parent"
   android:orientation="vertical"
@@ -12,6 +11,7 @@
     android:id="@+id/album_art"
     android:layout_width="200dp"
     android:layout_height="200dp"
+    android:transitionName="@string/playback_album_art_transition_name"
     android:src="@drawable/album" />
 
   <Space
@@ -27,6 +27,7 @@
     android:textSize="32sp"
     android:maxLines="1"
     android:ellipsize="end"
+    android:transitionName="@string/playback_title_transition_name"
     tools:text="I Can Never Say Goodbye" />
 
   <TextView
@@ -37,6 +38,7 @@
     android:textSize="24sp"
     android:maxLines="1"
     android:ellipsize="end"
+    android:transitionName="@string/playback_artist_transition_name"
     tools:text="The Cure" />
 
   <Space
@@ -50,6 +52,7 @@
     android:layout_height="4dp"
     android:indeterminate="false"
     android:progressDrawable="@drawable/progress_rounded_corners"
+    android:transitionName="@string/playback_progress_transition_name"
     tools:max="100"
     tools:progress="50" />
 

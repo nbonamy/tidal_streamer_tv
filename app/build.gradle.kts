@@ -51,6 +51,7 @@ dependencies {
   implementation(libs.androidx.lifecycle.runtime.ktx)
   implementation(libs.androidx.fragment.ktx)
   implementation(libs.androidx.palette.ktx)
+  implementation(libs.androidx.transition)
   implementation(libs.glide)
   implementation(libs.retrofit)
   implementation(libs.converter.gson)
