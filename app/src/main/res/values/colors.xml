@@ -1,8 +1,8 @@
 <resources>
   <color name="default_background">#000000</color>
   <color name="fastlane_background">#080808</color>
-  <color name="search_opaque">#ffaa3f</color>
-  <color name="selected_background">#ffaa3f</color>
+  <color name="search_opaque">#ff9800</color>
+  <color name="selected_background">#ff9800</color>
   <color name="details_background">#101010</color>
   <color name="item_light_fg_normal">#E0E0E0</color>
   <color name="item_light_fg_selected">#FFFFFF</color>
