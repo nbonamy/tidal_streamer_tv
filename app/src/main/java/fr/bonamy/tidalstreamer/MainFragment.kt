@@ -8,7 +8,7 @@ import kotlinx.coroutines.launch
 class MainFragment : BrowserFragment() {
 
   override fun title(): String {
-    return getString(R.string.browse_title)
+    return getString(R.string.browse_main_title)
   }
 
   override fun loadRows() {
