@@ -46,7 +46,7 @@ class PlaybackActivity : TidalActivity() {
   override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
 
     // toggle lyrics
-    if (keyCode == KeyEvent.KEYCODE_CAPTIONS || keyCode == KeyEvent.KEYCODE_C) {
+    if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER || keyCode == KeyEvent.KEYCODE_CAPTIONS || keyCode == KeyEvent.KEYCODE_C) {
       currentLayout =
         if (currentLayout == PlaybackLayout.NO_LYRICS) PlaybackLayout.LYRICS
         else PlaybackLayout.NO_LYRICS
