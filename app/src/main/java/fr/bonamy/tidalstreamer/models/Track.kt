@@ -13,10 +13,10 @@ data class Track(
   var copyright: String? = null,
   var audioQuality: String? = null,
   var audioModes: List<String>? = null,
-  var artist: Artist? = null,
-  var artists: List<Artist>? = null,
+  override var artist: Artist? = null,
+  override var artists: List<Artist>? = null,
   var album: Album? = null,
-) : Serializable, ImageRepresentation {
+) : Serializable, ImageRepresentation, PlayedBy {
 
   override fun imageUrl(): String {
     return album?.cover?.replace("-", "/")?.let { "https://resources.tidal.com/images/$it/640x640.jpg" } ?: ""
@@ -26,11 +26,6 @@ data class Track(
     val minutes = duration / 60
     val seconds = duration % 60
     return String.format(Locale.getDefault(), "%d:%02d", minutes, seconds)
-  }
-
-  fun mainArtist(): Artist? {
-    if (artist != null) return artist
-    return artists?.firstOrNull()
   }
 
   override fun toString(): String {

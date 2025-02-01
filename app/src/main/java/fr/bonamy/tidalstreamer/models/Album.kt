@@ -5,15 +5,15 @@ import android.graphics.Color
 data class Album(
   var id: String? = null,
   var title: String? = null,
-  var artist: Artist? = null,
-  var artists: Array<Artist>? = null,
   var cover: String? = null,
+  override var artist: Artist? = null,
+  override var artists: List<Artist>? = null,
   var vibrantColor: String? = null,
   var releaseDate: String? = null,
   var numberOfVolumes: Int = 0,
   var numberOfTracks: Int = 0,
   var popularity: Int? = null,
-) : Collection() {
+) : Collection(), PlayedBy {
 
   override fun title(): String {
     return title ?: ""
@@ -43,12 +43,6 @@ data class Album(
         ", cover='" + cover + '\'' +
         ", releaseDate='" + releaseDate + '\'' +
         '}'
-  }
-
-  fun mainArtist(): Artist? {
-    if (artist != null) return artist
-    val mainArtist = artists?.find { it.main == true }
-    return mainArtist ?: artists?.firstOrNull()
   }
 
 }

@@ -49,14 +49,10 @@ class ItemLongClickedListener(private val mActivity: FragmentActivity) {
 
     // artist
     if (collection is Album) {
-      if (collection.artists != null && collection.artists!!.size > 0) {
-        collection.artists!!.forEach {
-          if (it.name != null) {
-            menuItems.add(mActivity.getString(R.string.go_to_prefix) + " " + it.name!!)
-          }
+      collection.allArtists().forEach { artist ->
+        if (artist.name != null) {
+          menuItems.add(mActivity.getString(R.string.go_to_prefix) + " " + artist.name!!)
         }
-      } else if (collection.artist != null) {
-        menuItems.add(mActivity.getString(R.string.go_to_artist))
       }
     }
 
@@ -130,14 +126,10 @@ class ItemLongClickedListener(private val mActivity: FragmentActivity) {
     }
 
     // artist
-    if (track.artists != null && track.artists!!.size > 1) {
-      track.artists!!.forEach {
-        if (it.name != null) {
-          menuItems.add(mActivity.getString(R.string.go_to_prefix) + " " + it.name!!)
-        }
+    track.allArtists()!!.forEach {
+      if (it.name != null) {
+        menuItems.add(mActivity.getString(R.string.go_to_prefix) + " " + it.name!!)
       }
-    } else if (track.artist != null) {
-      menuItems.add(mActivity.getString(R.string.go_to_artist))
     }
 
     // show the dialog
