@@ -4,14 +4,14 @@
   <color name="search_opaque">#ff9800</color>
   <color name="selected_background">#ff9800</color>
   <color name="details_background">#101010</color>
-  <color name="item_light_fg_normal">#E0E0E0</color>
-  <color name="item_light_fg_selected">#FFFFFF</color>
-  <color name="item_dark_fg_normal">#777777</color>
-  <color name="item_dark_fg_selected">#000000</color>
 
+  <color name="text_light_faded">#90FFFFFF</color>
+  <color name="text_light_normal">#FFFFFFFF</color>
+  <color name="text_dark_faded">#60000000</color>
+  <color name="text_dark_normal">#FF000000</color>
 
-  <item name="row_action_light_text" type="color">@color/track_light_text</item>
-  <item name="row_action_dark_text" type="color">@color/track_dark_text</item>
+  <item name="row_action_light_text" type="color">@color/text_light_selector</item>
+  <item name="row_action_dark_text" type="color">@color/text_dark_selector</item>
 
   <color name="row_action_selected_light_bg">#20FFFFFF</color>
   <color name="row_action_selected_dark_bg">#10000000</color>

@@ -34,17 +34,17 @@ class CollectionPresenter(
     val vh = ViewHolder(view)
     vh.tracks.layoutManager = LinearLayoutManager(parent.context)
     vh.tracks.adapter = TrackAdapter(mCollection, listOf(), mAppearance, mListener)
-    vh.title.setTextColor(view.context.getColor(getSelectedTextColor()))
-    vh.subtitle.setTextColor(view.context.getColor(getSelectedTextColor()))
-    vh.releaseDate.setTextColor(view.context.getColor(getSelectedTextColor()))
-    vh.trackCount.setTextColor(view.context.getColor(getSelectedTextColor()))
+    vh.title.setTextColor(view.context.getColor(getNormalTextColor()))
+    vh.subtitle.setTextColor(view.context.getColor(getNormalTextColor()))
+    vh.releaseDate.setTextColor(view.context.getColor(getNormalTextColor()))
+    vh.trackCount.setTextColor(view.context.getColor(getNormalTextColor()))
     return vh
   }
 
-  private fun getSelectedTextColor(): Int {
+  private fun getNormalTextColor(): Int {
     return if (mAppearance == Appearance.LIGHT)
-      R.color.item_light_fg_selected else
-      R.color.item_dark_fg_selected
+      R.color.text_light_normal else
+      R.color.text_dark_normal
   }
 
   @SuppressLint("SetTextI18n")

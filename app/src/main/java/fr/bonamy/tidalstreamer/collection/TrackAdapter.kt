@@ -30,8 +30,8 @@ class TrackAdapter(private var mCollection: Collection, private var mList: List<
 
   private fun getSelectorTextColor(): Int {
     return if (mAppearance == Appearance.LIGHT)
-      R.color.track_light_text else
-      R.color.track_dark_text
+      R.color.text_light_selector else
+      R.color.text_dark_selector
   }
 
   // binds the list items to a view
