@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import android.view.KeyEvent
 import androidx.core.content.ContextCompat
 import androidx.leanback.app.BackgroundManager
 import androidx.leanback.app.BrowseSupportFragment
@@ -79,6 +80,18 @@ abstract class BrowserFragment : BrowseSupportFragment() {
     super.onDestroy()
     Log.d(TAG, "onDestroy: " + mBackgroundTimer?.toString())
     mBackgroundTimer?.cancel()
+  }
+
+  fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+
+    // reload
+    if (keyCode == KeyEvent.KEYCODE_PROG_YELLOW || keyCode == KeyEvent.KEYCODE_R) {
+      loadRows()
+      return true
+    }
+
+    // default
+    return false
   }
 
   private fun prepareBackgroundManager() {

@@ -125,6 +125,15 @@ abstract class TidalActivity : FragmentActivity() {
       return true
     }
 
+    // try fragment
+    supportFragmentManager.fragments.forEach {
+      if (it is BrowserFragment) {
+        val rc = it.onKeyDown(keyCode, event)
+        if (rc) return rc
+        return@forEach
+      }
+    }
+
     // default
     return super.onKeyDown(keyCode, event)
   }
