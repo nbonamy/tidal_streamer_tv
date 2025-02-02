@@ -4,13 +4,14 @@ import fr.bonamy.tidalstreamer.models.Album
 import fr.bonamy.tidalstreamer.models.Artist
 import fr.bonamy.tidalstreamer.models.Mix
 import fr.bonamy.tidalstreamer.models.Playlist
+import fr.bonamy.tidalstreamer.models.Shortcut
 import retrofit2.Response
 import retrofit2.http.GET
 
 interface UserService {
 
   @GET("/user/shortcuts")
-  suspend fun getShortcuts(): Response<ApiResponse<List<Album>>>
+  suspend fun getShortcuts(): Response<ApiResponse<List<Shortcut>>>
 
   @GET("/user/mixes")
   suspend fun getMixes(): Response<ApiResponse<List<Mix>>>

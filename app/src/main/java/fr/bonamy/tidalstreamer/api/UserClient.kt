@@ -2,6 +2,7 @@ package fr.bonamy.tidalstreamer.api
 
 import fr.bonamy.tidalstreamer.models.Album
 import fr.bonamy.tidalstreamer.models.Artist
+import fr.bonamy.tidalstreamer.models.Collection
 import fr.bonamy.tidalstreamer.models.Mix
 import fr.bonamy.tidalstreamer.models.Playlist
 import fr.bonamy.tidalstreamer.models.Track
@@ -10,10 +11,15 @@ import kotlinx.coroutines.withContext
 
 class UserClient : ApiClient() {
 
-  suspend fun fetchShortcuts(): ApiResult<List<Album>> = withContext(Dispatchers.IO) {
+  suspend fun fetchShortcuts(): ApiResult<List<Collection>> = withContext(Dispatchers.IO) {
     try {
       val response = apiService.getShortcuts()
-      fetchResponse(response)
+      if (response.isSuccessful && response.body()!!.status == "ok") {
+        val collections = response.body()!!.result!!.mapNotNull { it.toCollection() }
+        ApiResult.Success(collections)
+      } else {
+        ApiResult.Error(Throwable("Error: ${response.code()}"))
+      }
     } catch (e: Exception) {
       ApiResult.Error(e)
     }

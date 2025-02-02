@@ -18,8 +18,6 @@ import fr.bonamy.tidalstreamer.collection.CollectionActivity
 import fr.bonamy.tidalstreamer.models.Album
 import fr.bonamy.tidalstreamer.models.Artist
 import fr.bonamy.tidalstreamer.models.Collection
-import fr.bonamy.tidalstreamer.models.Mix
-import fr.bonamy.tidalstreamer.models.Playlist
 import fr.bonamy.tidalstreamer.models.Track
 import kotlinx.coroutines.launch
 
@@ -69,8 +67,8 @@ class ItemLongClickedListener(private val mActivity: FragmentActivity) {
 
         // first make sure we have tracks
         if (tracksNeeded && collection.tracks == null) {
-          fetchTracks(collection)
-          if (collection.tracks == null) {
+          val metadataClient = MetadataClient()
+          if (!metadataClient.fetchTracks(collection)) {
             return@launch
           }
         }
@@ -126,7 +124,7 @@ class ItemLongClickedListener(private val mActivity: FragmentActivity) {
     }
 
     // artist
-    track.allArtists()!!.forEach {
+    track.allArtists().forEach {
       if (it.name != null) {
         menuItems.add(mActivity.getString(R.string.go_to_prefix) + " " + it.name!!)
       }
@@ -180,51 +178,6 @@ class ItemLongClickedListener(private val mActivity: FragmentActivity) {
 
   private fun isGoToArtistPrefix(menuChosen: String): Boolean {
     return menuChosen.startsWith(mActivity.getString(R.string.go_to_prefix), ignoreCase = true)
-  }
-
-  private suspend fun fetchTracks(collection: Collection) {
-
-    val apiClient = MetadataClient()
-    when (collection) {
-      is Album -> {
-        when (val result = apiClient.fetchAlbumTracks(collection.id!!)) {
-          is ApiResult.Success -> {
-            collection.tracks = result.data
-          }
-
-          is ApiResult.Error -> {
-            // Handle the error here
-            Log.e(TAG, "Error fetching album tracks: ${result.exception}")
-          }
-        }
-      }
-
-      is Mix -> {
-        when (val result = apiClient.fetchMixTracks(collection.id!!)) {
-          is ApiResult.Success -> {
-            collection.tracks = result.data
-          }
-
-          is ApiResult.Error -> {
-            // Handle the error here
-            Log.e(TAG, "Error fetching mix tracks: ${result.exception}")
-          }
-        }
-      }
-
-      is Playlist -> {
-        when (val result = apiClient.fetchPlaylistTracks(collection.uuid!!)) {
-          is ApiResult.Success -> {
-            collection.tracks = result.data
-          }
-
-          is ApiResult.Error -> {
-            // Handle the error here
-            Log.e(TAG, "Error fetching playlist tracks: ${result.exception}")
-          }
-        }
-      }
-    }
   }
 
   private fun playTracks(apiClient: StreamingClient, tracks: Array<Track>) {

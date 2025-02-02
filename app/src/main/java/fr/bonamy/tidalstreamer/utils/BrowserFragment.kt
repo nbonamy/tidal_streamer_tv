@@ -38,7 +38,6 @@ import kotlinx.coroutines.withContext
 import java.util.Timer
 import java.util.TimerTask
 
-
 abstract class BrowserFragment : BrowseSupportFragment() {
 
   abstract fun title(): String
@@ -68,6 +67,8 @@ abstract class BrowserFragment : BrowseSupportFragment() {
     prepareBackgroundManager()
   }
 
+  @Suppress("DEPRECATION")
+  @Deprecated("Deprecated in Java")
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
     loadRows()

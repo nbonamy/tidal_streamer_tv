@@ -3,6 +3,7 @@ package fr.bonamy.tidalstreamer.playback
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.View
+import android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
 import androidx.activity.viewModels
 import androidx.fragment.app.commit
 import androidx.fragment.app.commitNow
@@ -35,6 +36,7 @@ class PlaybackActivity : TidalActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+    window.addFlags(FLAG_KEEP_SCREEN_ON)
     setContentView(R.layout.activity_playback)
     if (savedInstanceState == null) {
       supportFragmentManager.commitNow {
@@ -73,7 +75,6 @@ class PlaybackActivity : TidalActivity() {
   }
 
   companion object {
-    private const val TAG = "PlaybackActivity"
     var currentLayout = PlaybackLayout.NO_LYRICS
   }
 

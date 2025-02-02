@@ -149,10 +149,9 @@ class StreamingClient : ApiClient() {
     }
   }
 
-  protected val apiService: StreamingService by lazy {
+  private val apiService: StreamingService by lazy {
     ApiRetrofitClient.instance.create(StreamingService::class.java)
   }
-
 
   companion object {
     private const val TAG = "StreamingClient"
