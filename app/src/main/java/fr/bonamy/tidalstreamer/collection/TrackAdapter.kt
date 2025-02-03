@@ -8,13 +8,17 @@ import androidx.recyclerview.widget.RecyclerView
 import fr.bonamy.tidalstreamer.R
 import fr.bonamy.tidalstreamer.models.Album
 import fr.bonamy.tidalstreamer.models.Collection
+import fr.bonamy.tidalstreamer.models.PlayedBy
 import fr.bonamy.tidalstreamer.models.Track
 import java.util.Locale
 
 class TrackAdapter(private var mCollection: Collection, private var mList: List<Track>, private val mAppearance: Appearance, private val listener: OnTrackClickListener) : RecyclerView.Adapter<TrackAdapter.ViewHolder>() {
 
+  private var mSameArtists: Boolean = true
+
   fun updateData(newList: List<Track>) {
     mList = newList
+    mSameArtists = mList.map { it.artist?.name }.distinct().size == 1
     notifyDataSetChanged()
   }
 
@@ -55,8 +59,16 @@ class TrackAdapter(private var mCollection: Collection, private var mList: List<
       holder.index.visibility = View.GONE
     }
 
+    // title may contain artist name
+    var showArtists = !mSameArtists
+    if (showArtists && mCollection is PlayedBy) {
+      if (track.artists!!.size == 1 && track.artists!![0].id == (mCollection as PlayedBy).mainArtist()?.id) {
+        showArtists = false
+      }
+    }
+
     // title
-    if ((track.artist == null && track.artists != null) || track.index != null) {
+    if (showArtists) {
       holder.title.text = track.title + " - " + track.artists!!.map { it.name }.joinToString(", ")
     } else {
       holder.title.text = track.title
