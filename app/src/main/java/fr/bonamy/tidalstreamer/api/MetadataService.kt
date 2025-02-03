@@ -22,6 +22,9 @@ interface MetadataService {
   @GET("/info/artist/{id}/compilations")
   suspend fun getArtistCompilations(@Path("id") id: String): Response<ApiResponsePage<Album>>
 
+  @GET("/info/artist/{id}/radio")
+  suspend fun getArtistRadio(@Path("id") id: String): Response<ApiResponsePage<Track>>
+
   @GET("/info/artist/{id}/similar")
   suspend fun getSimilarArtists(@Path("id") id: String): Response<ApiResponsePage<Artist>>
 
@@ -34,7 +37,10 @@ interface MetadataService {
   @GET("/info/playlist/{id}")
   suspend fun getPlaylistTracks(@Path("id") id: String): Response<ApiResponsePage<ItemTrack>>
 
-  @GET("/lyrics/{id}")
+  @GET("/info/track/{id}/lyrics")
   suspend fun getTrackLyrics(@Path("id") id: String): Response<ApiResponse<Lyrics>>
+
+  @GET("/info/track/{id}/radio")
+  suspend fun getTrackRadio(@Path("id") id: String): Response<ApiResponsePage<Track>>
 
 }

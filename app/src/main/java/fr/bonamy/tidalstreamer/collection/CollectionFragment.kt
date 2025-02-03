@@ -121,6 +121,11 @@ class CollectionFragment : DetailsSupportFragment(), PaletteAsyncListener, OnTra
               }
             }
           }
+
+          else -> {
+            Log.e(TAG, "Does not know how to load tracks for ${mCollection!!.javaClass.simpleName}")
+            requireActivity().finish()
+          }
         }
       }
 
@@ -134,25 +139,28 @@ class CollectionFragment : DetailsSupportFragment(), PaletteAsyncListener, OnTra
   }
 
   private fun initializeBackground(collection: Collection?) {
-    //mDetailsBackground.enableParallax()
-    Glide.with(requireContext())
-      .asBitmap()
-      .centerCrop()
-      .error(R.drawable.default_background)
-      .load(collection?.largeImageUrl())
-      .into(object : CustomTarget<Bitmap>() {
+    try {
+      if (collection?.largeImageUrl() == "") {
+        return
+      }
+      Glide.with(requireContext())
+        .asBitmap()
+        .centerCrop()
+        .error(R.drawable.default_background)
+        .load(collection?.largeImageUrl())
+        .into(object : CustomTarget<Bitmap>() {
+          override fun onResourceReady(
+            bitmap: Bitmap,
+            transition: Transition<in Bitmap?>?
+          ) {
+            mBackgroundManager.setBitmap(bitmap)
+          }
 
-        override fun onResourceReady(
-          bitmap: Bitmap,
-          transition: Transition<in Bitmap?>?
-        ) {
-          mBackgroundManager.setBitmap(bitmap)
-        }
-
-        override fun onLoadCleared(placeholder: Drawable?) {
-
-        }
-      })
+          override fun onLoadCleared(placeholder: Drawable?) {}
+        })
+    } catch (e: Exception) {
+      Log.e(TAG, "Error updating background", e)
+    }
 
   }
 
@@ -160,22 +168,29 @@ class CollectionFragment : DetailsSupportFragment(), PaletteAsyncListener, OnTra
     Log.d(TAG, "doInBackground: " + mCollection?.toString())
     val row = DetailsOverviewRow(mCollection)
     row.imageDrawable = ContextCompat.getDrawable(requireContext(), R.drawable.default_background)
-    val width = convertDpToPixel(requireContext(), DETAIL_THUMB_WIDTH)
-    val height = convertDpToPixel(requireContext(), DETAIL_THUMB_HEIGHT)
-    Glide.with(requireContext())
-      .load(mCollection?.imageUrl())
-      .centerCrop()
-      .error(R.drawable.album)
-      .into(object : CustomTarget<Drawable>(width, height) {
-        override fun onResourceReady(drawable: Drawable, transition: Transition<in Drawable?>?) {
-          row.imageDrawable = drawable
-          mAdapter.notifyArrayItemRangeChanged(0, mAdapter.size())
-        }
 
-        override fun onLoadCleared(placeholder: Drawable?) {
+    if (mCollection?.imageUrl() != "") {
+      try {
+        val width = convertDpToPixel(requireContext(), DETAIL_THUMB_WIDTH)
+        val height = convertDpToPixel(requireContext(), DETAIL_THUMB_HEIGHT)
+        Glide.with(requireContext())
+          .load(mCollection?.imageUrl())
+          .centerCrop()
+          .error(R.drawable.album)
+          .into(object : CustomTarget<Drawable>(width, height) {
+            override fun onResourceReady(drawable: Drawable, transition: Transition<in Drawable?>?) {
+              row.imageDrawable = drawable
+              mAdapter.notifyArrayItemRangeChanged(0, mAdapter.size())
+            }
 
-        }
-      })
+            override fun onLoadCleared(placeholder: Drawable?) {
+
+            }
+          })
+      } catch (e: Exception) {
+        Log.e(TAG, "Error updating details thumbnail", e)
+      }
+    }
 
     val actionAdapter = ArrayObjectAdapter()
 
@@ -313,6 +328,21 @@ class CollectionFragment : DetailsSupportFragment(), PaletteAsyncListener, OnTra
               Log.e(TAG, "Error playing collection: ${result.exception}")
             }
           }
+        }
+
+        else -> {
+
+          if (mCollection!!.tracks != null) {
+            when (val result = apiClient.playTracks(mCollection!!.tracks!!.toTypedArray(), index)) {
+              is ApiResult.Success -> {}
+              is ApiResult.Error -> {
+                Log.e(TAG, "Error playing collection: ${result.exception}")
+              }
+            }
+          } else {
+            Log.e(TAG, "Cannot play collection without tracks")
+          }
+
         }
       }
     }

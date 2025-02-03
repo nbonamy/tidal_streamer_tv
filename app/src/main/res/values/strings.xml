@@ -10,8 +10,12 @@
   <string name="go_to_album">Go to Album</string>
   <string name="go_to_artist">Go to Artist</string>
   <string name="go_to_prefix">Go to</string>
+  <string name="go_to_artist_radio">Artist Radio</string>
+  <string name="go_to_track_radio">Track Radio</string>
 
   <string name="album_art_description">Album art</string>
+
+  <string name="radio_title">%s Radio</string>
 
   <string name="playback_album_art_transition_name">album_art</string>
   <string name="playback_title_transition_name">title</string>

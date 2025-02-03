@@ -50,6 +50,15 @@ class MetadataClient : ApiClient() {
     }
   }
 
+  suspend fun fetchArtistRadio(artistId: String): ApiResult<List<Track>> = withContext(Dispatchers.IO) {
+    try {
+      val response = apiService.getArtistRadio(artistId)
+      fetchPagedResponse(response)
+    } catch (e: Exception) {
+      ApiResult.Error(e)
+    }
+  }
+
   suspend fun fetchSimilarArtists(artistId: String): ApiResult<List<Artist>> = withContext(Dispatchers.IO) {
     try {
       val response = apiService.getSimilarArtists(artistId)
@@ -98,6 +107,15 @@ class MetadataClient : ApiClient() {
     try {
       val response = apiService.getTrackLyrics(trackId)
       fetchResponse(response)
+    } catch (e: Exception) {
+      ApiResult.Error(e)
+    }
+  }
+
+  suspend fun fetchTrackRadio(trackId: String): ApiResult<List<Track>> = withContext(Dispatchers.IO) {
+    try {
+      val response = apiService.getTrackRadio(trackId)
+      fetchPagedResponse(response)
     } catch (e: Exception) {
       ApiResult.Error(e)
     }

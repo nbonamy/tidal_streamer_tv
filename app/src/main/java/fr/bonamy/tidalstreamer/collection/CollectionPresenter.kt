@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import fr.bonamy.tidalstreamer.R
 import fr.bonamy.tidalstreamer.models.Album
 import fr.bonamy.tidalstreamer.models.Collection
+import fr.bonamy.tidalstreamer.models.Radio
 import fr.bonamy.tidalstreamer.models.Track
 
 interface OnTrackClickListener {
@@ -49,14 +50,25 @@ class CollectionPresenter(
 
   @SuppressLint("SetTextI18n")
   override fun onBindViewHolder(viewHolder: Presenter.ViewHolder?, item: Any?) {
+
+    // defaults
     val collection = item as Collection
     val vh = viewHolder as ViewHolder
     vh.title.text = collection.title()
     vh.subtitle.text = collection.subtitle()
+
+    // radio title is different
+    if (collection is Radio) {
+      vh.title.text = String.format(vh.view.resources.getString(R.string.radio_title), collection.title)
+    }
+
+    // release date for albums
     if (collection is Album && collection.releaseDate != null) {
       val tokens = collection.releaseDate!!.split("-")
       vh.releaseDate.text = tokens[0]
     }
+
+    // based on tracks
     if (collection.tracks != null) {
       val trackCount = collection.tracks!!.size
       val trackCountText =
