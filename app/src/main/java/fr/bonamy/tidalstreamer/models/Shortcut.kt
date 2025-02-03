@@ -14,7 +14,7 @@ data class Shortcut(
 
   fun toCollection(): Collection? {
 
-    if (type == "ALBUM") {
+    if (id != null && title != null) {
       return Album(
         id = id,
         title = title,
@@ -23,7 +23,7 @@ data class Shortcut(
       )
     }
 
-    if (type == "PLAYLIST" || type == "EDITORIAL") {
+    if (uuid != null && title != null) {
       return Playlist(
         uuid = uuid,
         title = title,
