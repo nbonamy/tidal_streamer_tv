@@ -84,6 +84,8 @@ abstract class BrowserFragment : BrowseSupportFragment() {
 
   fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
 
+    // color keys order: YBRG
+
     // reload
     if (keyCode == KeyEvent.KEYCODE_PROG_YELLOW || keyCode == KeyEvent.KEYCODE_R) {
       loadRows()
