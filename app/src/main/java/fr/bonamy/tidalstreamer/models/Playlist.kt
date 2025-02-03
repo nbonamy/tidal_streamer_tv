@@ -24,7 +24,7 @@ data class Playlist(
   }
 
   override fun toString(): String {
-    return "Album{" +
+    return "Playlist{" +
         "uuid=" + uuid +
         ", title='" + title + '\'' +
         ", image='" + image + '\'' +
