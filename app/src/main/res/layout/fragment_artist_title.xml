@@ -24,6 +24,7 @@
       android:layout_height="match_parent"
       android:adjustViewBounds="false"
       android:scaleType="centerCrop"
+      android:contentDescription="@string/artist_description"
       tools:src="@drawable/artist" />
 
     <View
@@ -51,7 +52,7 @@
       style="?attr/browseTitleTextStyle"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      tools:text="Title" />
+      tools:text="Artist Name" />
 
     <TextView
       android:id="@+id/description"
@@ -59,7 +60,23 @@
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:textSize="16sp"
-      tools:text="Title" />
+      tools:text="Artist Roles" />
+
+    <Space
+      android:layout_width="0dp"
+      android:layout_height="16dp" />
+
+    <TextView
+      android:id="@+id/radio"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:focusable="true"
+      android:background="@drawable/button_rounded_corners"
+      android:drawableStart="@drawable/radio"
+      android:drawablePadding="8dp"
+      android:textStyle="bold"
+      android:visibility="gone"
+      android:text="@string/artist_radio" />
 
   </LinearLayout>
 

@@ -14,7 +14,9 @@
   <string name="go_to_track_radio">Track Radio</string>
 
   <string name="album_art_description">Album art</string>
+  <string name="artist_description">Album art</string>
 
+  <string name="artist_radio">Artist Radio</string>
   <string name="radio_title">%s Radio</string>
 
   <string name="playback_album_art_transition_name">album_art</string>

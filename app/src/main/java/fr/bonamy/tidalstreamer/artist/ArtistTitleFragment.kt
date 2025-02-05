@@ -14,6 +14,7 @@ import com.bumptech.glide.Glide
 import fr.bonamy.tidalstreamer.R
 import fr.bonamy.tidalstreamer.models.Artist
 import fr.bonamy.tidalstreamer.search.SearchActivity
+import fr.bonamy.tidalstreamer.utils.ItemLongClickedListener
 
 
 class ArtistTitleFragment : Fragment() {
@@ -52,6 +53,13 @@ class ArtistTitleFragment : Fragment() {
     orb.setOnOrbClickedListener {
       val intent = Intent(requireContext(), SearchActivity::class.java)
       startActivity(intent)
+    }
+
+    // radio button
+    val radio = view.findViewById<TextView>(R.id.radio)
+    radio.setOnClickListener {
+      val longClickedListener = ItemLongClickedListener(requireActivity())
+      longClickedListener.goToArtistRadio(mArtist, null)
     }
 
     // done

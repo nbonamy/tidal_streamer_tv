@@ -221,7 +221,7 @@ class ItemLongClickedListener(private val mActivity: FragmentActivity) {
     }
   }
 
-  private fun goToCollection(collection: Collection, cardView: ImageCardView?) {
+  fun goToCollection(collection: Collection, cardView: ImageCardView?) {
 
     // base intent
     val intent = Intent(mActivity, CollectionActivity::class.java)
@@ -243,13 +243,13 @@ class ItemLongClickedListener(private val mActivity: FragmentActivity) {
 
   }
 
-  private fun goToArtist(artist: Artist) {
+  fun goToArtist(artist: Artist) {
     val intent = Intent(mActivity, ArtistActivity::class.java)
     intent.putExtra(ArtistActivity.ARTIST, artist)
     mActivity.startActivity(intent)
   }
 
-  private fun goToArtistRadio(artist: Artist, cardView: ImageCardView?) {
+  fun goToArtistRadio(artist: Artist, cardView: ImageCardView?) {
     mActivity.lifecycleScope.launch {
       val metadataClient = MetadataClient()
       when (val result = metadataClient.fetchArtistRadio(artist.id!!)) {
