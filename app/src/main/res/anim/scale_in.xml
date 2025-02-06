@@ -1,0 +1,8 @@
+<scale xmlns:android="http://schemas.android.com/apk/res/android"
+  android:duration="150"
+  android:fromXScale="100%"
+  android:fromYScale="100%"
+  android:toXScale="@fraction/orb_focused_zoom"
+  android:toYScale="@fraction/orb_focused_zoom"
+  android:pivotX="50%"
+  android:pivotY="50%"></scale>

@@ -11,7 +11,9 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_marginStart="54dp"
-    android:layout_marginTop="32dp" />
+    android:layout_marginTop="32dp"
+    tools:layout_width="52dp"
+    tools:layout_height="52dp" />
 
   <FrameLayout
     android:layout_width="wrap_content"
@@ -64,19 +66,35 @@
 
     <Space
       android:layout_width="0dp"
-      android:layout_height="16dp" />
+      android:layout_height="4dp" />
 
-    <TextView
-      android:id="@+id/radio"
+    <LinearLayout
       android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:focusable="true"
-      android:background="@drawable/button_rounded_corners"
-      android:drawableStart="@drawable/radio"
-      android:drawablePadding="8dp"
-      android:textStyle="bold"
-      android:visibility="gone"
-      android:text="@string/artist_radio" />
+      android:layout_height="wrap_content">
+
+      <fr.bonamy.tidalstreamer.utils.FocusableButton
+        android:id="@+id/radio"
+        android:layout_width="wrap_content"
+        android:layout_height="24dp"
+        android:layout_margin="8dp"
+        android:paddingVertical="2dp"
+        android:paddingHorizontal="8dp"
+        android:drawablePadding="4dp"
+        android:drawableStart="@drawable/dot_radiowaves_left_and_right"
+        android:text="@string/go_to_artist_radio" />
+
+      <fr.bonamy.tidalstreamer.utils.FocusableButton
+        android:id="@+id/info"
+        android:layout_width="wrap_content"
+        android:layout_height="24dp"
+        android:layout_margin="8dp"
+        android:paddingVertical="2dp"
+        android:paddingHorizontal="8dp"
+        android:drawablePadding="4dp"
+        android:drawableStart="@drawable/info_circle"
+        android:text="@string/go_to_artist_info" />
+
+    </LinearLayout>
 
   </LinearLayout>
 

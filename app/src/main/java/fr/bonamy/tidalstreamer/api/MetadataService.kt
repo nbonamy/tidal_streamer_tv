@@ -2,6 +2,7 @@ package fr.bonamy.tidalstreamer.api
 
 import fr.bonamy.tidalstreamer.models.Album
 import fr.bonamy.tidalstreamer.models.Artist
+import fr.bonamy.tidalstreamer.models.ArtistInfo
 import fr.bonamy.tidalstreamer.models.Lyrics
 import fr.bonamy.tidalstreamer.models.Track
 import retrofit2.Response
@@ -9,6 +10,9 @@ import retrofit2.http.GET
 import retrofit2.http.Path
 
 interface MetadataService {
+
+  @GET("/info/artist/{id}")
+  suspend fun getArtistInfo(@Path("id") id: String): Response<ApiResponse<ArtistInfo>>
 
   @GET("/info/artist/{id}/toptracks")
   suspend fun getArtistTopTracks(@Path("id") id: String): Response<ApiResponsePage<Track>>

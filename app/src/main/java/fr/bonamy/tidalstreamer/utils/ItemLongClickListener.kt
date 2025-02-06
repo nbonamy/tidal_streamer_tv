@@ -100,6 +100,7 @@ class ItemLongClickedListener(private val mActivity: FragmentActivity) {
     val menuItems: MutableList<String> = ArrayList()
     menuItems.add(mActivity.getString(R.string.go_to_artist))
     menuItems.add(mActivity.getString(R.string.go_to_artist_radio))
+    menuItems.add(mActivity.getString(R.string.go_to_artist_info))
 
     // show the dialog
     val builder: AlertDialog.Builder = AlertDialog.Builder(mActivity)
@@ -110,6 +111,8 @@ class ItemLongClickedListener(private val mActivity: FragmentActivity) {
         goToArtist(artist)
       } else if (isArtistRadio(menuChosen)) {
         goToArtistRadio(artist, cardView)
+      } else if (isGoToArtistInfo(menuChosen)) {
+        goToArtistInfo(artist, cardView)
       }
     }
     builder.show()
@@ -194,6 +197,10 @@ class ItemLongClickedListener(private val mActivity: FragmentActivity) {
     return menuChosen.equals(mActivity.getString(R.string.go_to_artist_radio), ignoreCase = true)
   }
 
+  private fun isGoToArtistInfo(menuChosen: String): Boolean {
+    return menuChosen.equals(mActivity.getString(R.string.go_to_artist_info), ignoreCase = true)
+  }
+
   private fun isTrackRadio(menuChosen: String): Boolean {
     return menuChosen.equals(mActivity.getString(R.string.go_to_track_radio), ignoreCase = true)
   }
@@ -263,6 +270,25 @@ class ItemLongClickedListener(private val mActivity: FragmentActivity) {
           radio.tracks = result.data
           radio.numberOfTracks = result.data.size
           goToCollection(radio, cardView)
+        }
+
+        is ApiResult.Error -> {
+          Log.e(TAG, "Error fetching artist radio: ${result.exception}")
+        }
+      }
+    }
+  }
+
+  fun goToArtistInfo(artist: Artist, cardView: ImageCardView?) {
+    mActivity.lifecycleScope.launch {
+      val metadataClient = MetadataClient()
+      when (val result = metadataClient.fetchArtistInfo(artist.id!!)) {
+        is ApiResult.Success -> {
+          // show an alert showing result.text
+          val builder: AlertDialog.Builder = AlertDialog.Builder(mActivity)
+          builder.setTitle(artist.name)
+          builder.setMessage(result.data.getPlainText())
+          builder.show()
         }
 
         is ApiResult.Error -> {

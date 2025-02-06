@@ -11,4 +11,6 @@
   <dimen name="artist_banner_bottom_fade_height">75dp</dimen>
   <dimen name="artist_banner_bottom_fade_offset">175dp</dimen>
 
+  <item name="orb_focused_zoom" type="fraction">110%</item>
+
 </resources>

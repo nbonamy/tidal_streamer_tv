@@ -1,16 +1,4 @@
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
-  <item android:state_focused="true">
-    <shape>
-      <padding android:left="8dp" android:top="8dp" android:right="4dp" android:bottom="4dp" />
-      <corners android:radius="8dp" />
-      <solid android:color="@color/button_bg_color" />
-    </shape>
-  </item>
-  <item>
-    <shape>
-      <padding android:left="6dp" android:top="6dp" android:right="3dp" android:bottom="3dp" />
-      <corners android:radius="8dp" />
-      <solid android:color="@color/button_bg_color" />
-    </shape>
-  </item>
-</selector>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+  <corners android:radius="6dp" />
+  <solid android:color="@color/button_bg_color" />
+</shape>

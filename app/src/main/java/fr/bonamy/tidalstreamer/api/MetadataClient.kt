@@ -3,6 +3,7 @@ package fr.bonamy.tidalstreamer.api
 import android.util.Log
 import fr.bonamy.tidalstreamer.models.Album
 import fr.bonamy.tidalstreamer.models.Artist
+import fr.bonamy.tidalstreamer.models.ArtistInfo
 import fr.bonamy.tidalstreamer.models.Collection
 import fr.bonamy.tidalstreamer.models.Lyrics
 import fr.bonamy.tidalstreamer.models.Mix
@@ -12,6 +13,15 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class MetadataClient : ApiClient() {
+
+  suspend fun fetchArtistInfo(artistId: String): ApiResult<ArtistInfo> = withContext(Dispatchers.IO) {
+    try {
+      val response = apiService.getArtistInfo(artistId)
+      fetchResponse(response)
+    } catch (e: Exception) {
+      ApiResult.Error(e)
+    }
+  }
 
   suspend fun fetchArtistTopTracks(artistId: String): ApiResult<List<Track>> =
     withContext(Dispatchers.IO) {

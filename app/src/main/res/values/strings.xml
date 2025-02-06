@@ -11,6 +11,7 @@
   <string name="go_to_artist">Go to Artist</string>
   <string name="go_to_prefix">Go to</string>
   <string name="go_to_artist_radio">Artist Radio</string>
+  <string name="go_to_artist_info">Artist Info</string>
   <string name="go_to_track_radio">Track Radio</string>
 
   <string name="album_art_description">Album art</string>
@@ -18,6 +19,8 @@
 
   <string name="artist_radio">Artist Radio</string>
   <string name="radio_title">%s Radio</string>
+
+  <string name="artist_info">Artist Info</string>
 
   <string name="playback_album_art_transition_name">album_art</string>
   <string name="playback_title_transition_name">title</string>

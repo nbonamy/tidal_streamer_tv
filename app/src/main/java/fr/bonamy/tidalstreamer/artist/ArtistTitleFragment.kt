@@ -14,6 +14,7 @@ import com.bumptech.glide.Glide
 import fr.bonamy.tidalstreamer.R
 import fr.bonamy.tidalstreamer.models.Artist
 import fr.bonamy.tidalstreamer.search.SearchActivity
+import fr.bonamy.tidalstreamer.utils.FocusableButton
 import fr.bonamy.tidalstreamer.utils.ItemLongClickedListener
 
 
@@ -56,11 +57,19 @@ class ArtistTitleFragment : Fragment() {
     }
 
     // radio button
-    val radio = view.findViewById<TextView>(R.id.radio)
+    val radio = view.findViewById<FocusableButton>(R.id.radio)
     radio.setOnClickListener {
       val longClickedListener = ItemLongClickedListener(requireActivity())
       longClickedListener.goToArtistRadio(mArtist, null)
     }
+
+    // info button
+    val info = view.findViewById<FocusableButton>(R.id.info)
+    info.setOnClickListener {
+      val longClickedListener = ItemLongClickedListener(requireActivity())
+      longClickedListener.goToArtistInfo(mArtist, null)
+    }
+
 
     // done
     return view
