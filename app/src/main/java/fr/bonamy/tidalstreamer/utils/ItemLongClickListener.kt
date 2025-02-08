@@ -1,5 +1,6 @@
 package fr.bonamy.tidalstreamer.utils
 
+import android.app.Activity
 import android.app.AlertDialog
 import android.content.DialogInterface
 import android.content.Intent
@@ -23,7 +24,8 @@ import fr.bonamy.tidalstreamer.models.RadioType
 import fr.bonamy.tidalstreamer.models.Track
 import kotlinx.coroutines.launch
 
-class ItemLongClickedListener(private val mActivity: FragmentActivity) {
+
+class ItemLongClickedListener(private val mActivity: FragmentActivity, private val mActivityToFinish: Activity? = null) {
 
   fun onItemLongClicked(item: Any, cardView: ImageCardView?) {
     if (item is Collection) {
@@ -49,9 +51,14 @@ class ItemLongClickedListener(private val mActivity: FragmentActivity) {
 
     // artist
     if (collection is Album) {
-      collection.allArtists().forEach { artist ->
+      val artists = collection.allArtists()
+      artists.forEach { artist ->
         if (artist.name != null) {
-          menuItems.add(mActivity.getString(R.string.go_to_prefix) + " " + artist.name!!)
+          if (artists.size == 1) {
+            menuItems.add(mActivity.getString(R.string.go_to_artist))
+          } else {
+            menuItems.add(mActivity.getString(R.string.go_to_prefix) + " " + artist.name!!)
+          }
         }
       }
     }
@@ -112,34 +119,43 @@ class ItemLongClickedListener(private val mActivity: FragmentActivity) {
       } else if (isArtistRadio(menuChosen)) {
         goToArtistRadio(artist, cardView)
       } else if (isGoToArtistInfo(menuChosen)) {
-        goToArtistInfo(artist, cardView)
+        goToArtistInfo(artist)
       }
     }
     builder.show()
   }
 
-  private fun onTrackLongClicked(track: Track, cardView: ImageCardView?) {
+  fun onTrackLongClicked(track: Track, cardView: ImageCardView?, navigationOnly: Boolean = false) {
 
     // populate menu
     val menuItems: MutableList<String> = ArrayList()
-    menuItems.add(mActivity.getString(R.string.play_now))
-    menuItems.add(mActivity.getString(R.string.play_next))
-    menuItems.add(mActivity.getString(R.string.play_after))
+    if (!navigationOnly) {
+      menuItems.add(mActivity.getString(R.string.play_now))
+      menuItems.add(mActivity.getString(R.string.play_next))
+      menuItems.add(mActivity.getString(R.string.play_after))
+    }
 
-    // album needs a cardView to transition to
-    if (cardView != null && track.album != null) {
+    // album
+    if (track.album != null) {
       menuItems.add(mActivity.getString(R.string.go_to_album))
     }
 
     // artist
-    track.allArtists().forEach {
+    val artists = track.allArtists()
+    artists.forEach {
       if (it.name != null) {
-        menuItems.add(mActivity.getString(R.string.go_to_prefix) + " " + it.name!!)
+        if (artists.size == 1) {
+          menuItems.add(mActivity.getString(R.string.go_to_artist))
+        } else {
+          menuItems.add(mActivity.getString(R.string.go_to_prefix) + " " + it.name!!)
+        }
       }
     }
 
     // track radio
-    menuItems.add(mActivity.getString(R.string.go_to_track_radio))
+    if (!navigationOnly) {
+      menuItems.add(mActivity.getString(R.string.go_to_track_radio))
+    }
 
     // show the dialog
     val builder: AlertDialog.Builder = AlertDialog.Builder(mActivity)
@@ -157,10 +173,10 @@ class ItemLongClickedListener(private val mActivity: FragmentActivity) {
       } else if (isGoToAlbum(menuChosen)) {
         goToCollection(track.album!!, cardView)
       } else if (isGoToArtist(menuChosen)) {
-        goToArtist(track.artist!!)
+        goToArtist(artists[0])
       } else if (isGoToArtistPrefix(menuChosen)) {
         val artistName = menuChosen.substring(mActivity.getString(R.string.go_to_prefix).length + 1)
-        val artist = track.artists!!.find { it.name == artistName }
+        val artist = artists.find { it.name == artistName }
         goToArtist(artist!!)
       } else if (isTrackRadio(menuChosen)) {
         goToTrackRadio(track, cardView)
@@ -228,7 +244,7 @@ class ItemLongClickedListener(private val mActivity: FragmentActivity) {
     }
   }
 
-  fun goToCollection(collection: Collection, cardView: ImageCardView?) {
+  private fun goToCollection(collection: Collection, cardView: ImageCardView?) {
 
     // base intent
     val intent = Intent(mActivity, CollectionActivity::class.java)
@@ -237,23 +253,26 @@ class ItemLongClickedListener(private val mActivity: FragmentActivity) {
     // if no card view
     if (cardView == null) {
       mActivity.startActivity(intent)
+      mActivityToFinish?.finish()
       return
     }
 
     // else add transition info
     val bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(
       mActivity,
-      cardView!!.mainImageView,
+      cardView.mainImageView,
       CollectionActivity.SHARED_ELEMENT_NAME
     ).toBundle()
     mActivity.startActivity(intent, bundle)
+    mActivityToFinish?.finish()
 
   }
 
-  fun goToArtist(artist: Artist) {
+  private fun goToArtist(artist: Artist) {
     val intent = Intent(mActivity, ArtistActivity::class.java)
     intent.putExtra(ArtistActivity.ARTIST, artist)
     mActivity.startActivity(intent)
+    mActivityToFinish?.finish()
   }
 
   fun goToArtistRadio(artist: Artist, cardView: ImageCardView?) {
@@ -279,7 +298,7 @@ class ItemLongClickedListener(private val mActivity: FragmentActivity) {
     }
   }
 
-  fun goToArtistInfo(artist: Artist, cardView: ImageCardView?) {
+  fun goToArtistInfo(artist: Artist) {
     mActivity.lifecycleScope.launch {
       val metadataClient = MetadataClient()
       when (val result = metadataClient.fetchArtistInfo(artist.id!!)) {

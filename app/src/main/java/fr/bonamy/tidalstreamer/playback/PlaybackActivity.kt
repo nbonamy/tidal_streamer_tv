@@ -70,6 +70,12 @@ class PlaybackActivity : TidalActivity() {
       return true
     }
 
+    // jump for menu
+    if (keyCode == KeyEvent.KEYCODE_LAST_CHANNEL || keyCode == KeyEvent.KEYCODE_J) {
+      viewModel.setEvent(keyCode)
+      return true
+    }
+
     // default
     return super.onKeyDown(keyCode, event)
   }

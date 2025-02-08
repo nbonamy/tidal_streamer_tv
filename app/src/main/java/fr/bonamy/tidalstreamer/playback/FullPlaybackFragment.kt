@@ -22,6 +22,7 @@ import fr.bonamy.tidalstreamer.api.StreamerListener
 import fr.bonamy.tidalstreamer.models.Lyrics
 import fr.bonamy.tidalstreamer.models.STATE_PLAYING
 import fr.bonamy.tidalstreamer.models.Status
+import fr.bonamy.tidalstreamer.utils.ItemLongClickedListener
 import kotlinx.coroutines.launch
 import java.util.Timer
 import java.util.TimerTask
@@ -174,6 +175,9 @@ class FullPlaybackFragment(private var mLayout: PlaybackLayout, private var mSta
       if (it == KeyEvent.KEYCODE_DPAD_UP || it == KeyEvent.KEYCODE_DPAD_DOWN) {
         onManualScroll()
       }
+      if (it == KeyEvent.KEYCODE_LAST_CHANNEL || it == KeyEvent.KEYCODE_J) {
+        onGoToKey()
+      }
     }
   }
 
@@ -193,6 +197,14 @@ class FullPlaybackFragment(private var mLayout: PlaybackLayout, private var mSta
         }
       }
     }, UNLOCK_SCROLL_DELAY)
+  }
+
+  private fun onGoToKey() {
+    // we need a track
+    if (mStatus == null) return
+    val track = mStatus!!.tracks?.get(mStatus!!.position)?.item ?: return
+    val handler = ItemLongClickedListener(requireActivity(), requireActivity())
+    handler.onTrackLongClicked(track, null, true)
   }
 
   private fun updateLyrics(lyrics: Lyrics?) {
