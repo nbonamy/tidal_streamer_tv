@@ -7,6 +7,7 @@ import android.os.Handler
 import android.os.Looper
 import android.speech.RecognizerIntent
 import android.util.Log
+import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.leanback.app.BackgroundManager
 import androidx.leanback.app.SearchSupportFragment
@@ -16,6 +17,7 @@ import androidx.leanback.widget.HeaderItem
 import androidx.leanback.widget.ListRow
 import androidx.leanback.widget.ListRowPresenter
 import androidx.leanback.widget.ObjectAdapter
+import androidx.leanback.widget.SearchBar
 import androidx.lifecycle.lifecycleScope
 import fr.bonamy.tidalstreamer.R
 import fr.bonamy.tidalstreamer.api.ApiResult
@@ -57,6 +59,28 @@ class SearchFragment : SearchSupportFragment(), SearchSupportFragment.SearchResu
 //				}
 //			}
 //		}
+
+  }
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+
+    //this is overriding the default searchResultProvider, because of a bug in it
+    view.findViewById<SearchBar>(androidx.leanback.R.id.lb_search_bar).setSearchBarListener(object : SearchBar.SearchBarListener {
+      override fun onSearchQueryChange(query: String?) {
+        onQueryTextChange(query)
+      }
+
+      override fun onSearchQuerySubmit(query: String?) {
+        onQueryTextSubmit(query)
+      }
+
+      override fun onKeyboardDismiss(query: String?) {
+        this@SearchFragment.mHandler.postDelayed({
+          requireView().findViewById<View>(androidx.leanback.R.id.container_list).requestFocus()
+        }, 200)
+      }
+    })
   }
 
   private fun prepareBackgroundManager() {
@@ -65,6 +89,7 @@ class SearchFragment : SearchSupportFragment(), SearchSupportFragment.SearchResu
     mBackgroundManager.color = ContextCompat.getColor(requireContext(), R.color.default_background)
   }
 
+  @Deprecated("OK Boomer")
   override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
     super.onActivityResult(requestCode, resultCode, data)
     if (requestCode == REQUEST_SPEECH && resultCode == Activity.RESULT_OK) {
