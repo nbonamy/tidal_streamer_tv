@@ -11,7 +11,6 @@ import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.ScrollView
 import android.widget.TextView
-import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.transition.TransitionInflater
 import fr.bonamy.tidalstreamer.R
@@ -42,8 +41,6 @@ class FullPlaybackFragment(private var mLayout: PlaybackLayout, private var mSta
   private var mUnlockScrollTimer: Timer? = null
   private var mStreamerListener = StreamerListener(this)
 
-  private val viewModel: PlaybackKeyEventViewModel by activityViewModels()
-
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     sharedElementEnterTransition = TransitionInflater.from(requireContext()).inflateTransition(R.transition.fragment_transition)
@@ -67,9 +64,6 @@ class FullPlaybackFragment(private var mLayout: PlaybackLayout, private var mSta
     if (mStatus != null) {
       processStatus(mStatus!!)
     }
-
-    // key events coming from activity
-    observeKeyEventChanges()
 
     // done
     return v
@@ -170,15 +164,19 @@ class FullPlaybackFragment(private var mLayout: PlaybackLayout, private var mSta
 
   }
 
-  private fun observeKeyEventChanges() {
-    viewModel.keyEvent.observe(viewLifecycleOwner) {
-      if (it == KeyEvent.KEYCODE_DPAD_UP || it == KeyEvent.KEYCODE_DPAD_DOWN) {
-        onManualScroll()
-      }
-      if (it == KeyEvent.KEYCODE_LAST_CHANNEL || it == KeyEvent.KEYCODE_J) {
-        onGoToKey()
-      }
+  fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+
+    if (keyCode == KeyEvent.KEYCODE_DPAD_UP || keyCode == KeyEvent.KEYCODE_DPAD_DOWN) {
+      onManualScroll()
+      return true
     }
+    
+    if (keyCode == KeyEvent.KEYCODE_LAST_CHANNEL || keyCode == KeyEvent.KEYCODE_J) {
+      onGoToKey()
+      return true
+    }
+
+    return false
   }
 
   private fun onManualScroll() {

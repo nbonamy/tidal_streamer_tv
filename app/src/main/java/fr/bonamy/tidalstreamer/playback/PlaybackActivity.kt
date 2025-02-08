@@ -4,22 +4,10 @@ import android.os.Bundle
 import android.view.KeyEvent
 import android.view.View
 import android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
-import androidx.activity.viewModels
 import androidx.fragment.app.commit
 import androidx.fragment.app.commitNow
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import fr.bonamy.tidalstreamer.R
 import fr.bonamy.tidalstreamer.utils.TidalActivity
-
-class PlaybackKeyEventViewModel : ViewModel() {
-  private val _keyEvent: MutableLiveData<Int> = MutableLiveData(-1)
-  val keyEvent: LiveData<Int> get() = _keyEvent
-  fun setEvent(code: Int) {
-    _keyEvent.value = code
-  }
-}
 
 enum class PlaybackLayout {
   NO_LYRICS,
@@ -27,8 +15,6 @@ enum class PlaybackLayout {
 }
 
 class PlaybackActivity : TidalActivity() {
-
-  private val viewModel: PlaybackKeyEventViewModel by viewModels()
 
   override fun hasMiniPlayback(): Boolean {
     return false
@@ -64,16 +50,17 @@ class PlaybackActivity : TidalActivity() {
       return true
     }
 
+    // we might need the fragment
+    val fragment = supportFragmentManager.findFragmentById(R.id.playback_fragment) as FullPlaybackFragment
+
     // lyrics scrolling: send event to fragment
     if (keyCode == KeyEvent.KEYCODE_DPAD_UP || keyCode == KeyEvent.KEYCODE_DPAD_DOWN) {
-      viewModel.setEvent(keyCode)
-      return true
+      return fragment.onKeyDown(keyCode, event)
     }
 
     // jump for menu
     if (keyCode == KeyEvent.KEYCODE_LAST_CHANNEL || keyCode == KeyEvent.KEYCODE_J) {
-      viewModel.setEvent(keyCode)
-      return true
+      return fragment.onKeyDown(keyCode, event)
     }
 
     // default
