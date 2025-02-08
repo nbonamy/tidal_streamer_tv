@@ -67,7 +67,7 @@ class ArtistTitleFragment : Fragment() {
     val info = view.findViewById<FocusableButton>(R.id.info)
     info.setOnClickListener {
       val longClickedListener = ItemLongClickedListener(requireActivity())
-      longClickedListener.goToArtistInfo(mArtist, null)
+      longClickedListener.goToArtistInfo(mArtist)
     }
 
 

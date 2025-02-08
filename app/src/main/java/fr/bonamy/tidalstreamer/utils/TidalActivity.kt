@@ -8,6 +8,7 @@ import android.view.KeyEvent
 import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
+import fr.bonamy.tidalstreamer.MainActivity
 import fr.bonamy.tidalstreamer.R
 import fr.bonamy.tidalstreamer.api.ApiResult
 import fr.bonamy.tidalstreamer.api.StreamingClient
@@ -51,6 +52,8 @@ abstract class TidalActivity : FragmentActivity() {
 
   override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
 
+    // color keys order: YBRG
+
     // reschedule playback task
     schedulePlaybackTask()
 
@@ -60,8 +63,16 @@ abstract class TidalActivity : FragmentActivity() {
       return true
     }
 
+    // back to home
+    if (keyCode == KeyEvent.KEYCODE_PROG_YELLOW || keyCode == KeyEvent.KEYCODE_H) {
+      val intent = Intent(this, MainActivity::class.java)
+      intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+      startActivity(intent)
+      return true
+    }
+
     // user collection
-    if (keyCode == KeyEvent.KEYCODE_LAST_CHANNEL || keyCode == KeyEvent.KEYCODE_J) {
+    if (keyCode == KeyEvent.KEYCODE_PROG_BLUE || keyCode == KeyEvent.KEYCODE_J) {
       val intent = Intent(this, UserActivity::class.java)
       startActivity(intent)
       return true
