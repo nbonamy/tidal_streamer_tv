@@ -5,8 +5,8 @@ import android.view.View
 import androidx.lifecycle.lifecycleScope
 import fr.bonamy.tidalstreamer.api.MetadataClient
 import fr.bonamy.tidalstreamer.models.Artist
-import fr.bonamy.tidalstreamer.search.TrackCardPresenter
 import fr.bonamy.tidalstreamer.utils.BrowserFragment
+import fr.bonamy.tidalstreamer.utils.PresenterFlags
 import kotlinx.coroutines.launch
 
 class ArtistFragment : BrowserFragment() {
@@ -63,7 +63,7 @@ class ArtistFragment : BrowserFragment() {
         metadataClient.fetchArtistTopTracks(mArtist.id!!),
         ROWS_TITLE,
         0,
-        TrackCardPresenter.TrackPlayback.ALL,
+        PresenterFlags.SHOW_TRACK_ALBUM or PresenterFlags.PLAY_ALL_TRACKS
       )
     }
 
@@ -73,6 +73,7 @@ class ArtistFragment : BrowserFragment() {
         metadataClient.fetchArtistAlbums(mArtist.id!!),
         ROWS_TITLE,
         1,
+        PresenterFlags.SHOW_ALBUM_YEAR
       )
     }
 
@@ -82,6 +83,7 @@ class ArtistFragment : BrowserFragment() {
         metadataClient.fetchArtistSingles(mArtist.id!!),
         ROWS_TITLE,
         2,
+        PresenterFlags.SHOW_ALBUM_YEAR
       )
     }
 

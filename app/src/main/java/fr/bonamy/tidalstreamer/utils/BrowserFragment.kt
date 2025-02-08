@@ -33,7 +33,6 @@ import fr.bonamy.tidalstreamer.models.ImageRepresentation
 import fr.bonamy.tidalstreamer.models.Track
 import fr.bonamy.tidalstreamer.search.SearchActivity
 import fr.bonamy.tidalstreamer.search.TrackCardPresenter
-import fr.bonamy.tidalstreamer.search.TrackCardPresenter.TrackPlayback
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.Timer
@@ -126,14 +125,14 @@ abstract class BrowserFragment : BrowseSupportFragment() {
     return rowsAdapter
   }
 
-  suspend fun <T> loadRow(rowsAdapter: ArrayObjectAdapter, result: ApiResult<List<T>>, titles: Array<String>, index: Int, trackPlayback: TrackPlayback = TrackPlayback.SINGLE) {
+  suspend fun <T> loadRow(rowsAdapter: ArrayObjectAdapter, result: ApiResult<List<T>>, titles: Array<String>, index: Int, flags: PresenterFlags = PresenterFlags.NONE) {
 
     // Create the presenter selector
     val presenter = ClassPresenterSelector()
     val itemLongClickedListener = ItemLongClickedListener(requireActivity())
-    presenter.addClassPresenter(Collection::class.java, CollectionCardPresenter(itemLongClickedListener))
-    presenter.addClassPresenter(Artist::class.java, ArtistCardPresenter(itemLongClickedListener))
-    presenter.addClassPresenter(Track::class.java, TrackCardPresenter(trackPlayback, itemLongClickedListener))
+    presenter.addClassPresenter(Collection::class.java, CollectionCardPresenter(flags, itemLongClickedListener))
+    presenter.addClassPresenter(Artist::class.java, ArtistCardPresenter(flags, itemLongClickedListener))
+    presenter.addClassPresenter(Track::class.java, TrackCardPresenter(flags, itemLongClickedListener))
 
     // Load the row
     when (result) {

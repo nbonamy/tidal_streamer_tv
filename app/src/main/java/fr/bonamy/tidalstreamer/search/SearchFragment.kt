@@ -29,6 +29,7 @@ import fr.bonamy.tidalstreamer.models.Collection
 import fr.bonamy.tidalstreamer.models.Track
 import fr.bonamy.tidalstreamer.utils.ItemClickedListener
 import fr.bonamy.tidalstreamer.utils.ItemLongClickedListener
+import fr.bonamy.tidalstreamer.utils.PresenterFlags
 import kotlinx.coroutines.launch
 
 
@@ -137,9 +138,9 @@ class SearchFragment : SearchSupportFragment(), SearchSupportFragment.SearchResu
     // Create the presenter selector
     val presenter = ClassPresenterSelector()
     val itemLongClickedListener = ItemLongClickedListener(requireActivity())
-    presenter.addClassPresenter(Collection::class.java, CollectionCardPresenter(itemLongClickedListener))
-    presenter.addClassPresenter(Artist::class.java, ArtistCardPresenter(itemLongClickedListener))
-    presenter.addClassPresenter(Track::class.java, TrackCardPresenter(TrackCardPresenter.TrackPlayback.SINGLE, itemLongClickedListener))
+    presenter.addClassPresenter(Collection::class.java, CollectionCardPresenter(PresenterFlags.NONE, itemLongClickedListener))
+    presenter.addClassPresenter(Artist::class.java, ArtistCardPresenter(PresenterFlags.NONE, itemLongClickedListener))
+    presenter.addClassPresenter(Track::class.java, TrackCardPresenter(PresenterFlags.NONE, itemLongClickedListener))
 
     viewLifecycleOwner.lifecycleScope.launch {
       when (val result = searchClient.searchAlbums(query)) {

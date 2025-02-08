@@ -64,8 +64,7 @@ class CollectionPresenter(
 
     // release date for albums
     if (collection is Album && collection.releaseDate != null) {
-      val tokens = collection.releaseDate!!.split("-")
-      vh.releaseDate.text = tokens[0]
+      vh.releaseDate.text = collection.releaseYear()
     }
 
     // based on tracks

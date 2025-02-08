@@ -11,8 +11,9 @@ import fr.bonamy.tidalstreamer.R
 import fr.bonamy.tidalstreamer.models.Artist
 import fr.bonamy.tidalstreamer.utils.CardPresenter
 import fr.bonamy.tidalstreamer.utils.ItemLongClickedListener
+import fr.bonamy.tidalstreamer.utils.PresenterFlags
 
-class ArtistCardPresenter(private var mLongClickedListener: ItemLongClickedListener) : CardPresenter() {
+class ArtistCardPresenter(mFlags: PresenterFlags, private var mLongClickedListener: ItemLongClickedListener) : CardPresenter(mFlags) {
 
   private var mDefaultCardImage: Drawable? = null
 

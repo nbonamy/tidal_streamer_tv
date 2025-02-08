@@ -9,8 +9,9 @@ import fr.bonamy.tidalstreamer.R
 import fr.bonamy.tidalstreamer.models.Track
 import fr.bonamy.tidalstreamer.utils.CardPresenter
 import fr.bonamy.tidalstreamer.utils.ItemLongClickedListener
+import fr.bonamy.tidalstreamer.utils.PresenterFlags
 
-class TrackCardPresenter(private var mTrackPlayback: TrackPlayback, private var mLongClickedListener: ItemLongClickedListener) : CardPresenter() {
+class TrackCardPresenter(mFlags: PresenterFlags, private var mLongClickedListener: ItemLongClickedListener) : CardPresenter(mFlags) {
 
   enum class TrackPlayback {
     SINGLE,
@@ -20,7 +21,7 @@ class TrackCardPresenter(private var mTrackPlayback: TrackPlayback, private var 
   private var mDefaultCardImage: Drawable? = null
 
   fun getTrackPlayback(): TrackPlayback {
-    return mTrackPlayback
+    return if (mFlags.hasFlag(PresenterFlags.PLAY_ALL_TRACKS)) TrackPlayback.ALL else TrackPlayback.SINGLE
   }
 
   override fun onCreateViewHolder(parent: ViewGroup): ViewHolder {
@@ -38,7 +39,15 @@ class TrackCardPresenter(private var mTrackPlayback: TrackPlayback, private var 
 
     //Log.d(TAG, "onBindViewHolder")
     cardView.titleText = track.title
-    cardView.contentText = track.artist?.name ?: ""
+
+    //  content depends on flags
+    if (mFlags.hasFlag(PresenterFlags.SHOW_TRACK_ALBUM)) {
+      cardView.contentText = track.album?.title ?: ""
+    } else {
+      cardView.contentText = track.artist?.name ?: ""
+    }
+
+    // image
     cardView.setMainImageDimensions(CARD_WIDTH, CARD_HEIGHT)
     Glide.with(viewHolder.view.context)
       .load(track.imageUrl())

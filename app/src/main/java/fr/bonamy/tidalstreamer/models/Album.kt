@@ -39,6 +39,10 @@ data class Album(
     return vibrantColor?.let { Color.parseColor(it) }
   }
 
+  fun releaseYear(): String {
+    return releaseDate?.split("-")?.get(0) ?: ""
+  }
+
 //  val quality: Int
 //    get() {
 //      return when (audioQuality) {

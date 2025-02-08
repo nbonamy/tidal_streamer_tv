@@ -7,15 +7,26 @@ import androidx.leanback.widget.Presenter
 import fr.bonamy.tidalstreamer.R
 import kotlin.properties.Delegates
 
-/**
- * A CardPresenter is used to generate Views and bind Objects to them on demand.
- * It contains an ImageCardView.
- */
-abstract class CardPresenter : Presenter() {
+@JvmInline
+value class PresenterFlags(private val value: Int) {
+  companion object {
+    val NONE = PresenterFlags(0)
+    val SHOW_ALBUM_YEAR = PresenterFlags(1 shl 0)  // 0b0001
+    val SHOW_TRACK_ALBUM = PresenterFlags(1 shl 1)  // 0b0010
+    val PLAY_ALL_TRACKS = PresenterFlags(1 shl 2)  // 0b0100
+  }
+
+  infix fun or(other: PresenterFlags) = PresenterFlags(this.value or other.value)
+  infix fun and(other: PresenterFlags) = PresenterFlags(this.value and other.value)
+  fun hasFlag(flag: PresenterFlags) = (this.value and flag.value) == flag.value
+}
+
+
+abstract class CardPresenter(protected var mFlags: PresenterFlags) : Presenter() {
   private var sSelectedBackgroundColor: Int by Delegates.notNull()
   private var sDefaultBackgroundColor: Int by Delegates.notNull()
 
-  override fun onCreateViewHolder(parent: ViewGroup): Presenter.ViewHolder {
+  override fun onCreateViewHolder(parent: ViewGroup): ViewHolder {
     //Log.d(TAG, "onCreateViewHolder")
 
     sDefaultBackgroundColor = ContextCompat.getColor(parent.context, R.color.default_background)
@@ -31,12 +42,12 @@ abstract class CardPresenter : Presenter() {
     cardView.isFocusable = true
     cardView.isFocusableInTouchMode = true
     updateCardBackgroundColor(cardView, false)
-    return Presenter.ViewHolder(cardView)
+    return ViewHolder(cardView)
   }
 
-  abstract override fun onBindViewHolder(viewHolder: Presenter.ViewHolder, item: Any)
+  abstract override fun onBindViewHolder(viewHolder: ViewHolder, item: Any)
 
-  override fun onUnbindViewHolder(viewHolder: Presenter.ViewHolder) {
+  override fun onUnbindViewHolder(viewHolder: ViewHolder) {
     //Log.d(TAG, "onUnbindViewHolder")
     val cardView = viewHolder.view as ImageCardView
     // Remove references to images so that the garbage collector can free up memory
@@ -53,8 +64,8 @@ abstract class CardPresenter : Presenter() {
   }
 
   companion object {
-    private val TAG = "CardPresenter"
-    val CARD_WIDTH = 250
-    val CARD_HEIGHT = 250
+    //private const val TAG = "CardPresenter"
+    const val CARD_WIDTH = 250
+    const val CARD_HEIGHT = 250
   }
 }
