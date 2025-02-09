@@ -31,6 +31,14 @@ class PlaybackActivity : TidalActivity() {
     }
   }
 
+  override fun onBackPressed() {
+    if (currentLayout == PlaybackLayout.LYRICS) {
+      onKeyDown(KeyEvent.KEYCODE_DPAD_CENTER, null)
+    } else {
+      super.onBackPressed()
+    }
+  }
+
   override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
 
     // toggle lyrics
