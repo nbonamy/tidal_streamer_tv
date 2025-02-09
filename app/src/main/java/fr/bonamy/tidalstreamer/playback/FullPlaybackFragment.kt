@@ -114,7 +114,7 @@ class FullPlaybackFragment(private var mLayout: PlaybackLayout, private var mSta
     }
 
     // we need the track
-    val track = super.getTrack(status) ?: return result
+    val track = status.currentTrack() ?: return result
 
     // load lyrics
     if (result == StatusProcessResult.NEW_TRACK && mLyricsView != null) {
@@ -170,7 +170,7 @@ class FullPlaybackFragment(private var mLayout: PlaybackLayout, private var mSta
       onManualScroll()
       return true
     }
-    
+
     if (keyCode == KeyEvent.KEYCODE_LAST_CHANNEL || keyCode == KeyEvent.KEYCODE_J) {
       onGoToKey()
       return true
