@@ -1,5 +1,6 @@
 package fr.bonamy.tidalstreamer.api
 
+import android.content.Context
 import android.util.Log
 import com.google.gson.Gson
 import fr.bonamy.tidalstreamer.models.Status
@@ -17,13 +18,13 @@ interface StreamerEventListener {
 }
 
 class StreamerListener// Trigger shutdown of the dispatcher's executor so this process exits immediately.
-  (private var mListener: StreamerEventListener) : WebSocketListener() {
+  (private var mContext: Context, private var mListener: StreamerEventListener) : WebSocketListener() {
 
   lateinit var client: OkHttpClient
   lateinit var webSocket: WebSocket
 
   fun start() {
-    val configuration = Configuration()
+    val configuration = Configuration(mContext)
     client = OkHttpClient.Builder()
       .readTimeout(0, TimeUnit.MILLISECONDS)
       .build()

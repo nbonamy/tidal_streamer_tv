@@ -78,7 +78,7 @@ class CollectionFragment : DetailsSupportFragment(), PaletteAsyncListener, OnTra
     if (mCollection!!.tracks == null) {
 
       lifecycleScope.launch {
-        val apiClient = MetadataClient()
+        val apiClient = MetadataClient(requireContext())
         when (mCollection) {
           is Album -> {
             when (val result = apiClient.fetchAlbumTracks((mCollection as Album).id!!)) {
@@ -299,7 +299,7 @@ class CollectionFragment : DetailsSupportFragment(), PaletteAsyncListener, OnTra
 
   private fun playCollection(index: Int = 0) {
     lifecycleScope.launch {
-      val apiClient = StreamingClient()
+      val apiClient = StreamingClient(requireContext())
 
       when (mCollection) {
         is Album -> {
@@ -357,7 +357,7 @@ class CollectionFragment : DetailsSupportFragment(), PaletteAsyncListener, OnTra
     }
 
     lifecycleScope.launch {
-      val apiClient = StreamingClient()
+      val apiClient = StreamingClient(requireContext())
       when (val result =
         apiClient.enqueueTracks(mCollection!!.tracks!!.toTypedArray(), position)) {
         is ApiResult.Success -> {}

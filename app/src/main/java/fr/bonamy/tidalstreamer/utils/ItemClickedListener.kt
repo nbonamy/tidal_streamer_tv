@@ -67,7 +67,7 @@ class ItemClickedListener(private val mActivity: FragmentActivity) : OnItemViewC
       if (presenter.getTrackPlayback() == TrackCardPresenter.TrackPlayback.SINGLE) {
 
         mActivity.lifecycleScope.launch {
-          val apiClient = StreamingClient()
+          val apiClient = StreamingClient(mActivity)
           when (val result = apiClient.playTracks((arrayOf(item)))) {
             is ApiResult.Success -> {}
             is ApiResult.Error -> {
@@ -82,7 +82,7 @@ class ItemClickedListener(private val mActivity: FragmentActivity) : OnItemViewC
         val position = tracks.indexOf(item)
 
         mActivity.lifecycleScope.launch {
-          val apiClient = StreamingClient()
+          val apiClient = StreamingClient(mActivity)
           when (val result = apiClient.playTracks(tracks, position)) {
             is ApiResult.Success -> {}
             is ApiResult.Error -> {
@@ -117,13 +117,13 @@ class ItemClickedListener(private val mActivity: FragmentActivity) : OnItemViewC
 
       // first make sure we have tracks
       if (item.tracks == null) {
-        val apiClient = MetadataClient()
+        val apiClient = MetadataClient(mActivity)
         if (!apiClient.fetchTracks(item)) {
           return@launch
         }
       }
 
-      val apiClient = StreamingClient()
+      val apiClient = StreamingClient(mActivity)
       when (val result = apiClient.playTracks(item.tracks!!.toTypedArray())) {
         is ApiResult.Success -> {}
         is ApiResult.Error -> {

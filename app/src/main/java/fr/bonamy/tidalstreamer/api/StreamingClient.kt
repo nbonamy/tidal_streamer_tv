@@ -1,10 +1,12 @@
 package fr.bonamy.tidalstreamer.api
 
+import android.content.Context
 import android.util.Log
 import fr.bonamy.tidalstreamer.models.Album
 import fr.bonamy.tidalstreamer.models.Queue
 import fr.bonamy.tidalstreamer.models.Status
 import fr.bonamy.tidalstreamer.models.Track
+import fr.bonamy.tidalstreamer.utils.Configuration
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -13,7 +15,7 @@ enum class EnqueuePosition {
   END,
 }
 
-class StreamingClient : ApiClient() {
+class StreamingClient(mContext: Context) : ApiClient() {
 
   suspend fun status(): ApiResult<Status> = withContext(Dispatchers.IO) {
     try {
@@ -160,7 +162,8 @@ class StreamingClient : ApiClient() {
   }
 
   private val apiService: StreamingService by lazy {
-    ApiRetrofitClient.instance.create(StreamingService::class.java)
+    val configuration = Configuration(mContext)
+    ApiRetrofitClient.instance(configuration.getHttpBaseUrl()).create(StreamingService::class.java)
   }
 
   companion object {

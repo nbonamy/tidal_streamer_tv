@@ -16,7 +16,7 @@ class UserFragment : BrowserFragment() {
 
     // init
     val rowsAdapter = initRowsAdapter(ROWS_TITLE.size)
-    val userClient = UserClient()
+    val userClient = UserClient(requireContext())
     adapter = rowsAdapter
 
     // now load rows

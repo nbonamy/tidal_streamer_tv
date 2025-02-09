@@ -67,7 +67,7 @@ class ItemLongClickedListener(private val mActivity: FragmentActivity, private v
     val builder: AlertDialog.Builder = AlertDialog.Builder(mActivity)
     builder.setItems(menuItems.toTypedArray()) { _: DialogInterface?, which: Int ->
 
-      val apiClient = StreamingClient()
+      val apiClient = StreamingClient(mActivity)
 
       val menuChosen = menuItems[which]
       val tracksNeeded = isPlayNow(menuChosen) || isPlayNext(menuChosen) || isPlayAfter(menuChosen)
@@ -76,7 +76,7 @@ class ItemLongClickedListener(private val mActivity: FragmentActivity, private v
 
         // first make sure we have tracks
         if (tracksNeeded && collection.tracks == null) {
-          val metadataClient = MetadataClient()
+          val metadataClient = MetadataClient(mActivity)
           if (!metadataClient.fetchTracks(collection)) {
             return@launch
           }
@@ -161,7 +161,7 @@ class ItemLongClickedListener(private val mActivity: FragmentActivity, private v
     val builder: AlertDialog.Builder = AlertDialog.Builder(mActivity)
     builder.setItems(menuItems.toTypedArray()) { _: DialogInterface?, which: Int ->
 
-      val apiClient = StreamingClient()
+      val apiClient = StreamingClient(mActivity)
 
       val menuChosen = menuItems[which]
       if (isPlayNow(menuChosen)) {
@@ -277,7 +277,7 @@ class ItemLongClickedListener(private val mActivity: FragmentActivity, private v
 
   fun goToArtistRadio(artist: Artist, cardView: ImageCardView?) {
     mActivity.lifecycleScope.launch {
-      val metadataClient = MetadataClient()
+      val metadataClient = MetadataClient(mActivity)
       when (val result = metadataClient.fetchArtistRadio(artist.id!!)) {
         is ApiResult.Success -> {
           val radio = Radio(
@@ -300,7 +300,7 @@ class ItemLongClickedListener(private val mActivity: FragmentActivity, private v
 
   fun goToArtistInfo(artist: Artist) {
     mActivity.lifecycleScope.launch {
-      val metadataClient = MetadataClient()
+      val metadataClient = MetadataClient(mActivity)
       when (val result = metadataClient.fetchArtistInfo(artist.id!!)) {
         is ApiResult.Success -> {
           // show an alert showing result.text
@@ -319,7 +319,7 @@ class ItemLongClickedListener(private val mActivity: FragmentActivity, private v
 
   private fun goToTrackRadio(track: Track, cardView: ImageCardView?) {
     mActivity.lifecycleScope.launch {
-      val metadataClient = MetadataClient()
+      val metadataClient = MetadataClient(mActivity)
       when (val result = metadataClient.fetchTrackRadio(track.id!!)) {
         is ApiResult.Success -> {
           val radio = Radio(

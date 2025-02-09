@@ -49,7 +49,7 @@ class ArtistFragment : BrowserFragment() {
 
     // init
     val rowsAdapter = initRowsAdapter(ROWS_TITLE.size)
-    val metadataClient = MetadataClient()
+    val metadataClient = MetadataClient(requireContext())
     adapter = rowsAdapter
 
     // now load rows

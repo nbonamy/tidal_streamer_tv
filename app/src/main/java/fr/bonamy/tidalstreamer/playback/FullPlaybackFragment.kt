@@ -39,10 +39,11 @@ class FullPlaybackFragment(private var mLayout: PlaybackLayout, private var mSta
   private var mScrollingLocked = false
   private var mSyncedLyrics = false
   private var mUnlockScrollTimer: Timer? = null
-  private var mStreamerListener = StreamerListener(this)
+  private lateinit var mStreamerListener: StreamerListener
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+    mStreamerListener = StreamerListener(requireContext(), this)
     sharedElementEnterTransition = TransitionInflater.from(requireContext()).inflateTransition(R.transition.fragment_transition)
     sharedElementReturnTransition = TransitionInflater.from(requireContext()).inflateTransition(R.transition.fragment_transition)
   }
@@ -125,7 +126,7 @@ class FullPlaybackFragment(private var mLayout: PlaybackLayout, private var mSta
         syncLyrics(status, true)
       } else {
         lifecycleScope.launch {
-          val metadataClient = MetadataClient()
+          val metadataClient = MetadataClient(requireContext())
           when (val lyrics = metadataClient.fetchTrackLyrics(track.id!!)) {
             is ApiResult.Success -> {
               updateLyrics(lyrics.data)

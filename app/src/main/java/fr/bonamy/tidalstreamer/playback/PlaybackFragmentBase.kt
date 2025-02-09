@@ -1,5 +1,6 @@
 package fr.bonamy.tidalstreamer.playback
 
+import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.LayoutInflater
@@ -28,12 +29,17 @@ abstract class PlaybackFragmentBase : Fragment() {
   abstract fun showSelf()
   abstract fun hideSelf()
 
-  private val apiClient = StreamingClient()
+  private lateinit var apiClient: StreamingClient
   private lateinit var titleView: TextView
   private lateinit var artistView: TextView
   private lateinit var albumArtView: ImageView
   private val handler = Handler(Looper.getMainLooper())
   private var currentMediaId: String? = null
+
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    apiClient = StreamingClient(requireContext())
+  }
 
   protected fun createView(
     inflater: LayoutInflater, container: ViewGroup?, layoutId: Int

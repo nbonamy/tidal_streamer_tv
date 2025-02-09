@@ -1,15 +1,17 @@
 package fr.bonamy.tidalstreamer.api
 
+import android.content.Context
 import fr.bonamy.tidalstreamer.models.Album
 import fr.bonamy.tidalstreamer.models.Artist
 import fr.bonamy.tidalstreamer.models.Collection
 import fr.bonamy.tidalstreamer.models.Mix
 import fr.bonamy.tidalstreamer.models.Playlist
 import fr.bonamy.tidalstreamer.models.Track
+import fr.bonamy.tidalstreamer.utils.Configuration
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class UserClient : ApiClient() {
+class UserClient(mContext: Context) : ApiClient() {
 
   suspend fun fetchShortcuts(): ApiResult<List<Collection>> = withContext(Dispatchers.IO) {
     try {
@@ -135,7 +137,8 @@ class UserClient : ApiClient() {
   }
 
   private val apiService: UserService by lazy {
-    ApiRetrofitClient.instance.create(UserService::class.java)
+    val configuration = Configuration(mContext)
+    ApiRetrofitClient.instance(configuration.getHttpBaseUrl()).create(UserService::class.java)
   }
 
 }

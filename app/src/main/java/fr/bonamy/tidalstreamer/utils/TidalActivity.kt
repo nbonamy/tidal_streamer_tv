@@ -38,7 +38,7 @@ abstract class TidalActivity : FragmentActivity() {
 //          .commitNow()
 //      }
 //    }
-    mApiClient = StreamingClient()
+    mApiClient = StreamingClient(this)
   }
 
   open fun hasMiniPlayback(): Boolean {
@@ -254,7 +254,7 @@ abstract class TidalActivity : FragmentActivity() {
 
       // repeat
       mHandler.postDelayed(this, SEEK_REPEAT_DELAY)
-      
+
     }
   }
 
