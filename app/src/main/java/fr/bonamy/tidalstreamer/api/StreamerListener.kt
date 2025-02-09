@@ -44,7 +44,7 @@ class StreamerListener// Trigger shutdown of the dispatcher's executor so this p
 
   override fun onMessage(webSocket: WebSocket, text: String) {
 
-    var status: Status? = null
+    var status: Status?
 
     // decode
     try {

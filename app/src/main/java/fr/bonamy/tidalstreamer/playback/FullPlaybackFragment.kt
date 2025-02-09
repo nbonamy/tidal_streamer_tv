@@ -164,6 +164,7 @@ class FullPlaybackFragment(private var mLayout: PlaybackLayout, private var mSta
 
   }
 
+  @Suppress("UNUSED_PARAMETER")
   fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
 
     if (keyCode == KeyEvent.KEYCODE_DPAD_UP || keyCode == KeyEvent.KEYCODE_DPAD_DOWN) {

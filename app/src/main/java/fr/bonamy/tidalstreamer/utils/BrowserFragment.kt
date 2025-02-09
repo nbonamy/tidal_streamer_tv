@@ -81,6 +81,7 @@ abstract class BrowserFragment : BrowseSupportFragment() {
     mBackgroundTimer?.cancel()
   }
 
+  @Suppress("UNUSED_PARAMETER")
   fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
     // default
     return false

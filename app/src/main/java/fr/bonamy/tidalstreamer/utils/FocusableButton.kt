@@ -25,7 +25,7 @@ class FocusableButton : TextView {
 
     this.focusable = FOCUSABLE
     this.background = context.getDrawable(R.drawable.button_rounded_corners)
-    this.setOnFocusChangeListener(View.OnFocusChangeListener { v, hasFocus ->
+    this.setOnFocusChangeListener(View.OnFocusChangeListener { _, hasFocus ->
       if (hasFocus) {
         // run scale animation and make it bigger
         val anim = AnimationUtils.loadAnimation(context, R.anim.scale_in)

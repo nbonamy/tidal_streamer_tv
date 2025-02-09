@@ -19,9 +19,6 @@ class ArtistFragment : BrowserFragment() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     mArtist = requireActivity().intent.getSerializableExtra(ArtistActivity.ARTIST) as Artist
-    if (mArtist == null) {
-      requireActivity().finish()
-    }
     super.onCreate(savedInstanceState)
   }
 
