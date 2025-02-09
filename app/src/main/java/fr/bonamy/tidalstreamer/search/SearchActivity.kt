@@ -1,5 +1,6 @@
 package fr.bonamy.tidalstreamer.search
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import fr.bonamy.tidalstreamer.R
 import fr.bonamy.tidalstreamer.utils.TidalActivity
@@ -14,6 +15,11 @@ class SearchActivity : TidalActivity() {
         .replace(R.id.search_fragment, SearchFragment())
         .commitNow()
     }
+  }
+
+  @SuppressLint("MissingSuperCall")
+  override fun onBackPressed() {
+    (supportFragmentManager.findFragmentById(R.id.search_fragment) as SearchFragment).onBackPressed()
   }
 
   override fun canSwitchToPlayback(): Boolean {

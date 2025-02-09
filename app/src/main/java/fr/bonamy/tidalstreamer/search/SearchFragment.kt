@@ -27,26 +27,33 @@ import fr.bonamy.tidalstreamer.collection.CollectionCardPresenter
 import fr.bonamy.tidalstreamer.models.Artist
 import fr.bonamy.tidalstreamer.models.Collection
 import fr.bonamy.tidalstreamer.models.Track
+import fr.bonamy.tidalstreamer.utils.Configuration
 import fr.bonamy.tidalstreamer.utils.ItemClickedListener
 import fr.bonamy.tidalstreamer.utils.ItemLongClickedListener
 import fr.bonamy.tidalstreamer.utils.PresenterFlags
 import kotlinx.coroutines.launch
 
+enum class SearchState {
+  RECENT_SEARCHES,
+  SEARCH_RESULTS
+}
 
 class SearchFragment : SearchSupportFragment(), SearchSupportFragment.SearchResultProvider {
 
+  private lateinit var mConfiguration: Configuration
   private lateinit var mBackgroundManager: BackgroundManager
   private lateinit var mRowsAdapter: ArrayObjectAdapter
   private var mLastQuery: String = ""
   private val mHandler = Handler(Looper.getMainLooper())
   private var mSearchRunnable: Runnable? = null
+  private var mState: SearchState = SearchState.RECENT_SEARCHES
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     prepareBackgroundManager()
+    mConfiguration = Configuration(requireContext())
     mRowsAdapter = ArrayObjectAdapter(ListRowPresenter())
     setSearchResultProvider(this)
-    setOnItemViewClickedListener(ItemClickedListener(requireActivity()))
 
 //		if (!AndroidUtils.hasPermission(requireContext(), Manifest.permission.RECORD_AUDIO)) {
 //			// SpeechRecognitionCallback is not required and if not provided recognition will be handled
@@ -61,6 +68,18 @@ class SearchFragment : SearchSupportFragment(), SearchSupportFragment.SearchResu
 //			}
 //		}
 
+    // handle recent search click and result item click
+    val itemClickedListener = ItemClickedListener(requireActivity())
+    setOnItemViewClickedListener { itemViewHolder, item, rowViewHolder, row ->
+      if (item is RecentSearch) {
+        query(item.query)
+        focusResults()
+      } else {
+        itemClickedListener.onItemClicked(itemViewHolder, item, rowViewHolder, row)
+      }
+    }
+
+
   }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -70,6 +89,9 @@ class SearchFragment : SearchSupportFragment(), SearchSupportFragment.SearchResu
     view.findViewById<SearchBar>(androidx.leanback.R.id.lb_search_bar).setSearchBarListener(object : SearchBar.SearchBarListener {
       override fun onSearchQueryChange(query: String?) {
         onQueryTextChange(query)
+        if (query.isNullOrEmpty()) {
+          showRecentSearches()
+        }
       }
 
       override fun onSearchQuerySubmit(query: String?) {
@@ -77,11 +99,20 @@ class SearchFragment : SearchSupportFragment(), SearchSupportFragment.SearchResu
       }
 
       override fun onKeyboardDismiss(query: String?) {
-        this@SearchFragment.mHandler.postDelayed({
-          requireView().findViewById<View>(androidx.leanback.R.id.container_list).requestFocus()
-        }, 200)
+        mConfiguration.addRecentSearch(query)
+        focusResults()
       }
     })
+
+    showRecentSearches()
+  }
+
+  fun onBackPressed() {
+    if (mState == SearchState.SEARCH_RESULTS) {
+      showRecentSearches()
+    } else {
+      requireActivity().finish()
+    }
   }
 
   private fun prepareBackgroundManager() {
@@ -101,6 +132,12 @@ class SearchFragment : SearchSupportFragment(), SearchSupportFragment.SearchResu
     }
   }
 
+  fun focusResults() {
+    this@SearchFragment.mHandler.postDelayed({
+      requireView().findViewById<View>(androidx.leanback.R.id.container_list).requestFocus()
+    }, 200)
+  }
+
   override fun getResultsAdapter(): ObjectAdapter {
     Log.d(TAG, "getResultsAdapter")
     Log.d(TAG, mRowsAdapter.toString())
@@ -115,7 +152,9 @@ class SearchFragment : SearchSupportFragment(), SearchSupportFragment.SearchResu
   }
 
   override fun onQueryTextSubmit(query: String?): Boolean {
-    query(query!!)
+    if (query == null) return false
+    mConfiguration.addRecentSearch(query)
+    query(query)
     return true
   }
 
@@ -128,7 +167,7 @@ class SearchFragment : SearchSupportFragment(), SearchSupportFragment.SearchResu
       return
     }
 
-    val searchClient = SearchClient()
+    val searchClient = SearchClient(requireContext())
 
     mRowsAdapter.clear()
     mRowsAdapter.add(ListRow(ArrayObjectAdapter(ListRowPresenter())))
@@ -193,12 +232,58 @@ class SearchFragment : SearchSupportFragment(), SearchSupportFragment.SearchResu
       }
     }
 
+    mState = SearchState.SEARCH_RESULTS
+
+  }
+
+  private fun showRecentSearches() {
+
+    var chars = 0
+    var firstRow = true
+    mRowsAdapter.clear()
+    val recentSearches = mConfiguration.loadRecentSearches()
+    var listRowAdapter = ArrayObjectAdapter(RecentSearchPresenter())
+    val header = HeaderItem("Recent Searches")
+
+    for (search in recentSearches) {
+
+      val length = 20.coerceAtMost(search.length)
+      if (chars + length > RECENT_SEARCH_ROW_SIZE) {
+        if (mRowsAdapter.size() == 0) {
+          mRowsAdapter.add(ListRow(header, listRowAdapter))
+        } else {
+          mRowsAdapter.add(ListRow(listRowAdapter))
+        }
+
+        // reset
+        listRowAdapter = ArrayObjectAdapter(RecentSearchPresenter())
+        firstRow = false
+        chars = 0
+      }
+
+      // add it
+      listRowAdapter.add(RecentSearch(search, firstRow))
+      chars += length
+    }
+
+    if (listRowAdapter.size() > 0) {
+      if (mRowsAdapter.size() == 0) {
+        mRowsAdapter.add(ListRow(header, listRowAdapter))
+      } else {
+        mRowsAdapter.add(ListRow(listRowAdapter))
+      }
+    }
+
+    mRowsAdapter.notifyArrayItemRangeChanged(0, mRowsAdapter.size())
+    mState = SearchState.RECENT_SEARCHES
+
   }
 
   companion object {
     private const val TAG = "SearchFragment"
     private const val REQUEST_SPEECH = 1
     private const val SEARCH_TEMPO = 500L
+    private const val RECENT_SEARCH_ROW_SIZE = 90
   }
 
 }
