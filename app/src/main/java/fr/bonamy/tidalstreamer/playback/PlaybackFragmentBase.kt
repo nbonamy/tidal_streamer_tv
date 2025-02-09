@@ -15,7 +15,6 @@ import fr.bonamy.tidalstreamer.api.ApiResult
 import fr.bonamy.tidalstreamer.api.StreamingClient
 import fr.bonamy.tidalstreamer.models.STATE_STOPPED
 import fr.bonamy.tidalstreamer.models.Status
-import fr.bonamy.tidalstreamer.models.Track
 import kotlinx.coroutines.launch
 
 enum class StatusProcessResult {
@@ -94,7 +93,7 @@ abstract class PlaybackFragmentBase : Fragment() {
     }
 
     // get track
-    val track = getTrack(status)
+    val track = status.currentTrack()
     if (track == null) {
       hideSelf()
       currentMediaId = null
@@ -122,10 +121,6 @@ abstract class PlaybackFragmentBase : Fragment() {
     currentMediaId = track.id
     return StatusProcessResult.NEW_TRACK
 
-  }
-
-  protected fun getTrack(status: Status): Track? {
-    return status.tracks?.get(status.position)?.item
   }
 
   companion object {

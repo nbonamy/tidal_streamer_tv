@@ -17,4 +17,8 @@ data class Status(
   val tracks: List<StatusTrack>? = null,
   val position: Int = -1,
   val progress: Int = -1
-) : Serializable
+) : Serializable {
+  fun currentTrack(): Track? {
+    return tracks?.getOrNull(position)?.item
+  }
+}

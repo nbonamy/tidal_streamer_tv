@@ -16,4 +16,8 @@ class SearchActivity : TidalActivity() {
     }
   }
 
+  override fun canSwitchToPlayback(): Boolean {
+    return false
+  }
+
 }

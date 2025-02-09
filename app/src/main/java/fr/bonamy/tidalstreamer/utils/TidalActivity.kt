@@ -15,14 +15,19 @@ import fr.bonamy.tidalstreamer.api.StreamingClient
 import fr.bonamy.tidalstreamer.models.STATE_PAUSED
 import fr.bonamy.tidalstreamer.models.STATE_PLAYING
 import fr.bonamy.tidalstreamer.models.STATE_STOPPED
+import fr.bonamy.tidalstreamer.models.Status
 import fr.bonamy.tidalstreamer.playback.PlaybackActivity
 import fr.bonamy.tidalstreamer.user.UserActivity
 import kotlinx.coroutines.launch
+import kotlin.math.min
 
 abstract class TidalActivity : FragmentActivity() {
 
-  private lateinit var apiClient: StreamingClient
-  private val handler = Handler(Looper.getMainLooper())
+  private lateinit var mApiClient: StreamingClient
+  private val mHandler = Handler(Looper.getMainLooper())
+  private var mStatus: Status? = null
+  private var mSeekKey: Int = 0
+  private var mIsSeeking = false
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -33,10 +38,14 @@ abstract class TidalActivity : FragmentActivity() {
 //          .commitNow()
 //      }
 //    }
-    apiClient = StreamingClient()
+    mApiClient = StreamingClient()
   }
 
   open fun hasMiniPlayback(): Boolean {
+    return true
+  }
+
+  open fun canSwitchToPlayback(): Boolean {
     return true
   }
 
@@ -52,7 +61,7 @@ abstract class TidalActivity : FragmentActivity() {
 
   override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
 
-    // color keys order: YBRG
+    // color keys order: YELLOW, BLUE, RED, GREEN
 
     // reschedule playback task
     schedulePlaybackTask()
@@ -81,12 +90,12 @@ abstract class TidalActivity : FragmentActivity() {
     // toggle play/pause
     if (keyCode == KeyEvent.KEYCODE_MEDIA_PAUSE || keyCode == KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE || keyCode == KeyEvent.KEYCODE_P) {
       lifecycleScope.launch {
-        when (val status = apiClient.status()) {
+        when (val status = mApiClient.status()) {
           is ApiResult.Success -> {
             if (status.data.state == STATE_PAUSED) {
-              apiClient.stop()
+              mApiClient.stop()
             } else {
-              apiClient.pause()
+              mApiClient.pause()
             }
           }
 
@@ -99,23 +108,26 @@ abstract class TidalActivity : FragmentActivity() {
     // play
     if (keyCode == KeyEvent.KEYCODE_MEDIA_PLAY || keyCode == KeyEvent.KEYCODE_O) {
       lifecycleScope.launch {
-        apiClient.play()
+        mApiClient.play()
       }
       return true
     }
 
-    // next track
-    if (keyCode == KeyEvent.KEYCODE_MEDIA_FAST_FORWARD || keyCode == KeyEvent.KEYCODE_RIGHT_BRACKET) {
+    // track seek or move
+    if (isNextTrackKey(keyCode) || isPreviousTrackKey(keyCode)) {
       lifecycleScope.launch {
-        apiClient.next()
-      }
-      return true
-    }
+        if (mStatus == null) {
+          mIsSeeking = false
+          when (val result = mApiClient.status()) {
+            is ApiResult.Success -> {
+              mSeekKey = keyCode
+              mStatus = result.data
+              mHandler.postDelayed(seekTrackTask, SEEK_INITIAL_DELAY)
+            }
 
-    // prev track
-    if (keyCode == KeyEvent.KEYCODE_MEDIA_REWIND || keyCode == KeyEvent.KEYCODE_LEFT_BRACKET) {
-      lifecycleScope.launch {
-        apiClient.previous()
+            is ApiResult.Error -> {}
+          }
+        }
       }
       return true
     }
@@ -123,7 +135,7 @@ abstract class TidalActivity : FragmentActivity() {
     // volume up
     if (keyCode == KeyEvent.KEYCODE_VOLUME_UP || keyCode == KeyEvent.KEYCODE_CHANNEL_UP || keyCode == KeyEvent.KEYCODE_EQUALS) {
       lifecycleScope.launch {
-        apiClient.volumeUp()
+        mApiClient.volumeUp()
       }
       return true
     }
@@ -131,7 +143,7 @@ abstract class TidalActivity : FragmentActivity() {
     // volume down
     if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN || keyCode == KeyEvent.KEYCODE_CHANNEL_DOWN || keyCode == KeyEvent.KEYCODE_MINUS) {
       lifecycleScope.launch {
-        apiClient.volumeDown()
+        mApiClient.volumeDown()
       }
       return true
     }
@@ -140,7 +152,7 @@ abstract class TidalActivity : FragmentActivity() {
     supportFragmentManager.fragments.forEach {
       if (it is BrowserFragment) {
         val rc = it.onKeyDown(keyCode, event)
-        if (rc) return rc
+        if (rc) return true
         return@forEach
       }
     }
@@ -149,37 +161,106 @@ abstract class TidalActivity : FragmentActivity() {
     return super.onKeyDown(keyCode, event)
   }
 
+  override fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
+
+    // first cancel seek task
+    if (isNextTrackKey(keyCode) || isPreviousTrackKey(keyCode)) {
+      mHandler.removeCallbacks(seekTrackTask)
+      mStatus = null
+    }
+
+    // next track
+    if (isNextTrackKey(keyCode) && !mIsSeeking) {
+      lifecycleScope.launch {
+        mApiClient.next()
+      }
+      return true
+    }
+
+    // prev track
+    if (isPreviousTrackKey(keyCode) && !mIsSeeking) {
+      lifecycleScope.launch {
+        mApiClient.previous()
+      }
+      return true
+    }
+
+    // default
+    return super.onKeyUp(keyCode, event)
+  }
+
+  private fun isPreviousTrackKey(keyCode: Int) = keyCode == KeyEvent.KEYCODE_MEDIA_REWIND || keyCode == KeyEvent.KEYCODE_LEFT_BRACKET
+
+  private fun isNextTrackKey(keyCode: Int) = keyCode == KeyEvent.KEYCODE_MEDIA_FAST_FORWARD || keyCode == KeyEvent.KEYCODE_RIGHT_BRACKET
+
   private fun cancelPlaybackTask() {
-    handler.removeCallbacks(playbackTask)
+    mHandler.removeCallbacks(checkPlaybackTask)
   }
 
   private fun schedulePlaybackTask() {
     cancelPlaybackTask()
-    handler.postDelayed(playbackTask, REFRESH_INTERVAL)
+    mHandler.postDelayed(checkPlaybackTask, REFRESH_INTERVAL)
   }
 
-  private val playbackTask = object : Runnable {
+  private val checkPlaybackTask = object : Runnable {
     override fun run() {
-      lifecycleScope.launch {
-        when (val status = apiClient.status()) {
-          is ApiResult.Success -> {
-            if (status.data.state == STATE_PLAYING) {
-              startPlaybackActivity()
-            }
-          }
 
-          is ApiResult.Error -> {
+      if (canSwitchToPlayback()) {
+        lifecycleScope.launch {
+          when (val status = mApiClient.status()) {
+            is ApiResult.Success -> {
+              if (status.data.state == STATE_PLAYING) {
+                startPlaybackActivity()
+              }
+            }
+
+            is ApiResult.Error -> {
+            }
           }
         }
       }
 
-      handler.postDelayed(this, REFRESH_INTERVAL)
+      mHandler.postDelayed(this, REFRESH_INTERVAL)
+    }
+  }
+
+  private val seekTrackTask = object : Runnable {
+    override fun run() {
+      lifecycleScope.launch {
+
+        // current state
+        val progress = mStatus!!.progress
+        val track = mStatus!!.currentTrack()
+
+        // update is between 0 and duration minus step
+        var updated = if (isNextTrackKey(mSeekKey)) progress + SEEK_STEP else progress - SEEK_STEP
+        if (updated < 0) updated = 0
+        if (track != null) {
+          updated = min(track.duration * 1000 - SEEK_STEP, updated)
+        }
+
+        // update local status for next iteration
+        mStatus = Status(
+          state = mStatus!!.state,
+          tracks = mStatus!!.tracks,
+          position = mStatus!!.position,
+          progress = updated
+        )
+
+        // do it!
+        mIsSeeking = true
+        mApiClient.seek(updated / 1000)
+      }
+
+      // repeat
+      mHandler.postDelayed(this, SEEK_REPEAT_DELAY)
+      
     }
   }
 
   private fun startPlaybackActivity() {
     lifecycleScope.launch {
-      when (val result = apiClient.status()) {
+      when (val result = mApiClient.status()) {
         is ApiResult.Success -> {
           if (result.data.state != STATE_STOPPED) {
             val intent = Intent(this@TidalActivity, PlaybackActivity::class.java)
@@ -198,6 +279,9 @@ abstract class TidalActivity : FragmentActivity() {
   companion object {
     //private const val TAG = "PlaybackFragment"
     private const val REFRESH_INTERVAL = 15000L
+    private const val SEEK_INITIAL_DELAY = 250L
+    private const val SEEK_REPEAT_DELAY = 100L
+    private const val SEEK_STEP = 5000
   }
 
 }

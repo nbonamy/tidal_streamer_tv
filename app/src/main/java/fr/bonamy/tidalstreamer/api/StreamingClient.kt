@@ -79,6 +79,16 @@ class StreamingClient : ApiClient() {
     }
   }
 
+  suspend fun seek(position: Int): ApiResult<String> = withContext(Dispatchers.IO) {
+    try {
+      Log.i(TAG, "seek $position")
+      val response = apiService.seek(position)
+      fetchResponse(response)
+    } catch (e: Exception) {
+      ApiResult.Error(e)
+    }
+  }
+
   suspend fun volumeUp(): ApiResult<String> = withContext(Dispatchers.IO) {
     try {
       Log.i(TAG, "volumeUp")

@@ -30,6 +30,9 @@ interface StreamingService {
   @POST("/prev")
   suspend fun previous(): Response<ApiResponse<String>>
 
+  @POST("/timeseek/{position}")
+  suspend fun seek(@Path("position") position: Int): Response<ApiResponse<String>>
+
   @POST("/volume/up")
   suspend fun volumeUp(): Response<ApiResponse<String>>
 
