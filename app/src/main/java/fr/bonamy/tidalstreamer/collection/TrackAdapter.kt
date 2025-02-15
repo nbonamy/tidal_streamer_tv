@@ -18,7 +18,7 @@ class TrackAdapter(private var mCollection: Collection, private var mList: List<
 
   fun updateData(newList: List<Track>) {
     mList = newList
-    mSameArtists = mList.map { it.artist?.name }.distinct().size == 1
+    mSameArtists = mList.map { it.mainArtist()?.name }.distinct().size == 1
     notifyDataSetChanged()
   }
 
