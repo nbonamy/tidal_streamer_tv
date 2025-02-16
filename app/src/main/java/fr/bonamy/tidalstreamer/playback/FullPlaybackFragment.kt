@@ -39,11 +39,9 @@ class FullPlaybackFragment(private var mLayout: PlaybackLayout, private var mSta
   private var mScrollingLocked = false
   private var mSyncedLyrics = false
   private var mUnlockScrollTimer: Timer? = null
-  private lateinit var mStreamerListener: StreamerListener
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    mStreamerListener = StreamerListener(requireContext(), this)
     sharedElementEnterTransition = TransitionInflater.from(requireContext()).inflateTransition(R.transition.fragment_transition)
     sharedElementReturnTransition = TransitionInflater.from(requireContext()).inflateTransition(R.transition.fragment_transition)
   }
@@ -72,12 +70,12 @@ class FullPlaybackFragment(private var mLayout: PlaybackLayout, private var mSta
 
   override fun onResume() {
     super.onResume()
-    mStreamerListener.start()
+    StreamerListener.getInstance().addListener(this)
   }
 
   override fun onPause() {
     super.onPause()
-    mStreamerListener.stop()
+    StreamerListener.getInstance().removeListener(this)
   }
 
   fun latestStatus(): Status? {

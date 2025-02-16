@@ -9,9 +9,12 @@ import androidx.leanback.widget.Presenter
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import fr.bonamy.tidalstreamer.R
+import fr.bonamy.tidalstreamer.api.StreamerEventListener
+import fr.bonamy.tidalstreamer.api.StreamerListener
 import fr.bonamy.tidalstreamer.models.Album
 import fr.bonamy.tidalstreamer.models.Collection
 import fr.bonamy.tidalstreamer.models.Radio
+import fr.bonamy.tidalstreamer.models.Status
 import fr.bonamy.tidalstreamer.models.Track
 
 interface OnTrackClickListener {
@@ -23,7 +26,9 @@ class CollectionPresenter(
   private val mCollection: Collection,
   private val mAppearance: Appearance,
   private val mListener: OnTrackClickListener
-) : Presenter() {
+) : Presenter(), StreamerEventListener {
+
+  private lateinit var mTrackAdapter: TrackAdapter
 
   private fun onCreateView(parent: ViewGroup): View {
     return LayoutInflater.from(parent.context)
@@ -39,6 +44,7 @@ class CollectionPresenter(
     vh.subtitle.setTextColor(view.context.getColor(getNormalTextColor()))
     vh.releaseDate.setTextColor(view.context.getColor(getNormalTextColor()))
     vh.trackCount.setTextColor(view.context.getColor(getNormalTextColor()))
+    mTrackAdapter = vh.tracks.adapter as TrackAdapter
     return vh
   }
 
@@ -80,9 +86,13 @@ class CollectionPresenter(
       vh.trackCount.text = "${collection.tracks?.size?.toString()} tracks"
     }
     (vh.tracks.adapter as TrackAdapter).updateData(collection.tracks ?: listOf())
+
+    // add listener
+    StreamerListener.getInstance().addListener(this)
   }
 
   override fun onUnbindViewHolder(viewHolder: Presenter.ViewHolder?) {
+    StreamerListener.getInstance().removeListener(this)
   }
 
   class ViewHolder(view: View) : Presenter.ViewHolder(view) {
@@ -92,6 +102,10 @@ class CollectionPresenter(
     var releaseDate: TextView = view.findViewById<View>(R.id.details_1) as TextView
     var trackCount = view.findViewById<View>(R.id.details_2) as TextView
     val tracks: RecyclerView = view.findViewById<View>(R.id.details_tracks) as RecyclerView
+  }
+
+  override fun onStatus(status: Status) {
+    mTrackAdapter.updateStatus(status)
   }
 
 }

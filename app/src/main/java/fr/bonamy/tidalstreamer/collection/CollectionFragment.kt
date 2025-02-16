@@ -67,7 +67,7 @@ class CollectionFragment : DetailsSupportFragment(), PaletteAsyncListener, OnTra
     mDetailsBackground = DetailsSupportFragmentBackgroundController(this)
     mBackgroundManager = BackgroundManager.getInstance(requireActivity())
     mBackgroundManager.attach(requireActivity().window)
-    mBackgroundManager.drawable = resources.getDrawable(R.drawable.default_background)
+    mBackgroundManager.drawable = resources.getDrawable(R.drawable.default_background, null)
 
     mPresenterSelector = ClassPresenterSelector()
     mAdapter = ArrayObjectAdapter(mPresenterSelector)
@@ -215,12 +215,10 @@ class CollectionFragment : DetailsSupportFragment(), PaletteAsyncListener, OnTra
 
   private fun splitActionLabel(label: String): Pair<String, String> {
     val parts = label.split(" ")
-    if (parts.size == 1) {
-      return Pair(parts[0], "")
-    } else if (parts.size == 2) {
-      return Pair(parts[0], parts[1])
-    } else {
-      return Pair(parts.subList(0, 2).joinToString(" "), parts.subList(2, parts.size).joinToString(" "))
+    return when (parts.size) {
+      1 -> Pair(parts[0], "")
+      2 -> Pair(parts[0], parts[1])
+      else -> Pair(parts.subList(0, 2).joinToString(" "), parts.subList(2, parts.size).joinToString(" "))
     }
   }
 
@@ -380,7 +378,6 @@ class CollectionFragment : DetailsSupportFragment(), PaletteAsyncListener, OnTra
     mDetailsPresenter.setBackgroundColor(contentBgColor)
     mAdapter.notifyArrayItemRangeChanged(0, mAdapter.size())
   }
-
 
   companion object {
     private const val TAG = "VideoDetailsFragment"

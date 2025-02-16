@@ -13,7 +13,6 @@ android {
     targetSdk = 35
     versionCode = 1
     versionName = "1.0"
-
   }
 
   signingConfigs {
@@ -56,4 +55,6 @@ dependencies {
   implementation(libs.okhttp)
   implementation(libs.retrofit)
   implementation(libs.converter.gson)
+  implementation(libs.miniequalizer)
+
 }

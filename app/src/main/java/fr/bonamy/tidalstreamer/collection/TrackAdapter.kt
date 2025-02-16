@@ -1,25 +1,48 @@
 package fr.bonamy.tidalstreamer.collection
 
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import es.claucookie.miniequalizerlibrary.EqualizerView
 import fr.bonamy.tidalstreamer.R
 import fr.bonamy.tidalstreamer.models.Album
 import fr.bonamy.tidalstreamer.models.Collection
 import fr.bonamy.tidalstreamer.models.PlayedBy
+import fr.bonamy.tidalstreamer.models.Status
 import fr.bonamy.tidalstreamer.models.Track
 import java.util.Locale
 
 class TrackAdapter(private var mCollection: Collection, private var mList: List<Track>, private val mAppearance: Appearance, private val listener: OnTrackClickListener) : RecyclerView.Adapter<TrackAdapter.ViewHolder>() {
 
+  private var mPosition: Int = -1
   private var mSameArtists: Boolean = true
 
   fun updateData(newList: List<Track>) {
     mList = newList
     mSameArtists = mList.map { it.mainArtist()?.name }.distinct().size == 1
-    notifyDataSetChanged()
+    notifyItemRangeChanged(0, mList.size)
+  }
+
+  fun updateStatus(status: Status) {
+
+    // find the current track
+    val currentTrack = status.currentTrack()
+    val position = mList.indexOfFirst { it.id == currentTrack?.id }
+    if (position != mPosition) {
+      Handler(Looper.getMainLooper()).post {
+        if (mPosition != -1) {
+          notifyItemChanged(mPosition)
+        }
+        mPosition = position
+        if (mPosition != -1) {
+          notifyItemChanged(mPosition)
+        }
+      }
+    }
   }
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -49,6 +72,15 @@ class TrackAdapter(private var mCollection: Collection, private var mList: List<
     holder.itemView.setOnLongClickListener {
       listener.onTrackLongClick(track)
       true
+    }
+
+    // playing
+    if (mPosition == position) {
+      holder.playing.visibility = View.VISIBLE
+      holder.playing.animateBars()
+    } else {
+      holder.playing.visibility = View.INVISIBLE
+      holder.playing.stopBars()
     }
 
     // index
@@ -85,7 +117,8 @@ class TrackAdapter(private var mCollection: Collection, private var mList: List<
   }
 
   // Holds the views for adding it to image and text
-  class ViewHolder(ItemView: View) : RecyclerView.ViewHolder(ItemView) {
+  class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    val playing: EqualizerView = itemView.findViewById(R.id.playing)
     val index: TextView = itemView.findViewById(R.id.index)
     val title: TextView = itemView.findViewById(R.id.title)
     val duration: TextView = itemView.findViewById(R.id.duration)

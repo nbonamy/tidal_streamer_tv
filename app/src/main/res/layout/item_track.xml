@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:custom="http://schemas.android.com/apk/res-auto"
   xmlns:tools="http://schemas.android.com/tools"
   android:layout_width="match_parent"
   android:layout_height="wrap_content"
@@ -8,6 +9,15 @@
   android:clickable="true"
   android:focusable="true"
   android:orientation="horizontal">
+
+  <es.claucookie.miniequalizerlibrary.EqualizerView
+    android:id="@+id/playing"
+    android:layout_width="16dp"
+    android:layout_height="16dp"
+    android:layout_gravity="center_vertical"
+    android:layout_marginEnd="8dp"
+    custom:foregroundColor="@color/button_bg_color"
+    custom:animDuration="4000" />
 
   <TextView
     android:id="@+id/index"
