@@ -11,7 +11,12 @@ data class RecentSearch(
   val isFirstRow: Boolean
 )
 
-class RecentSearchPresenter : Presenter() {
+interface OnRecentSearchClickListener {
+  fun onLongClick(recentSearch: RecentSearch)
+}
+
+
+class RecentSearchPresenter(private var mListener: OnRecentSearchClickListener) : Presenter() {
 
   override fun onCreateViewHolder(parent: ViewGroup): ViewHolder {
     val view = LayoutInflater.from(parent.context).inflate(R.layout.item_recent_search, parent, false)
@@ -24,6 +29,12 @@ class RecentSearchPresenter : Presenter() {
     textView.text = searchItem.query
     if (searchItem.isFirstRow) {
       textView.setPadding(0, 48, textView.paddingRight, 0)
+    }
+
+    // long click
+    viewHolder.view.setOnLongClickListener {
+      mListener.onLongClick(searchItem)
+      true
     }
   }
 

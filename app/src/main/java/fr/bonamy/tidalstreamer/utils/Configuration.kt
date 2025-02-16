@@ -17,23 +17,23 @@ class Configuration(mContext: Context) {
     return "${getWsProtocol()}${getServerHostname()}:${getWsPort()}"
   }
 
-  fun getServerHostname(): String {
+  private fun getServerHostname(): String {
     return "192.168.1.2"
   }
 
-  fun getHttpProtocol(): String {
+  private fun getHttpProtocol(): String {
     return "http://"
   }
 
-  fun getWsProtocol(): String {
+  private fun getWsProtocol(): String {
     return "ws://"
   }
 
-  fun getHttpPort(): Int {
+  private fun getHttpPort(): Int {
     return 5002
   }
 
-  fun getWsPort(): Int {
+  private fun getWsPort(): Int {
     return 5003
   }
 
@@ -57,7 +57,18 @@ class Configuration(mContext: Context) {
     if (search == null) return
     if (search.trim().isEmpty()) return
     val searches = loadRecentSearches().toMutableList()
-    searches.add(0, search)
+    searches.remove(search)
+    searches.add(search)
+    val editor = sharedPreferences.edit()
+    editor.putStringSet(KEY_RECENT_SEARCHES, searches.toSet())
+    editor.apply()
+  }
+
+  fun removeRecentSearch(search: String?) {
+    if (search == null) return
+    if (search.trim().isEmpty()) return
+    val searches = loadRecentSearches().toMutableList()
+    searches.remove(search)
     val editor = sharedPreferences.edit()
     editor.putStringSet(KEY_RECENT_SEARCHES, searches.toSet())
     editor.apply()
