@@ -11,6 +11,7 @@ import androidx.lifecycle.lifecycleScope
 import fr.bonamy.tidalstreamer.MainActivity
 import fr.bonamy.tidalstreamer.R
 import fr.bonamy.tidalstreamer.api.ApiResult
+import fr.bonamy.tidalstreamer.api.StreamerListener
 import fr.bonamy.tidalstreamer.api.StreamingClient
 import fr.bonamy.tidalstreamer.models.STATE_PAUSED
 import fr.bonamy.tidalstreamer.models.STATE_PLAYING
@@ -48,6 +49,10 @@ abstract class TidalActivity : FragmentActivity() {
 
   open fun canSwitchToPlayback(): Boolean {
     return true
+  }
+
+  open fun closeOnGoToKey(): Boolean {
+    return false
   }
 
   override fun onResume() {
@@ -147,6 +152,11 @@ abstract class TidalActivity : FragmentActivity() {
         mApiClient.volumeDown()
       }
       return true
+    }
+
+    // jump for menu
+    if (keyCode == KeyEvent.KEYCODE_LAST_CHANNEL || keyCode == KeyEvent.KEYCODE_J) {
+      return onGoToKey()
     }
 
     // try fragment
@@ -275,6 +285,15 @@ abstract class TidalActivity : FragmentActivity() {
         }
       }
     }
+  }
+
+  private fun onGoToKey(): Boolean {
+    // we need a track
+    val status = StreamerListener.getInstance().status
+    val track = status?.currentTrack() ?: return false
+    val handler = ItemLongClickedListener(this, if (closeOnGoToKey()) this else null)
+    handler.onTrackLongClicked(track, null, true)
+    return true
   }
 
   companion object {

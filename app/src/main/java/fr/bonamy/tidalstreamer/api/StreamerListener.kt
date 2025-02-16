@@ -24,6 +24,7 @@ class StreamerListener private constructor() : WebSocketListener() {
   private lateinit var mRequest: Request
   private lateinit var mClient: OkHttpClient
   private lateinit var mWebSocket: WebSocket
+  private var mLatestStatus: Status? = null
   private val mListeners = mutableListOf<StreamerEventListener>()
 
   fun addListener(listener: StreamerEventListener) {
@@ -33,6 +34,9 @@ class StreamerListener private constructor() : WebSocketListener() {
   fun removeListener(listener: StreamerEventListener) {
     mListeners.remove(listener)
   }
+
+  val status: Status?
+    get() = mLatestStatus
 
   fun start(context: Context) {
 
@@ -74,24 +78,21 @@ class StreamerListener private constructor() : WebSocketListener() {
 
   override fun onMessage(webSocket: WebSocket, text: String) {
 
-    val status: Status?
-
     // decode
     try {
-      status = Gson().fromJson(text, Status::class.java)
+      mLatestStatus = Gson().fromJson(text, Status::class.java)
     } catch (e: Exception) {
       Log.e(TAG, "Failed to parse status: $e")
+      mLatestStatus = null
       return
     }
 
     // now process
-    if (status != null) {
-      mListeners.forEach {
-        try {
-          it.onStatus(status)
-        } catch (e: Exception) {
-          Log.e(TAG, "Failed to process status: $e")
-        }
+    mListeners.forEach {
+      try {
+        it.onStatus(mLatestStatus!!)
+      } catch (e: Exception) {
+        Log.e(TAG, "Failed to process status: $e")
       }
     }
 

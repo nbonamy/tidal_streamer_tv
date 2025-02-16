@@ -20,6 +20,10 @@ class PlaybackActivity : TidalActivity() {
     return false
   }
 
+  override fun closeOnGoToKey(): Boolean {
+    return true
+  }
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     window.addFlags(FLAG_KEEP_SCREEN_ON)
@@ -63,11 +67,6 @@ class PlaybackActivity : TidalActivity() {
 
     // lyrics scrolling: send event to fragment
     if (keyCode == KeyEvent.KEYCODE_DPAD_UP || keyCode == KeyEvent.KEYCODE_DPAD_DOWN) {
-      return fragment.onKeyDown(keyCode, event)
-    }
-
-    // jump for menu
-    if (keyCode == KeyEvent.KEYCODE_LAST_CHANNEL || keyCode == KeyEvent.KEYCODE_J) {
       return fragment.onKeyDown(keyCode, event)
     }
 
