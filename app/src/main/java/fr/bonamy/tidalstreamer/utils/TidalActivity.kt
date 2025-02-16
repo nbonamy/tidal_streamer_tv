@@ -16,6 +16,7 @@ import fr.bonamy.tidalstreamer.models.STATE_PAUSED
 import fr.bonamy.tidalstreamer.models.STATE_PLAYING
 import fr.bonamy.tidalstreamer.models.STATE_STOPPED
 import fr.bonamy.tidalstreamer.models.Status
+import fr.bonamy.tidalstreamer.playback.MiniPlaybackFragment
 import fr.bonamy.tidalstreamer.playback.PlaybackActivity
 import fr.bonamy.tidalstreamer.user.UserActivity
 import kotlinx.coroutines.launch
@@ -31,13 +32,13 @@ abstract class TidalActivity : FragmentActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-//    if (savedInstanceState == null) {
-//      if (hasMiniPlayback()) {
-//        supportFragmentManager.beginTransaction()
-//          .replace(R.id.playback_fragment, MiniPlaybackFragment())
-//          .commitNow()
-//      }
-//    }
+    if (savedInstanceState == null) {
+      if (hasMiniPlayback()) {
+        supportFragmentManager.beginTransaction()
+          .replace(R.id.playback_fragment, MiniPlaybackFragment())
+          .commitNow()
+      }
+    }
     mApiClient = StreamingClient(this)
   }
 

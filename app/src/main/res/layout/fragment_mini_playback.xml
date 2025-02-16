@@ -1,26 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
   xmlns:tools="http://schemas.android.com/tools"
-  android:layout_width="400dp"
+  android:layout_width="250dp"
   android:layout_height="56dp"
   android:background="@drawable/mini_playback_shape"
-  android:paddingHorizontal="24dp"
+  android:paddingHorizontal="8dp"
   android:paddingVertical="8dp"
   tools:context=".playback.MiniPlaybackFragment">
-
-  <ImageView
-    android:id="@+id/album_art"
-    android:layout_width="40dp"
-    android:layout_height="40dp"
-    android:src="@drawable/album" />
-
-  <Space
-    android:layout_width="16dp"
-    android:layout_height="0dp" />
 
   <LinearLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_toStartOf="@id/album_art"
+    android:layout_marginEnd="16dp"
     android:orientation="vertical">
 
     <TextView
@@ -30,6 +22,7 @@
       android:textColor="@android:color/white"
       android:maxLines="1"
       android:ellipsize="end"
+      android:textAlignment="viewEnd"
       tools:text="I Can Never Say Goodbye" />
 
     <TextView
@@ -38,8 +31,16 @@
       android:layout_height="match_parent"
       android:maxLines="1"
       android:ellipsize="end"
+      android:textAlignment="viewEnd"
       tools:text="The Cure" />
 
   </LinearLayout>
 
-</LinearLayout>
+  <ImageView
+    android:id="@+id/album_art"
+    android:layout_width="40dp"
+    android:layout_height="40dp"
+    android:layout_alignParentEnd="true"
+    android:src="@drawable/album" />
+
+</RelativeLayout>

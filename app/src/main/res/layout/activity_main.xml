@@ -16,7 +16,7 @@
     android:id="@+id/playback_fragment"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_gravity="center|bottom"
+    android:layout_gravity="end|bottom"
     android:focusable="false" />
 
 </FrameLayout>
