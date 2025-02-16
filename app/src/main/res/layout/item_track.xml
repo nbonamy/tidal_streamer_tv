@@ -10,15 +10,6 @@
   android:focusable="true"
   android:orientation="horizontal">
 
-  <es.claucookie.miniequalizerlibrary.EqualizerView
-    android:id="@+id/playing"
-    android:layout_width="16dp"
-    android:layout_height="16dp"
-    android:layout_gravity="center_vertical"
-    android:layout_marginEnd="8dp"
-    custom:foregroundColor="@color/button_bg_color"
-    custom:animDuration="4000" />
-
   <TextView
     android:id="@+id/index"
     android:layout_width="26dp"
@@ -42,6 +33,15 @@
     android:textSize="16sp"
     android:textColor="@color/text_light_selector"
     tools:text="With or without you" />
+
+  <es.claucookie.miniequalizerlibrary.EqualizerView
+    android:id="@+id/playing"
+    android:layout_width="16dp"
+    android:layout_height="16dp"
+    android:layout_gravity="center_vertical"
+    android:layout_marginEnd="8dp"
+    custom:foregroundColor="@color/button_bg_color"
+    custom:animDuration="4000" />
 
   <TextView
     android:id="@+id/duration"
