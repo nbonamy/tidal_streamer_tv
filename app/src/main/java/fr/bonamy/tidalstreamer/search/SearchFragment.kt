@@ -38,7 +38,7 @@ enum class SearchState {
   SEARCH_RESULTS
 }
 
-class SearchFragment : SearchSupportFragment(), SearchSupportFragment.SearchResultProvider {
+class SearchFragment : SearchSupportFragment(), SearchSupportFragment.SearchResultProvider, OnRecentSearchClickListener {
 
   private lateinit var mConfiguration: Configuration
   private lateinit var mBackgroundManager: BackgroundManager
@@ -78,7 +78,6 @@ class SearchFragment : SearchSupportFragment(), SearchSupportFragment.SearchResu
         itemClickedListener.onItemClicked(itemViewHolder, item, rowViewHolder, row)
       }
     }
-
 
   }
 
@@ -242,10 +241,10 @@ class SearchFragment : SearchSupportFragment(), SearchSupportFragment.SearchResu
     var firstRow = true
     mRowsAdapter.clear()
     val recentSearches = mConfiguration.loadRecentSearches()
-    var listRowAdapter = ArrayObjectAdapter(RecentSearchPresenter())
+    var listRowAdapter = ArrayObjectAdapter(RecentSearchPresenter(this))
     val header = HeaderItem("Recent Searches")
 
-    for (search in recentSearches) {
+    for (search in recentSearches.reversed()) {
 
       val length = 20.coerceAtMost(search.length)
       if (chars + length > RECENT_SEARCH_ROW_SIZE) {
@@ -256,7 +255,7 @@ class SearchFragment : SearchSupportFragment(), SearchSupportFragment.SearchResu
         }
 
         // reset
-        listRowAdapter = ArrayObjectAdapter(RecentSearchPresenter())
+        listRowAdapter = ArrayObjectAdapter(RecentSearchPresenter(this))
         firstRow = false
         chars = 0
       }
@@ -277,6 +276,11 @@ class SearchFragment : SearchSupportFragment(), SearchSupportFragment.SearchResu
     mRowsAdapter.notifyArrayItemRangeChanged(0, mRowsAdapter.size())
     mState = SearchState.RECENT_SEARCHES
 
+  }
+
+  override fun onLongClick(recentSearch: RecentSearch) {
+    mConfiguration.removeRecentSearch(recentSearch.query)
+    showRecentSearches()
   }
 
   companion object {
