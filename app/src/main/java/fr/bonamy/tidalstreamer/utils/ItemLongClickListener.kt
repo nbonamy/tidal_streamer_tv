@@ -65,6 +65,7 @@ class ItemLongClickedListener(private val mActivity: FragmentActivity, private v
 
     // show the dialog
     val builder: AlertDialog.Builder = AlertDialog.Builder(mActivity)
+    builder.setTitle(collection.title())
     builder.setItems(menuItems.toTypedArray()) { _: DialogInterface?, which: Int ->
 
       val apiClient = StreamingClient(mActivity)
@@ -111,6 +112,7 @@ class ItemLongClickedListener(private val mActivity: FragmentActivity, private v
 
     // show the dialog
     val builder: AlertDialog.Builder = AlertDialog.Builder(mActivity)
+    builder.setTitle(artist.name)
     builder.setItems(menuItems.toTypedArray()) { _: DialogInterface?, which: Int ->
 
       val menuChosen = menuItems[which]
@@ -159,6 +161,7 @@ class ItemLongClickedListener(private val mActivity: FragmentActivity, private v
 
     // show the dialog
     val builder: AlertDialog.Builder = AlertDialog.Builder(mActivity)
+    builder.setTitle("${track.title} - ${track.mainArtist()?.name}")
     builder.setItems(menuItems.toTypedArray()) { _: DialogInterface?, which: Int ->
 
       val apiClient = StreamingClient(mActivity)
