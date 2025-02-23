@@ -44,6 +44,15 @@ class MetadataClient(mContext: Context) : ApiClient() {
     }
   }
 
+  suspend fun fetchArtistLiveAlbums(artistId: String): ApiResult<List<Album>> = withContext(Dispatchers.IO) {
+    try {
+      val response = apiService.getArtistLiveAlbums(artistId)
+      fetchPagedResponse(response)
+    } catch (e: Exception) {
+      ApiResult.Error(e)
+    }
+  }
+
   suspend fun fetchArtistSingles(artistId: String): ApiResult<List<Album>> = withContext(Dispatchers.IO) {
     try {
       val response = apiService.getArtistSingles(artistId)

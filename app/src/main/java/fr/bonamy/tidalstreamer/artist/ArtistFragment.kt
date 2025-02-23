@@ -77,9 +77,19 @@ class ArtistFragment : BrowserFragment() {
     viewLifecycleOwner.lifecycleScope.launch {
       loadRow(
         rowsAdapter,
-        metadataClient.fetchArtistSingles(mArtist.id!!),
+        metadataClient.fetchArtistLiveAlbums(mArtist.id!!),
         ROWS_TITLE,
         2,
+        PresenterFlags.SHOW_ALBUM_YEAR
+      )
+    }
+
+    viewLifecycleOwner.lifecycleScope.launch {
+      loadRow(
+        rowsAdapter,
+        metadataClient.fetchArtistSingles(mArtist.id!!),
+        ROWS_TITLE,
+        3,
         PresenterFlags.SHOW_ALBUM_YEAR
       )
     }
@@ -90,7 +100,7 @@ class ArtistFragment : BrowserFragment() {
         rowsAdapter,
         metadataClient.fetchArtistCompilations(mArtist.id!!),
         ROWS_TITLE,
-        3,
+        4,
       )
     }
 
@@ -99,7 +109,7 @@ class ArtistFragment : BrowserFragment() {
         rowsAdapter,
         metadataClient.fetchSimilarArtists(mArtist.id!!),
         ROWS_TITLE,
-        4,
+        5,
       )
     }
 
@@ -110,6 +120,7 @@ class ArtistFragment : BrowserFragment() {
     private val ROWS_TITLE = arrayOf(
       "Top tracks",
       "Albums",
+      "Live Albums",
       "EP & Singles",
       "Compilations",
       "Fans also like"
