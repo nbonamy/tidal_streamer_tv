@@ -34,6 +34,8 @@ import fr.bonamy.tidalstreamer.models.Track
 import fr.bonamy.tidalstreamer.search.SearchActivity
 import fr.bonamy.tidalstreamer.search.TrackCardPresenter
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import java.util.Timer
 import java.util.TimerTask
@@ -60,6 +62,8 @@ abstract class BrowserFragment : BrowseSupportFragment() {
   private var mDefaultBackground: Drawable? = null
   private var mBackgroundTimer: Timer? = null
   private var mBackgroundUri: String? = null
+  private var mRowsDeleted: List<Int> = emptyList()
+  private val mRowUpdateMutex: Mutex = Mutex()
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -123,6 +127,7 @@ abstract class BrowserFragment : BrowseSupportFragment() {
       val listRowAdapter = ArrayObjectAdapter()
       rowsAdapter.add(ListRow(HeaderItem(""), listRowAdapter))
     }
+    mRowsDeleted = emptyList()
     return rowsAdapter
   }
 
@@ -138,6 +143,13 @@ abstract class BrowserFragment : BrowseSupportFragment() {
     // Load the row
     when (result) {
       is ApiResult.Success -> {
+
+        // if no data, replace with something that does not take space
+        if (result.data.isEmpty()) {
+          deleteRow(rowsAdapter, index)
+          return
+        }
+
         val rowAdapter = ArrayObjectAdapter(presenter)
         result.data.forEach { item ->
           if (item is Album) {
@@ -148,18 +160,41 @@ abstract class BrowserFragment : BrowseSupportFragment() {
           rowAdapter.add(item)
         }
         withContext(Dispatchers.Main) {
-          val header = HeaderItem(titles[index])
-          rowsAdapter.replace(index, ListRow(header, rowAdapter))
-          rowsAdapter.notifyArrayItemRangeChanged(index, 1)
+
+          mRowUpdateMutex.withLock {
+            // update index based on rows deleted
+            var offsetIndex = index
+            for (i in mRowsDeleted) {
+              if (i < offsetIndex) {
+                offsetIndex--
+              }
+            }
+
+            val header = HeaderItem(titles[index])
+            rowsAdapter.replace(offsetIndex, ListRow(header, rowAdapter))
+            rowsAdapter.notifyArrayItemRangeChanged(offsetIndex, 1)
+
+          }
         }
       }
 
       is ApiResult.Error -> {
-        // Handle the error here
-        Log.e(TAG, "Error fetching artist albums: ${result.exception}")
+        Log.e(TAG, "Error fetching artist stuuf: ${result.exception}")
+        deleteRow(rowsAdapter, index)
       }
     }
 
+  }
+
+  private suspend fun deleteRow(rowsAdapter: ArrayObjectAdapter, index: Int) {
+    withContext(Dispatchers.Main) {
+      mRowUpdateMutex.withLock {
+        rowsAdapter.remove(rowsAdapter.get(index))
+        //rowsAdapter.replace(index, ListRow(ArrayObjectAdapter()))
+        rowsAdapter.notifyArrayItemRangeChanged(index, 1)
+        mRowsDeleted += index
+      }
+    }
   }
 
   private inner class ItemViewSelectedListener : OnItemViewSelectedListener {
