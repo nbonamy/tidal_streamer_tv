@@ -50,7 +50,7 @@ class Configuration(mContext: Context) {
 //      "roxanne", "under pressure", "sweet home alabama", "paint it black", "sultans of swing",
 //      "another brick in the wall", "back in black", "dream on", "knockin' on heaven's door", "piano man"
 //    )
-    return sharedPreferences.getStringSet(KEY_RECENT_SEARCHES, emptySet())?.toList() ?: emptyList()
+    return sharedPreferences.getString(KEY_RECENT_SEARCHES, "")?.split("///")?.filter { it.isNotEmpty() } ?: emptyList()
   }
 
   fun addRecentSearch(search: String?) {
@@ -60,7 +60,7 @@ class Configuration(mContext: Context) {
     searches.remove(search)
     searches.add(search)
     val editor = sharedPreferences.edit()
-    editor.putStringSet(KEY_RECENT_SEARCHES, searches.toSet())
+    editor.putString(KEY_RECENT_SEARCHES, searches.joinToString("///"))
     editor.apply()
   }
 
@@ -70,12 +70,12 @@ class Configuration(mContext: Context) {
     val searches = loadRecentSearches().toMutableList()
     searches.remove(search)
     val editor = sharedPreferences.edit()
-    editor.putStringSet(KEY_RECENT_SEARCHES, searches.toSet())
+    editor.putString(KEY_RECENT_SEARCHES, searches.joinToString("///"))
     editor.apply()
   }
 
   companion object {
     private const val PREFS_NAME = "tidal_streamer_tv"
-    private const val KEY_RECENT_SEARCHES = "recent_searches"
+    private const val KEY_RECENT_SEARCHES = "recent_search"
   }
 }

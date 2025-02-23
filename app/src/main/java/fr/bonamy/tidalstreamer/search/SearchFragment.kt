@@ -244,6 +244,8 @@ class SearchFragment : SearchSupportFragment(), SearchSupportFragment.SearchResu
     var listRowAdapter = ArrayObjectAdapter(RecentSearchPresenter(this))
     val header = HeaderItem("Recent Searches")
 
+    Log.d(TAG, recentSearches.toString())
+
     for (search in recentSearches.reversed()) {
 
       val length = 20.coerceAtMost(search.length)
@@ -287,7 +289,7 @@ class SearchFragment : SearchSupportFragment(), SearchSupportFragment.SearchResu
     private const val TAG = "SearchFragment"
     private const val REQUEST_SPEECH = 1
     private const val SEARCH_TEMPO = 500L
-    private const val RECENT_SEARCH_ROW_SIZE = 90
+    private const val RECENT_SEARCH_ROW_SIZE = 80
   }
 
 }
