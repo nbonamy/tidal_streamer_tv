@@ -15,57 +15,28 @@ class UserFragment : BrowserFragment() {
   override fun loadRows() {
 
     // init
-    val rowsAdapter = initRowsAdapter(ROWS_TITLE.size)
+    val rowsAdapter = initRowsAdapter(4)
     val userClient = UserClient(requireContext())
     adapter = rowsAdapter
 
-    // now load rows
+    // User's personal library only
 
     viewLifecycleOwner.lifecycleScope.launch {
-      loadRow(
-        rowsAdapter,
-        userClient.fetchPlaylists(),
-        ROWS_TITLE,
-        0,
-      )
+      loadRow(rowsAdapter, userClient.fetchPlaylists(), 0, "Your playlists")
     }
 
     viewLifecycleOwner.lifecycleScope.launch {
-      loadRow(
-        rowsAdapter,
-        userClient.fetchFavoriteAlbums(),
-        ROWS_TITLE,
-        1,
-      )
+      loadRow(rowsAdapter, userClient.fetchFavoriteAlbums(), 1, "Your albums")
     }
 
     viewLifecycleOwner.lifecycleScope.launch {
-      loadRow(
-        rowsAdapter,
-        userClient.fetchFavoriteArtists(),
-        ROWS_TITLE,
-        2,
-      )
+      loadRow(rowsAdapter, userClient.fetchFavoriteArtists(), 2, "Your artists")
     }
 
     viewLifecycleOwner.lifecycleScope.launch {
-      loadRow(
-        rowsAdapter,
-        userClient.fetchFavoriteTracks(),
-        ROWS_TITLE,
-        3,
-      )
+      loadRow(rowsAdapter, userClient.fetchFavoriteTracks(), 3, "Your tracks")
     }
 
   }
 
-  companion object {
-    //    private const val TAG = "UserFragment"
-    private val ROWS_TITLE = arrayOf(
-      "Your playlists",
-      "Your albums",
-      "Your artists",
-      "Your tracks",
-    )
-  }
 }

@@ -131,7 +131,7 @@ abstract class BrowserFragment : BrowseSupportFragment() {
     return rowsAdapter
   }
 
-  suspend fun <T> loadRow(rowsAdapter: ArrayObjectAdapter, result: ApiResult<List<T>>, titles: Array<String>, index: Int, flags: PresenterFlags = PresenterFlags.NONE) {
+  suspend fun <T> loadRow(rowsAdapter: ArrayObjectAdapter, result: ApiResult<List<T>>, index: Int, title: String, flags: PresenterFlags = PresenterFlags.NONE) {
 
     // Create the presenter selector
     val presenter = ClassPresenterSelector()
@@ -170,7 +170,7 @@ abstract class BrowserFragment : BrowseSupportFragment() {
               }
             }
 
-            val header = HeaderItem(titles[index])
+            val header = HeaderItem(title)
             rowsAdapter.replace(offsetIndex, ListRow(header, rowAdapter))
             rowsAdapter.notifyArrayItemRangeChanged(offsetIndex, 1)
 
@@ -179,7 +179,7 @@ abstract class BrowserFragment : BrowseSupportFragment() {
       }
 
       is ApiResult.Error -> {
-        Log.e(TAG, "Error fetching artist stuuf: ${result.exception}")
+        Log.e(TAG, "Error fetching artist stuff: ${result.exception}")
         deleteRow(rowsAdapter, index)
       }
     }
@@ -189,10 +189,20 @@ abstract class BrowserFragment : BrowseSupportFragment() {
   private suspend fun deleteRow(rowsAdapter: ArrayObjectAdapter, index: Int) {
     withContext(Dispatchers.Main) {
       mRowUpdateMutex.withLock {
-        rowsAdapter.remove(rowsAdapter.get(index))
-        //rowsAdapter.replace(index, ListRow(ArrayObjectAdapter()))
-        rowsAdapter.notifyArrayItemRangeChanged(index, 1)
-        mRowsDeleted += index
+        // Calculate offset index based on rows already deleted
+        var offsetIndex = index
+        for (i in mRowsDeleted) {
+          if (i < offsetIndex) {
+            offsetIndex--
+          }
+        }
+
+        // Only remove if index is valid
+        if (offsetIndex >= 0 && offsetIndex < rowsAdapter.size()) {
+          rowsAdapter.remove(rowsAdapter.get(offsetIndex))
+          rowsAdapter.notifyArrayItemRangeChanged(offsetIndex, 1)
+          mRowsDeleted += index
+        }
       }
     }
   }

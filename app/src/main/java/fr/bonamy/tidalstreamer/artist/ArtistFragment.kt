@@ -48,7 +48,7 @@ class ArtistFragment : BrowserFragment() {
   override fun loadRows() {
 
     // init
-    val rowsAdapter = initRowsAdapter(ROWS_TITLE.size)
+    val rowsAdapter = initRowsAdapter(6)
     val metadataClient = MetadataClient(requireContext())
     adapter = rowsAdapter
 
@@ -58,8 +58,8 @@ class ArtistFragment : BrowserFragment() {
       loadRow(
         rowsAdapter,
         metadataClient.fetchArtistTopTracks(mArtist.id!!),
-        ROWS_TITLE,
         0,
+        "Top tracks",
         PresenterFlags.SHOW_TRACK_ALBUM or PresenterFlags.PLAY_ALL_TRACKS
       )
     }
@@ -68,8 +68,8 @@ class ArtistFragment : BrowserFragment() {
       loadRow(
         rowsAdapter,
         metadataClient.fetchArtistAlbums(mArtist.id!!),
-        ROWS_TITLE,
         1,
+        "Albums",
         PresenterFlags.SHOW_ALBUM_YEAR
       )
     }
@@ -78,8 +78,8 @@ class ArtistFragment : BrowserFragment() {
       loadRow(
         rowsAdapter,
         metadataClient.fetchArtistLiveAlbums(mArtist.id!!),
-        ROWS_TITLE,
         2,
+        "Live Albums",
         PresenterFlags.SHOW_ALBUM_YEAR
       )
     }
@@ -88,19 +88,18 @@ class ArtistFragment : BrowserFragment() {
       loadRow(
         rowsAdapter,
         metadataClient.fetchArtistSingles(mArtist.id!!),
-        ROWS_TITLE,
         3,
+        "EP & Singles",
         PresenterFlags.SHOW_ALBUM_YEAR
       )
     }
-
 
     viewLifecycleOwner.lifecycleScope.launch {
       loadRow(
         rowsAdapter,
         metadataClient.fetchArtistCompilations(mArtist.id!!),
-        ROWS_TITLE,
         4,
+        "Compilations",
       )
     }
 
@@ -108,23 +107,11 @@ class ArtistFragment : BrowserFragment() {
       loadRow(
         rowsAdapter,
         metadataClient.fetchSimilarArtists(mArtist.id!!),
-        ROWS_TITLE,
         5,
+        "Fans also like",
       )
     }
 
-  }
-
-  companion object {
-    //private const val TAG = "ArtistFragment"
-    private val ROWS_TITLE = arrayOf(
-      "Top tracks",
-      "Albums",
-      "Live Albums",
-      "EP & Singles",
-      "Compilations",
-      "Fans also like"
-    )
   }
 
 }

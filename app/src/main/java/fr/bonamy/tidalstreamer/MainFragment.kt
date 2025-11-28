@@ -14,77 +14,72 @@ class MainFragment : BrowserFragment() {
   override fun loadRows() {
 
     // init
-    val rowsAdapter = initRowsAdapter(ROWS_TITLE.size)
+    val rowsAdapter = initRowsAdapter(15)
     val userClient = UserClient(requireContext())
     adapter = rowsAdapter
 
-    // now load rows
+    // TIDAL home layout - matching order from tidal_streamer
 
     viewLifecycleOwner.lifecycleScope.launch {
-      loadRow(
-        rowsAdapter,
-        userClient.fetchShortcuts(),
-        ROWS_TITLE,
-        0,
-      )
+      loadRow(rowsAdapter, userClient.fetchShortcuts(), 0, "Shortcuts")
     }
 
     viewLifecycleOwner.lifecycleScope.launch {
-      loadRow(
-        rowsAdapter,
-        userClient.fetchNewAlbums(),
-        ROWS_TITLE,
-        1,
-      )
+      loadRow(rowsAdapter, userClient.fetchNewAlbums(), 1, "Suggested new albums")
     }
 
     viewLifecycleOwner.lifecycleScope.launch {
-      loadRow(
-        rowsAdapter,
-        userClient.fetchRecentAlbums(),
-        ROWS_TITLE,
-        2,
-      )
+      loadRow(rowsAdapter, userClient.fetchNewTracks(), 2, "Recommended new tracks")
     }
 
     viewLifecycleOwner.lifecycleScope.launch {
-      loadRow(
-        rowsAdapter,
-        userClient.fetchRecommendedAlbums(),
-        ROWS_TITLE,
-        3,
-      )
+      loadRow(rowsAdapter, userClient.fetchRecommendedAlbums(), 3, "Albums you'll enjoy")
     }
 
     viewLifecycleOwner.lifecycleScope.launch {
-      loadRow(
-        rowsAdapter,
-        userClient.fetchMixes(),
-        ROWS_TITLE,
-        4,
-      )
+      loadRow(rowsAdapter, userClient.fetchPopularPlaylists(), 4, "Popular playlists")
     }
 
     viewLifecycleOwner.lifecycleScope.launch {
-      loadRow(
-        rowsAdapter,
-        userClient.fetchRecentArtists(),
-        ROWS_TITLE,
-        5,
-      )
+      loadRow(rowsAdapter, userClient.fetchSpotlightedTracks(), 5, "Spotlighted tracks")
+    }
+
+    viewLifecycleOwner.lifecycleScope.launch {
+      loadRow(rowsAdapter, userClient.fetchUploadsTracks(), 6, "Uploads for you")
+    }
+
+    viewLifecycleOwner.lifecycleScope.launch {
+      loadRow(rowsAdapter, userClient.fetchHistoryMixes(), 7, "Your listening history")
+    }
+
+    viewLifecycleOwner.lifecycleScope.launch {
+      loadRow(rowsAdapter, userClient.fetchRecentArtists(), 8, "Your favorite artists")
+    }
+
+    viewLifecycleOwner.lifecycleScope.launch {
+      loadRow(rowsAdapter, userClient.fetchDailyMixes(), 9, "Custom mixes")
+    }
+
+    viewLifecycleOwner.lifecycleScope.launch {
+      loadRow(rowsAdapter, userClient.fetchEssentialPlaylists(), 10, "Essentials to explore")
+    }
+
+    viewLifecycleOwner.lifecycleScope.launch {
+      loadRow(rowsAdapter, userClient.fetchRadioMixes(), 11, "Personal radio stations")
+    }
+
+    viewLifecycleOwner.lifecycleScope.launch {
+      loadRow(rowsAdapter, userClient.fetchUpdatedPlaylists(), 12, "Just updated")
+    }
+
+    viewLifecycleOwner.lifecycleScope.launch {
+      loadRow(rowsAdapter, userClient.fetchRecommendedPlaylists(), 13, "User playlists you'll love")
+    }
+
+    viewLifecycleOwner.lifecycleScope.launch {
+      loadRow(rowsAdapter, userClient.fetchForgottenAlbums(), 14, "Your forgotten favorites")
     }
 
   }
 
-  companion object {
-    //    private const val TAG = "MainFragment"
-    private val ROWS_TITLE = arrayOf(
-      "",
-      "Suggested new albums for you",
-      "Recently played",
-      "Albums you'll enjoy",
-      "Custom mixes",
-      "Your favorite artists",
-    )
-  }
 }

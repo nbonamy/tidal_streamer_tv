@@ -13,6 +13,7 @@ import kotlinx.coroutines.withContext
 
 class UserClient(mContext: Context) : ApiClient() {
 
+
   suspend fun fetchShortcuts(): ApiResult<List<Collection>> = withContext(Dispatchers.IO) {
     try {
       val response = apiService.getShortcuts()
@@ -27,9 +28,9 @@ class UserClient(mContext: Context) : ApiClient() {
     }
   }
 
-  suspend fun fetchMixes(): ApiResult<List<Mix>> = withContext(Dispatchers.IO) {
+  suspend fun fetchDailyMixes(): ApiResult<List<Mix>> = withContext(Dispatchers.IO) {
     try {
-      val response = apiService.getMixes()
+      val response = apiService.getDailyMixes()
       if (response.isSuccessful && response.body()!!.status == "ok") {
         ApiResult.Success(response.body()!!.result!!.sortedWith { a, _ ->
           when (a.type) {
@@ -109,14 +110,14 @@ class UserClient(mContext: Context) : ApiClient() {
     }
   }
 
-  suspend fun fetchRecentAlbums(): ApiResult<List<Album>> = withContext(Dispatchers.IO) {
-    try {
-      val response = apiService.getRecentAlbums()
-      fetchResponse(response)
-    } catch (e: Exception) {
-      ApiResult.Error(e)
-    }
-  }
+//  suspend fun fetchRecentAlbums(): ApiResult<List<Album>> = withContext(Dispatchers.IO) {
+//    try {
+//      val response = apiService.getRecentAlbums()
+//      fetchResponse(response)
+//    } catch (e: Exception) {
+//      ApiResult.Error(e)
+//    }
+//  }
 
   suspend fun fetchRecentArtists(): ApiResult<List<Artist>> = withContext(Dispatchers.IO) {
     try {
@@ -130,6 +131,96 @@ class UserClient(mContext: Context) : ApiClient() {
   suspend fun fetchRecommendedAlbums(): ApiResult<List<Album>> = withContext(Dispatchers.IO) {
     try {
       val response = apiService.getRecommendedAlbums()
+      fetchResponse(response)
+    } catch (e: Exception) {
+      ApiResult.Error(e)
+    }
+  }
+
+  suspend fun fetchForgottenAlbums(): ApiResult<List<Album>> = withContext(Dispatchers.IO) {
+    try {
+      val response = apiService.getForgottenAlbums()
+      fetchResponse(response)
+    } catch (e: Exception) {
+      ApiResult.Error(e)
+    }
+  }
+
+  suspend fun fetchHistoryMixes(): ApiResult<List<Mix>> = withContext(Dispatchers.IO) {
+    try {
+      val response = apiService.getHistoryMixes()
+      fetchResponse(response)
+    } catch (e: Exception) {
+      ApiResult.Error(e)
+    }
+  }
+
+  suspend fun fetchEssentialPlaylists(): ApiResult<List<Playlist>> = withContext(Dispatchers.IO) {
+    try {
+      val response = apiService.getEssentialPlaylists()
+      fetchResponse(response)
+    } catch (e: Exception) {
+      ApiResult.Error(e)
+    }
+  }
+
+  suspend fun fetchRadioMixes(): ApiResult<List<Mix>> = withContext(Dispatchers.IO) {
+    try {
+      val response = apiService.getRadioMixes()
+      fetchResponse(response)
+    } catch (e: Exception) {
+      ApiResult.Error(e)
+    }
+  }
+
+  suspend fun fetchSpotlightedTracks(): ApiResult<List<Track>> = withContext(Dispatchers.IO) {
+    try {
+      val response = apiService.getSpotlightedTracks()
+      fetchResponse(response)
+    } catch (e: Exception) {
+      ApiResult.Error(e)
+    }
+  }
+
+  suspend fun fetchUploadsTracks(): ApiResult<List<Track>> = withContext(Dispatchers.IO) {
+    try {
+      val response = apiService.getUploadsTracks()
+      fetchResponse(response)
+    } catch (e: Exception) {
+      ApiResult.Error(e)
+    }
+  }
+
+  suspend fun fetchNewTracks(): ApiResult<List<Track>> = withContext(Dispatchers.IO) {
+    try {
+      val response = apiService.getNewTracks()
+      fetchResponse(response)
+    } catch (e: Exception) {
+      ApiResult.Error(e)
+    }
+  }
+
+  suspend fun fetchPopularPlaylists(): ApiResult<List<Playlist>> = withContext(Dispatchers.IO) {
+    try {
+      val response = apiService.getPopularPlaylists()
+      fetchResponse(response)
+    } catch (e: Exception) {
+      ApiResult.Error(e)
+    }
+  }
+
+  suspend fun fetchUpdatedPlaylists(): ApiResult<List<Playlist>> = withContext(Dispatchers.IO) {
+    try {
+      val response = apiService.getUpdatedPlaylists()
+      fetchResponse(response)
+    } catch (e: Exception) {
+      ApiResult.Error(e)
+    }
+  }
+
+  suspend fun fetchRecommendedPlaylists(): ApiResult<List<Playlist>> = withContext(Dispatchers.IO) {
+    try {
+      val response = apiService.getRecommendedPlaylists()
       fetchResponse(response)
     } catch (e: Exception) {
       ApiResult.Error(e)

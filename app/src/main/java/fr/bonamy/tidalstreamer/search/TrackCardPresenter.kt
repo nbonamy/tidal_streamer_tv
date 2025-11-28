@@ -44,7 +44,7 @@ class TrackCardPresenter(mFlags: PresenterFlags, private var mLongClickedListene
     if (mFlags.hasFlag(PresenterFlags.SHOW_TRACK_ALBUM)) {
       cardView.contentText = track.album?.title ?: ""
     } else {
-      cardView.contentText = track.artist?.name ?: ""
+      cardView.contentText = track.mainArtist()?.name ?: ""
     }
 
     // image
