@@ -12,7 +12,7 @@ import retrofit2.http.Query
 
 interface StreamingService {
 
-  @GET("/status")
+  @GET("/status?format=tidal")
   suspend fun status(): Response<Status>
 
   @POST("/play")
