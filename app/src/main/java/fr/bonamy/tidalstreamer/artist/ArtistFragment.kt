@@ -2,12 +2,11 @@ package fr.bonamy.tidalstreamer.artist
 
 import android.os.Bundle
 import android.view.View
-import androidx.lifecycle.lifecycleScope
 import fr.bonamy.tidalstreamer.api.MetadataClient
 import fr.bonamy.tidalstreamer.models.Artist
 import fr.bonamy.tidalstreamer.utils.BrowserFragment
 import fr.bonamy.tidalstreamer.utils.PresenterFlags
-import kotlinx.coroutines.launch
+import fr.bonamy.tidalstreamer.utils.RowDefinition
 
 class ArtistFragment : BrowserFragment() {
 
@@ -46,72 +45,34 @@ class ArtistFragment : BrowserFragment() {
   }
 
   override fun loadRows() {
-
-    // init
-    val rowsAdapter = initRowsAdapter(6)
     val metadataClient = MetadataClient(requireContext())
-    adapter = rowsAdapter
 
-    // now load rows
-
-    viewLifecycleOwner.lifecycleScope.launch {
-      loadRow(
-        rowsAdapter,
-        metadataClient.fetchArtistTopTracks(mArtist.id!!),
-        0,
+    val rows = listOf(
+      RowDefinition(
         "Top tracks",
+        { metadataClient.fetchArtistTopTracks(mArtist.id!!) },
         PresenterFlags.SHOW_TRACK_ALBUM or PresenterFlags.PLAY_ALL_TRACKS
-      )
-    }
-
-    viewLifecycleOwner.lifecycleScope.launch {
-      loadRow(
-        rowsAdapter,
-        metadataClient.fetchArtistAlbums(mArtist.id!!),
-        1,
+      ),
+      RowDefinition(
         "Albums",
+        { metadataClient.fetchArtistAlbums(mArtist.id!!) },
         PresenterFlags.SHOW_ALBUM_YEAR
-      )
-    }
-
-    viewLifecycleOwner.lifecycleScope.launch {
-      loadRow(
-        rowsAdapter,
-        metadataClient.fetchArtistLiveAlbums(mArtist.id!!),
-        2,
+      ),
+      RowDefinition(
         "Live Albums",
+        { metadataClient.fetchArtistLiveAlbums(mArtist.id!!) },
         PresenterFlags.SHOW_ALBUM_YEAR
-      )
-    }
-
-    viewLifecycleOwner.lifecycleScope.launch {
-      loadRow(
-        rowsAdapter,
-        metadataClient.fetchArtistSingles(mArtist.id!!),
-        3,
+      ),
+      RowDefinition(
         "EP & Singles",
+        { metadataClient.fetchArtistSingles(mArtist.id!!) },
         PresenterFlags.SHOW_ALBUM_YEAR
-      )
-    }
+      ),
+      RowDefinition("Compilations", { metadataClient.fetchArtistCompilations(mArtist.id!!) }),
+      RowDefinition("Fans also like", { metadataClient.fetchSimilarArtists(mArtist.id!!) }),
+    )
 
-    viewLifecycleOwner.lifecycleScope.launch {
-      loadRow(
-        rowsAdapter,
-        metadataClient.fetchArtistCompilations(mArtist.id!!),
-        4,
-        "Compilations",
-      )
-    }
-
-    viewLifecycleOwner.lifecycleScope.launch {
-      loadRow(
-        rowsAdapter,
-        metadataClient.fetchSimilarArtists(mArtist.id!!),
-        5,
-        "Fans also like",
-      )
-    }
-
+    loadRowsFromDefinitions(rows)
   }
 
 }

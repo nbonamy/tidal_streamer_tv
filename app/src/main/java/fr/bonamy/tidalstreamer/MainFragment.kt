@@ -1,9 +1,8 @@
 package fr.bonamy.tidalstreamer
 
-import androidx.lifecycle.lifecycleScope
 import fr.bonamy.tidalstreamer.api.UserClient
 import fr.bonamy.tidalstreamer.utils.BrowserFragment
-import kotlinx.coroutines.launch
+import fr.bonamy.tidalstreamer.utils.RowDefinition
 
 class MainFragment : BrowserFragment() {
 
@@ -12,74 +11,27 @@ class MainFragment : BrowserFragment() {
   }
 
   override fun loadRows() {
-
-    // init
-    val rowsAdapter = initRowsAdapter(15)
     val userClient = UserClient(requireContext())
-    adapter = rowsAdapter
 
-    // TIDAL home layout - matching order from tidal_streamer
+    val rows = listOf(
+      RowDefinition("Shortcuts", { userClient.fetchShortcuts() }),
+      RowDefinition("Suggested new albums", { userClient.fetchNewAlbums() }),
+      RowDefinition("Recommended new tracks", { userClient.fetchNewTracks() }),
+      RowDefinition("Albums you'll enjoy", { userClient.fetchRecommendedAlbums() }),
+      RowDefinition("Popular playlists", { userClient.fetchPopularPlaylists() }),
+      RowDefinition("Spotlighted tracks", { userClient.fetchSpotlightedTracks() }),
+      RowDefinition("Uploads for you", { userClient.fetchUploadsTracks() }),
+      RowDefinition("Your listening history", { userClient.fetchHistoryMixes() }),
+      RowDefinition("Your favorite artists", { userClient.fetchRecentArtists() }),
+      RowDefinition("Custom mixes", { userClient.fetchDailyMixes() }),
+      RowDefinition("Essentials to explore", { userClient.fetchEssentialPlaylists() }),
+      RowDefinition("Personal radio stations", { userClient.fetchRadioMixes() }),
+      RowDefinition("Just updated", { userClient.fetchUpdatedPlaylists() }),
+      RowDefinition("User playlists you'll love", { userClient.fetchRecommendedPlaylists() }),
+      RowDefinition("Your forgotten favorites", { userClient.fetchForgottenAlbums() }),
+    )
 
-    viewLifecycleOwner.lifecycleScope.launch {
-      loadRow(rowsAdapter, userClient.fetchShortcuts(), 0, "Shortcuts")
-    }
-
-    viewLifecycleOwner.lifecycleScope.launch {
-      loadRow(rowsAdapter, userClient.fetchNewAlbums(), 1, "Suggested new albums")
-    }
-
-    viewLifecycleOwner.lifecycleScope.launch {
-      loadRow(rowsAdapter, userClient.fetchNewTracks(), 2, "Recommended new tracks")
-    }
-
-    viewLifecycleOwner.lifecycleScope.launch {
-      loadRow(rowsAdapter, userClient.fetchRecommendedAlbums(), 3, "Albums you'll enjoy")
-    }
-
-    viewLifecycleOwner.lifecycleScope.launch {
-      loadRow(rowsAdapter, userClient.fetchPopularPlaylists(), 4, "Popular playlists")
-    }
-
-    viewLifecycleOwner.lifecycleScope.launch {
-      loadRow(rowsAdapter, userClient.fetchSpotlightedTracks(), 5, "Spotlighted tracks")
-    }
-
-    viewLifecycleOwner.lifecycleScope.launch {
-      loadRow(rowsAdapter, userClient.fetchUploadsTracks(), 6, "Uploads for you")
-    }
-
-    viewLifecycleOwner.lifecycleScope.launch {
-      loadRow(rowsAdapter, userClient.fetchHistoryMixes(), 7, "Your listening history")
-    }
-
-    viewLifecycleOwner.lifecycleScope.launch {
-      loadRow(rowsAdapter, userClient.fetchRecentArtists(), 8, "Your favorite artists")
-    }
-
-    viewLifecycleOwner.lifecycleScope.launch {
-      loadRow(rowsAdapter, userClient.fetchDailyMixes(), 9, "Custom mixes")
-    }
-
-    viewLifecycleOwner.lifecycleScope.launch {
-      loadRow(rowsAdapter, userClient.fetchEssentialPlaylists(), 10, "Essentials to explore")
-    }
-
-    viewLifecycleOwner.lifecycleScope.launch {
-      loadRow(rowsAdapter, userClient.fetchRadioMixes(), 11, "Personal radio stations")
-    }
-
-    viewLifecycleOwner.lifecycleScope.launch {
-      loadRow(rowsAdapter, userClient.fetchUpdatedPlaylists(), 12, "Just updated")
-    }
-
-    viewLifecycleOwner.lifecycleScope.launch {
-      loadRow(rowsAdapter, userClient.fetchRecommendedPlaylists(), 13, "User playlists you'll love")
-    }
-
-    viewLifecycleOwner.lifecycleScope.launch {
-      loadRow(rowsAdapter, userClient.fetchForgottenAlbums(), 14, "Your forgotten favorites")
-    }
-
+    loadRowsFromDefinitions(rows)
   }
 
 }

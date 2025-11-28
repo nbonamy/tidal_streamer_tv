@@ -19,6 +19,7 @@ import androidx.leanback.widget.OnItemViewSelectedListener
 import androidx.leanback.widget.Presenter
 import androidx.leanback.widget.Row
 import androidx.leanback.widget.RowPresenter
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
@@ -34,6 +35,7 @@ import fr.bonamy.tidalstreamer.models.Track
 import fr.bonamy.tidalstreamer.search.SearchActivity
 import fr.bonamy.tidalstreamer.search.TrackCardPresenter
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -248,6 +250,24 @@ abstract class BrowserFragment : BrowseSupportFragment() {
 
     override fun run() {
       mHandler.post { updateBackground(mBackgroundUri) }
+    }
+  }
+
+  protected fun loadRowsFromDefinitions(rows: List<RowDefinition>) {
+    val rowsAdapter = initRowsAdapter(rows.size)
+    adapter = rowsAdapter
+
+    rows.forEachIndexed { index, row ->
+      viewLifecycleOwner.lifecycleScope.launch {
+        @Suppress("UNCHECKED_CAST")
+        loadRow(
+          rowsAdapter,
+          row.fetcher() as ApiResult<List<Any>>,
+          index,
+          row.title,
+          row.flags
+        )
+      }
     }
   }
 
