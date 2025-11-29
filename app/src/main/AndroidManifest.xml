@@ -37,6 +37,9 @@
       </intent-filter>
     </activity>
     <activity
+      android:name=".auth.AuthActivity"
+      android:exported="false" />
+    <activity
       android:name=".user.UserActivity"
       android:exported="false" />
     <activity

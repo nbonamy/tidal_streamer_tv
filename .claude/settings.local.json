@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cat:*)",
+      "Bash(./gradlew assembleDebug:*)",
+      "Bash(./gradlew assembleRelease:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

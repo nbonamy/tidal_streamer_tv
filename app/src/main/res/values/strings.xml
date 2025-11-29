@@ -1,7 +1,7 @@
 <resources>
 
   <string name="app_name">TIDAL Streamer</string>
-  <string name="browse_main_title">TIDAL</string>
+  <string name="browse_main_title">TIDAL        </string>
   <string name="browse_user_title">Collection</string>
 
   <string name="play_now">Play Now</string>

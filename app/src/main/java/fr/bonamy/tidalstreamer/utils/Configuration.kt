@@ -74,8 +74,20 @@ class Configuration(mContext: Context) {
     editor.apply()
   }
 
+  fun getUserId(): Int? {
+    val userId = sharedPreferences.getInt(KEY_USER_ID, -1)
+    return if (userId == -1) null else userId
+  }
+
+  fun setUserId(userId: Int) {
+    val editor = sharedPreferences.edit()
+    editor.putInt(KEY_USER_ID, userId)
+    editor.apply()
+  }
+
   companion object {
     private const val PREFS_NAME = "tidal_streamer_tv"
     private const val KEY_RECENT_SEARCHES = "recent_search"
+    private const val KEY_USER_ID = "user_id"
   }
 }

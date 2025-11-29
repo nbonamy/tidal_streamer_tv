@@ -11,8 +11,10 @@ import androidx.lifecycle.lifecycleScope
 import fr.bonamy.tidalstreamer.MainActivity
 import fr.bonamy.tidalstreamer.R
 import fr.bonamy.tidalstreamer.api.ApiResult
+import fr.bonamy.tidalstreamer.api.ApiRetrofitClient
 import fr.bonamy.tidalstreamer.api.StreamerListener
 import fr.bonamy.tidalstreamer.api.StreamingClient
+import fr.bonamy.tidalstreamer.auth.AuthActivity
 import fr.bonamy.tidalstreamer.models.STATE_PAUSED
 import fr.bonamy.tidalstreamer.models.STATE_PLAYING
 import fr.bonamy.tidalstreamer.models.STATE_STOPPED
@@ -40,6 +42,11 @@ abstract class TidalActivity : FragmentActivity() {
           .commitNow()
       }
     }
+
+    // Initialize user ID for API calls
+    val configuration = Configuration(this)
+    ApiRetrofitClient.setUserId(configuration.getUserId())
+
     mApiClient = StreamingClient(this)
   }
 
@@ -68,6 +75,7 @@ abstract class TidalActivity : FragmentActivity() {
   override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
 
     // color keys order: YELLOW, BLUE, RED, GREEN
+    // YELLOW: Home, BLUE: User collection, RED: (reserved), GREEN: User selection/auth
 
     // reschedule playback task
     schedulePlaybackTask()
@@ -89,6 +97,13 @@ abstract class TidalActivity : FragmentActivity() {
     // user collection
     if (keyCode == KeyEvent.KEYCODE_PROG_BLUE || keyCode == KeyEvent.KEYCODE_J) {
       val intent = Intent(this, UserActivity::class.java)
+      startActivity(intent)
+      return true
+    }
+
+    // user selection / authentication
+    if (keyCode == KeyEvent.KEYCODE_PROG_GREEN || keyCode == KeyEvent.KEYCODE_U) {
+      val intent = Intent(this, AuthActivity::class.java)
       startActivity(intent)
       return true
     }
