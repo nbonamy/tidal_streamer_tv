@@ -65,6 +65,12 @@ class PlaybackActivity : TidalActivity() {
     // we might need the fragment
     val fragment = supportFragmentManager.findFragmentById(R.id.playback_fragment) as FullPlaybackFragment
 
+    // toggle favorite
+    if (keyCode == KeyEvent.KEYCODE_MEDIA_RECORD || keyCode == KeyEvent.KEYCODE_F) {
+      fragment.toggleFavorite()
+      return true
+    }
+
     // lyrics scrolling: send event to fragment
     if (keyCode == KeyEvent.KEYCODE_DPAD_UP || keyCode == KeyEvent.KEYCODE_DPAD_DOWN) {
       return fragment.onKeyDown(keyCode, event)

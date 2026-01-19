@@ -62,6 +62,12 @@
       tools:max="100"
       tools:progress="50" />
 
+    <Space
+      android:layout_width="0dp"
+      android:layout_height="16dp" />
+
+    <include layout="@layout/include_favorite_indicator" />
+
   </LinearLayout>
 
   <ScrollView

@@ -227,6 +227,32 @@ class UserClient(mContext: Context) : ApiClient() {
     }
   }
 
+  suspend fun isTrackFavorite(trackId: String): ApiResult<Boolean> = withContext(Dispatchers.IO) {
+    try {
+      val response = apiService.isTrackFavorite(trackId)
+      if (response.isSuccessful && response.body()!!.status == "ok") {
+        ApiResult.Success(response.body()!!.result!!.favorite)
+      } else {
+        ApiResult.Error(Throwable("Error: ${response.code()}"))
+      }
+    } catch (e: Exception) {
+      ApiResult.Error(e)
+    }
+  }
+
+  suspend fun toggleTrackFavorite(trackId: String): ApiResult<Boolean> = withContext(Dispatchers.IO) {
+    try {
+      val response = apiService.toggleTrackFavorite(trackId)
+      if (response.isSuccessful && response.body()!!.status == "ok") {
+        ApiResult.Success(response.body()!!.result!!.favorite)
+      } else {
+        ApiResult.Error(Throwable("Error: ${response.code()}"))
+      }
+    } catch (e: Exception) {
+      ApiResult.Error(e)
+    }
+  }
+
   private val apiService: UserService by lazy {
     val configuration = Configuration(mContext)
     ApiRetrofitClient.instance(configuration.getHttpBaseUrl()).create(UserService::class.java)

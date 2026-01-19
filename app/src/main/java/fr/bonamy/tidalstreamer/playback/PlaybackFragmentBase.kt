@@ -14,6 +14,7 @@ import com.bumptech.glide.Glide
 import fr.bonamy.tidalstreamer.R
 import fr.bonamy.tidalstreamer.api.ApiResult
 import fr.bonamy.tidalstreamer.api.StreamingClient
+import fr.bonamy.tidalstreamer.api.UserClient
 import fr.bonamy.tidalstreamer.models.STATE_STOPPED
 import fr.bonamy.tidalstreamer.models.Status
 import kotlinx.coroutines.launch
@@ -30,15 +31,20 @@ abstract class PlaybackFragmentBase : Fragment() {
   abstract fun hideSelf()
 
   private lateinit var apiClient: StreamingClient
+  private lateinit var userClient: UserClient
   private lateinit var titleView: TextView
   private lateinit var artistView: TextView
   private lateinit var albumArtView: ImageView
+  private var heartView: ImageView? = null
+  private var favoriteHintView: TextView? = null
+  private var favoriteLoadingView: View? = null
   private val handler = Handler(Looper.getMainLooper())
   private var currentMediaId: String? = null
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     apiClient = StreamingClient(requireContext())
+    userClient = UserClient(requireContext())
   }
 
   protected fun createView(
@@ -48,6 +54,9 @@ abstract class PlaybackFragmentBase : Fragment() {
     titleView = v.findViewById(R.id.title)
     artistView = v.findViewById(R.id.artist)
     albumArtView = v.findViewById(R.id.album_art)
+    heartView = v.findViewById(R.id.favorite)
+    favoriteHintView = v.findViewById(R.id.favorite_hint)
+    favoriteLoadingView = v.findViewById(R.id.favorite_loading)
     return v
   }
 
@@ -123,10 +132,51 @@ abstract class PlaybackFragmentBase : Fragment() {
       .error(R.drawable.album)
       .into(albumArtView)
 
+    // check favorite status
+    track.id?.let { checkFavoriteStatus(it) }
+
     // update
     currentMediaId = track.id
     return StatusProcessResult.NEW_TRACK
 
+  }
+
+  private fun checkFavoriteStatus(trackId: String) {
+    heartView?.visibility = View.GONE
+    favoriteLoadingView?.visibility = View.VISIBLE
+    lifecycleScope.launch {
+      when (val result = userClient.isTrackFavorite(trackId)) {
+        is ApiResult.Success -> updateFavoriteUI(result.data)
+        is ApiResult.Error -> updateFavoriteUI(false)
+      }
+      favoriteLoadingView?.visibility = View.GONE
+      heartView?.visibility = View.VISIBLE
+    }
+  }
+
+  fun toggleFavorite() {
+    currentMediaId?.let { trackId ->
+      heartView?.visibility = View.GONE
+      favoriteLoadingView?.visibility = View.VISIBLE
+      lifecycleScope.launch {
+        when (val result = userClient.toggleTrackFavorite(trackId)) {
+          is ApiResult.Success -> updateFavoriteUI(result.data)
+          is ApiResult.Error -> { }
+        }
+        favoriteLoadingView?.visibility = View.GONE
+        heartView?.visibility = View.VISIBLE
+      }
+    }
+  }
+
+  private fun updateFavoriteUI(isFavorite: Boolean) {
+    if (isFavorite) {
+      heartView?.setImageResource(R.drawable.ic_heart)
+      favoriteHintView?.text = "press  ●  to unfavorite"
+    } else {
+      heartView?.setImageResource(R.drawable.ic_heart_outline)
+      favoriteHintView?.text = "press  ●  to favorite"
+    }
   }
 
   companion object {

@@ -8,6 +8,8 @@ import fr.bonamy.tidalstreamer.models.Shortcut
 import fr.bonamy.tidalstreamer.models.Track
 import retrofit2.Response
 import retrofit2.http.GET
+import retrofit2.http.POST
+import retrofit2.http.Path
 
 interface UserService {
 
@@ -71,4 +73,14 @@ interface UserService {
   @GET("/user/playlists/recommended")
   suspend fun getRecommendedPlaylists(): Response<ApiResponse<List<Playlist>>>
 
+  @GET("/user/tracks/{trackId}/favorite")
+  suspend fun isTrackFavorite(@Path("trackId") trackId: String): Response<ApiResponse<FavoriteResponse>>
+
+  @POST("/user/tracks/{trackId}/favorite/toggle")
+  suspend fun toggleTrackFavorite(@Path("trackId") trackId: String): Response<ApiResponse<FavoriteResponse>>
+
 }
+
+data class FavoriteResponse(
+  val favorite: Boolean
+)

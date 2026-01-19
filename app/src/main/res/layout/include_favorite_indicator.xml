@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  android:id="@+id/favorite_container"
+  android:layout_width="wrap_content"
+  android:layout_height="wrap_content"
+  android:orientation="horizontal"
+  android:gravity="center_vertical">
+
+  <FrameLayout
+    android:layout_width="12dp"
+    android:layout_height="12dp"
+    android:layout_marginTop="2dp">
+
+    <ImageView
+      android:id="@+id/favorite"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:src="@drawable/ic_heart_outline" />
+
+    <ProgressBar
+      android:id="@+id/favorite_loading"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:indeterminate="true"
+      android:indeterminateTint="#FF5555"
+      android:visibility="gone" />
+
+  </FrameLayout>
+
+  <TextView
+    android:id="@+id/favorite_hint"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="6dp"
+    android:textColor="#FF5555"
+    android:textSize="12sp"
+    android:text="press  ●  to favorite" />
+
+</LinearLayout>
