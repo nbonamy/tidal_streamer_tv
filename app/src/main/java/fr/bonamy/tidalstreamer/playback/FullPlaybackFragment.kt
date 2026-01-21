@@ -306,7 +306,9 @@ class FullPlaybackFragment(private var mLayout: PlaybackLayout, private var mSta
       if (!mScrollingLocked) {
         val view = mLinesViews[activeLine]
         if (view != null) {
-          scrollView.smoothScrollTo(0, view.top - scrollView.height / 4)
+          scrollView.post {
+            scrollView.smoothScrollTo(0, view.top - scrollView.height / 4)
+          }
         }
       }
     }
