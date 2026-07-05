@@ -1,9 +1,12 @@
 package fr.bonamy.tidalstreamer.api
 
 import android.content.Context
+import com.google.gson.Gson
+import com.google.gson.JsonElement
 import fr.bonamy.tidalstreamer.models.Album
 import fr.bonamy.tidalstreamer.models.Artist
 import fr.bonamy.tidalstreamer.models.Collection
+import fr.bonamy.tidalstreamer.models.HomeSection
 import fr.bonamy.tidalstreamer.models.Mix
 import fr.bonamy.tidalstreamer.models.Playlist
 import fr.bonamy.tidalstreamer.models.Track
@@ -13,6 +16,32 @@ import kotlinx.coroutines.withContext
 
 class UserClient(mContext: Context) : ApiClient() {
 
+  private val gson = Gson()
+
+  suspend fun fetchHomeSections(): ApiResult<List<HomeSection>> = withContext(Dispatchers.IO) {
+    try {
+      val response = apiService.getHomeSections()
+      fetchResponse(response)
+    } catch (e: Exception) {
+      ApiResult.Error(e)
+    }
+  }
+
+  suspend fun fetchHomeSectionItems(sectionId: String): ApiResult<List<Any>> = withContext(Dispatchers.IO) {
+    try {
+      val response = apiService.getHomeSectionItems(sectionId)
+      if (response.isSuccessful && response.body()!!.status == "ok") {
+        val items = response.body()!!.result!!.items
+          ?.mapNotNull { parseHomeSectionItem(it.itemType, it.data) }
+          ?: emptyList()
+        ApiResult.Success(items)
+      } else {
+        ApiResult.Error(Throwable("Error: ${response.code()}"))
+      }
+    } catch (e: Exception) {
+      ApiResult.Error(e)
+    }
+  }
 
   suspend fun fetchShortcuts(): ApiResult<List<Collection>> = withContext(Dispatchers.IO) {
     try {
@@ -258,5 +287,19 @@ class UserClient(mContext: Context) : ApiClient() {
     ApiRetrofitClient.instance(configuration.getHttpBaseUrl()).create(UserService::class.java)
   }
 
-}
+  private fun parseHomeSectionItem(itemType: String?, data: JsonElement?): Any? {
+    if (data == null || data.isJsonNull) {
+      return null
+    }
 
+    return when (itemType) {
+      "album" -> gson.fromJson(data, Album::class.java)
+      "playlist" -> gson.fromJson(data, Playlist::class.java)
+      "track" -> gson.fromJson(data, Track::class.java)
+      "artist" -> gson.fromJson(data, Artist::class.java)
+      "mix" -> gson.fromJson(data, Mix::class.java)
+      else -> null
+    }
+  }
+
+}

@@ -2,6 +2,8 @@ package fr.bonamy.tidalstreamer.api
 
 import fr.bonamy.tidalstreamer.models.Album
 import fr.bonamy.tidalstreamer.models.Artist
+import fr.bonamy.tidalstreamer.models.HomeSection
+import fr.bonamy.tidalstreamer.models.HomeSectionItems
 import fr.bonamy.tidalstreamer.models.Mix
 import fr.bonamy.tidalstreamer.models.Playlist
 import fr.bonamy.tidalstreamer.models.Shortcut
@@ -12,6 +14,12 @@ import retrofit2.http.POST
 import retrofit2.http.Path
 
 interface UserService {
+
+  @GET("/user/home/sections")
+  suspend fun getHomeSections(): Response<ApiResponse<List<HomeSection>>>
+
+  @GET("/user/home/sections/{sectionId}/items")
+  suspend fun getHomeSectionItems(@Path("sectionId") sectionId: String): Response<ApiResponse<HomeSectionItems>>
 
   @GET("/user/shortcuts")
   suspend fun getShortcuts(): Response<ApiResponse<List<Shortcut>>>
