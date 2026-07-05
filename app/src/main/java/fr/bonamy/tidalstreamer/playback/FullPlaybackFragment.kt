@@ -2,10 +2,14 @@ package fr.bonamy.tidalstreamer.playback
 
 import android.animation.ObjectAnimator
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.os.SystemClock
 import android.util.Log
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.ProgressBar
@@ -39,6 +43,13 @@ class FullPlaybackFragment(private var mLayout: PlaybackLayout, private var mSta
   private var mSyncedLyrics = false
   private var mUnlockScrollTimer: Timer? = null
   private var nextTrackView: TextView? = null
+  private var shortcutsView: View? = null
+  private val infoHandler = Handler(Looper.getMainLooper())
+  private var transientInfoVisibleUntil = 0L
+  private var hasNextTrack = false
+  private val hideTransientInfoTask = Runnable {
+    updateTransientInfoVisibility(mStatus)
+  }
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -59,6 +70,8 @@ class FullPlaybackFragment(private var mLayout: PlaybackLayout, private var mSta
     val v = createView(inflater, container, layoutId) ?: return null
     mLyricsView = v.findViewById(R.id.lyrics)
     nextTrackView = v.findViewById(R.id.next_track)
+    shortcutsView = v.findViewById(R.id.playback_shortcuts)
+    revealTransientPlaybackInfo()
 
     // if we have a status
     if (mStatus != null) {
@@ -77,6 +90,7 @@ class FullPlaybackFragment(private var mLayout: PlaybackLayout, private var mSta
   override fun onPause() {
     super.onPause()
     StreamerListener.getInstance().removeListener(this)
+    infoHandler.removeCallbacks(hideTransientInfoTask)
   }
 
   fun latestStatus(): Status? {
@@ -88,6 +102,14 @@ class FullPlaybackFragment(private var mLayout: PlaybackLayout, private var mSta
 
   override fun hideSelf() {
     requireActivity().finish()
+  }
+
+  fun revealTransientPlaybackInfo() {
+    if (nextTrackView == null && shortcutsView == null) return
+
+    transientInfoVisibleUntil = SystemClock.elapsedRealtime() + TRANSIENT_INFO_VISIBLE_DURATION
+    updateTransientInfoVisibility(mStatus)
+    scheduleTransientInfoHide()
   }
 
   override fun onStatus(status: Status) {
@@ -116,6 +138,7 @@ class FullPlaybackFragment(private var mLayout: PlaybackLayout, private var mSta
     // we need the track
     val track = status.currentTrack() ?: return result
     updateNextTrack(status)
+    updateTransientInfoVisibility(status)
 
     // load lyrics
     if (result == StatusProcessResult.NEW_TRACK && mLyricsView != null) {
@@ -169,10 +192,12 @@ class FullPlaybackFragment(private var mLayout: PlaybackLayout, private var mSta
     val view = nextTrackView ?: return
     val nextTrack = status.tracks?.getOrNull(status.position + 1)?.item
     if (nextTrack == null) {
-      view.visibility = View.GONE
+      hasNextTrack = false
+      view.visibility = INVISIBLE
       return
     }
 
+    hasNextTrack = true
     val title = nextTrack.title.orEmpty()
     val artist = nextTrack.mainArtist()?.name.orEmpty()
     view.text = if (artist.isBlank()) {
@@ -180,7 +205,26 @@ class FullPlaybackFragment(private var mLayout: PlaybackLayout, private var mSta
     } else {
       getString(R.string.playback_next_track, title, artist)
     }
-    view.visibility = VISIBLE
+  }
+
+  private fun updateTransientInfoVisibility(status: Status?) {
+    val transientVisible = SystemClock.elapsedRealtime() < transientInfoVisibleUntil
+    shortcutsView?.visibility = if (transientVisible) VISIBLE else INVISIBLE
+
+    val track = status?.currentTrack()
+    val durationMs = (track?.duration ?: 0) * 1000
+    val progress = status?.progress ?: 0
+    val inEdgeWindow = durationMs > 0 &&
+      progress >= 0 &&
+      (progress <= NEXT_TRACK_EDGE_WINDOW || durationMs - progress <= NEXT_TRACK_EDGE_WINDOW)
+
+    nextTrackView?.visibility = if (hasNextTrack && (inEdgeWindow || transientVisible)) VISIBLE else INVISIBLE
+  }
+
+  private fun scheduleTransientInfoHide() {
+    infoHandler.removeCallbacks(hideTransientInfoTask)
+    val delay = (transientInfoVisibleUntil - SystemClock.elapsedRealtime()).coerceAtLeast(0L)
+    infoHandler.postDelayed(hideTransientInfoTask, delay)
   }
 
   @Suppress("UNUSED_PARAMETER")
@@ -351,6 +395,8 @@ class FullPlaybackFragment(private var mLayout: PlaybackLayout, private var mSta
     private const val TIMESTAMP_LENGTH = 10
     private const val SYNCED_EMPTY_LINE = "●  ●  ●"
     private const val UNLOCK_SCROLL_DELAY = 3000L
+    private const val TRANSIENT_INFO_VISIBLE_DURATION = 5000L
+    private const val NEXT_TRACK_EDGE_WINDOW = 10000
   }
 
 }

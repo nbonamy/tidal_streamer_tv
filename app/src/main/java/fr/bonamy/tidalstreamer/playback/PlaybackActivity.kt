@@ -67,6 +67,8 @@ class PlaybackActivity : TidalActivity() {
   }
 
   override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+    (supportFragmentManager.findFragmentById(R.id.playback_fragment) as? FullPlaybackFragment)
+      ?.revealTransientPlaybackInfo()
 
     if (RemoteKey.isCaptions(keyCode)) {
       switchMode(if (currentMode == PlaybackScreenMode.LYRICS) PlaybackScreenMode.PLAYBACK else PlaybackScreenMode.LYRICS)

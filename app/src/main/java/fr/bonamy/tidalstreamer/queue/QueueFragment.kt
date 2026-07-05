@@ -416,6 +416,47 @@ class QueueFragment(private var initialStatus: Status?) : PlaybackFragmentBase()
     }
   }
 
+  private fun removeTracks(positions: List<Int>, focusPosition: Int) {
+    val removePositions = positions
+      .filter { it in tracks.indices }
+      .distinct()
+      .sortedDescending()
+    if (removePositions.isEmpty()) return
+
+    clearReorderMode()
+    pendingReorderPlayingTrackId = null
+
+    lifecycleScope.launch {
+      var failed = false
+      for (position in removePositions) {
+        when (streamingClient.dequeue(position)) {
+          is ApiResult.Success -> {}
+          is ApiResult.Error -> {
+            failed = true
+            break
+          }
+        }
+      }
+
+      if (failed) {
+        showActionError()
+        refreshStatus(focusPosition = focusedPosition)
+      } else {
+        refreshStatus(focusPosition = focusPosition.coerceAtLeast(0))
+      }
+    }
+  }
+
+  private fun removeAllOtherTracks(position: Int) {
+    if (position !in tracks.indices) return
+    removeTracks(tracks.indices.filter { it != position }, 0)
+  }
+
+  private fun removeAllTracksAfter(position: Int) {
+    if (position !in tracks.indices) return
+    removeTracks(((position + 1)..tracks.lastIndex).toList(), position)
+  }
+
   private fun isConfirmKey(keyCode: Int): Boolean {
     return keyCode == KeyEvent.KEYCODE_DPAD_CENTER || keyCode == KeyEvent.KEYCODE_ENTER
   }
@@ -461,6 +502,8 @@ class QueueFragment(private var initialStatus: Status?) : PlaybackFragmentBase()
     focusedPosition = position
     val menuItems = mutableListOf(getString(R.string.queue_reorder))
     menuItems.add(getString(R.string.queue_remove))
+    menuItems.add(getString(R.string.queue_remove_all_others))
+    menuItems.add(getString(R.string.queue_remove_all_after))
 
     val title = tracks[position].item?.title ?: getString(R.string.queue_unavailable_track)
     TvActionDialog.showActions(
@@ -471,6 +514,8 @@ class QueueFragment(private var initialStatus: Status?) : PlaybackFragmentBase()
           when (menuItem) {
             getString(R.string.queue_reorder) -> startReorder(position)
             getString(R.string.queue_remove) -> removeTrack(position)
+            getString(R.string.queue_remove_all_others) -> removeAllOtherTracks(position)
+            getString(R.string.queue_remove_all_after) -> removeAllTracksAfter(position)
           }
         }
       }
