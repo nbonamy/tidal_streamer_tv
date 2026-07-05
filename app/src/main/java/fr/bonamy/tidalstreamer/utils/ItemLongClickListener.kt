@@ -304,8 +304,7 @@ class ItemLongClickedListener(private val mActivity: FragmentActivity, private v
           TvActionDialog.showMessage(
             context = mActivity,
             title = artist.name,
-            message = result.data.getPlainText(),
-            actionLabel = "OK"
+            message = result.data.getPlainText()
           )
         }
 

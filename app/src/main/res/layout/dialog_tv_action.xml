@@ -34,16 +34,32 @@
       android:textSize="20sp"
       tools:text="Plainsong - The Cure" />
 
-    <TextView
-      android:id="@+id/dialog_message"
+    <ScrollView
+      android:id="@+id/dialog_message_scroll"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:layout_marginTop="12dp"
-      android:lineSpacingExtra="3dp"
-      android:textColor="@color/text_light_faded"
-      android:textSize="16sp"
-      android:visibility="gone"
-      tools:text="Dialog message" />
+      android:background="@drawable/tv_dialog_action_background"
+      android:fadeScrollbars="true"
+      android:focusable="true"
+      android:focusableInTouchMode="true"
+      android:paddingStart="14dp"
+      android:paddingTop="10dp"
+      android:paddingEnd="14dp"
+      android:paddingBottom="10dp"
+      android:scrollbars="none"
+      android:visibility="gone">
+
+      <TextView
+        android:id="@+id/dialog_message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:lineSpacingExtra="3dp"
+        android:textColor="@color/text_light_faded"
+        android:textSize="16sp"
+        tools:text="Dialog message" />
+
+    </ScrollView>
 
     <FrameLayout
       android:id="@+id/dialog_custom_content"

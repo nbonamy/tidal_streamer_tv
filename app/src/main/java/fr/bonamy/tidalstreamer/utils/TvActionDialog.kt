@@ -12,6 +12,7 @@ import android.view.Window
 import android.view.WindowManager
 import android.widget.FrameLayout
 import android.widget.LinearLayout
+import android.widget.ScrollView
 import android.widget.TextView
 import fr.bonamy.tidalstreamer.R
 
@@ -34,7 +35,7 @@ object TvActionDialog {
     context: Context,
     title: String?,
     message: String?,
-    actionLabel: String,
+    actionLabel: String? = null,
     cancelable: Boolean = true,
     customView: View? = null,
     onAction: () -> Unit = {}
@@ -44,7 +45,7 @@ object TvActionDialog {
       title = title,
       message = message,
       customView = customView,
-      actions = listOf(TvDialogAction(actionLabel, onAction)),
+      actions = actionLabel?.let { listOf(TvDialogAction(it, onAction)) } ?: emptyList(),
       cancelable = cancelable
     )
   }
@@ -64,6 +65,7 @@ object TvActionDialog {
     val inflater = LayoutInflater.from(context)
     val content = inflater.inflate(R.layout.dialog_tv_action, null)
     val titleView = content.findViewById<TextView>(R.id.dialog_title)
+    val messageScroll = content.findViewById<ScrollView>(R.id.dialog_message_scroll)
     val messageView = content.findViewById<TextView>(R.id.dialog_message)
     val customContainer = content.findViewById<FrameLayout>(R.id.dialog_custom_content)
     val actionContainer = content.findViewById<LinearLayout>(R.id.dialog_actions)
@@ -72,7 +74,7 @@ object TvActionDialog {
     titleView.visibility = if (title.isNullOrBlank()) View.GONE else View.VISIBLE
 
     messageView.text = message.orEmpty()
-    messageView.visibility = if (message.isNullOrBlank()) View.GONE else View.VISIBLE
+    messageScroll.visibility = if (message.isNullOrBlank()) View.GONE else View.VISIBLE
 
     if (customView != null) {
       (customView.parent as? ViewGroup)?.removeView(customView)
@@ -87,6 +89,7 @@ object TvActionDialog {
           topMargin = row.resources.getDimensionPixelSize(R.dimen.tv_dialog_action_spacing)
         }
       }
+      row.id = View.generateViewId()
       row.text = action.label
       row.setOnClickListener {
         dialog.dismiss()
@@ -94,10 +97,17 @@ object TvActionDialog {
       }
       actionContainer.addView(row)
     }
+    actionContainer.visibility = if (actions.isEmpty()) View.GONE else View.VISIBLE
 
     dialog.setContentView(content)
     dialog.setOnShowListener {
-      actionContainer.getChildAt(0)?.requestFocus()
+      capScrollableMessageHeight(messageScroll)
+      setupScrollableMessageNavigation(messageScroll, actionContainer.getChildAt(0))
+      if (messageScroll.visibility == View.VISIBLE) {
+        messageScroll.requestFocus()
+      } else {
+        actionContainer.getChildAt(0)?.requestFocus()
+      }
     }
     dialog.show()
     dialog.window?.apply {
@@ -111,6 +121,54 @@ object TvActionDialog {
         dimAmount = 0.72f
         gravity = Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL
         y = 0
+      }
+    }
+  }
+
+  private fun capScrollableMessageHeight(messageScroll: ScrollView) {
+    if (messageScroll.visibility != View.VISIBLE) return
+
+    messageScroll.post {
+      val maxHeight = messageScroll.resources.getDimensionPixelSize(R.dimen.tv_dialog_message_max_height)
+      if (messageScroll.height > maxHeight) {
+        messageScroll.layoutParams = messageScroll.layoutParams.apply {
+          height = maxHeight
+        }
+        messageScroll.requestLayout()
+      }
+    }
+  }
+
+  private fun setupScrollableMessageNavigation(messageScroll: ScrollView, firstAction: View?) {
+    if (messageScroll.visibility != View.VISIBLE) return
+
+    firstAction?.let {
+      messageScroll.nextFocusDownId = it.id
+      it.nextFocusUpId = R.id.dialog_message_scroll
+    }
+
+    messageScroll.setOnKeyListener { view, keyCode, event ->
+      if (event.action != android.view.KeyEvent.ACTION_DOWN) return@setOnKeyListener false
+      val scrollView = view as ScrollView
+      val scrollDelta = scrollView.resources.getDimensionPixelSize(R.dimen.tv_dialog_message_scroll_step)
+
+      when (keyCode) {
+        android.view.KeyEvent.KEYCODE_DPAD_UP -> {
+          if (scrollView.scrollY <= 0) return@setOnKeyListener false
+          scrollView.smoothScrollBy(0, -scrollDelta)
+          true
+        }
+
+        android.view.KeyEvent.KEYCODE_DPAD_DOWN -> {
+          val child = scrollView.getChildAt(0) ?: return@setOnKeyListener false
+          val maxScroll = (child.height - scrollView.height).coerceAtLeast(0)
+          if (maxScroll <= 0 && firstAction == null) return@setOnKeyListener true
+          if (scrollView.scrollY >= maxScroll) return@setOnKeyListener false
+          scrollView.smoothScrollBy(0, scrollDelta)
+          true
+        }
+
+        else -> false
       }
     }
   }

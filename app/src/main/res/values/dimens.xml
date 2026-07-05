@@ -12,6 +12,8 @@
   <dimen name="artist_banner_bottom_fade_offset">175dp</dimen>
   <dimen name="tv_dialog_width">520dp</dimen>
   <dimen name="tv_dialog_action_spacing">4dp</dimen>
+  <dimen name="tv_dialog_message_max_height">260dp</dimen>
+  <dimen name="tv_dialog_message_scroll_step">72dp</dimen>
 
   <item name="orb_focused_zoom" type="fraction">110%</item>
 
