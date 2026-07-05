@@ -36,8 +36,6 @@ import fr.bonamy.tidalstreamer.search.SearchActivity
 import fr.bonamy.tidalstreamer.search.TrackCardPresenter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import java.util.Timer
 import java.util.TimerTask
@@ -64,8 +62,6 @@ abstract class BrowserFragment : BrowseSupportFragment() {
   private var mDefaultBackground: Drawable? = null
   private var mBackgroundTimer: Timer? = null
   private var mBackgroundUri: String? = null
-  private var mRowsDeleted: List<Int> = emptyList()
-  private val mRowUpdateMutex: Mutex = Mutex()
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -123,17 +119,11 @@ abstract class BrowserFragment : BrowseSupportFragment() {
 
   }
 
-  protected fun initRowsAdapter(count: Int): ArrayObjectAdapter {
-    val rowsAdapter = ArrayObjectAdapter(ListRowPresenter())
-    for (i in 0..<count) {
-      val listRowAdapter = ArrayObjectAdapter()
-      rowsAdapter.add(ListRow(HeaderItem(""), listRowAdapter))
-    }
-    mRowsDeleted = emptyList()
-    return rowsAdapter
+  protected fun initRowsAdapter(): ArrayObjectAdapter {
+    return ArrayObjectAdapter(ListRowPresenter())
   }
 
-  suspend fun <T> loadRow(rowsAdapter: ArrayObjectAdapter, result: ApiResult<List<T>>, index: Int, title: String, flags: PresenterFlags = PresenterFlags.NONE) {
+  private fun <T> buildRow(result: ApiResult<List<T>>, title: String, flags: PresenterFlags = PresenterFlags.NONE): ListRow? {
 
     // Create the presenter selector
     val presenter = ClassPresenterSelector()
@@ -146,65 +136,38 @@ abstract class BrowserFragment : BrowseSupportFragment() {
     when (result) {
       is ApiResult.Success -> {
 
-        // if no data, replace with something that does not take space
+        // if no data, skip the row entirely so it cannot receive focus
         if (result.data.isEmpty()) {
-          deleteRow(rowsAdapter, index)
-          return
+          Log.d(TAG, "Skipping empty row: $title")
+          return null
         }
 
         val rowAdapter = ArrayObjectAdapter(presenter)
         result.data.forEach { item ->
-          if (item is Album) {
-            if (item.title == null || item.mainArtist() == null) {
-              return@forEach
-            }
-          }
-          rowAdapter.add(item)
-        }
-        withContext(Dispatchers.Main) {
-
-          mRowUpdateMutex.withLock {
-            // update index based on rows deleted
-            var offsetIndex = index
-            for (i in mRowsDeleted) {
-              if (i < offsetIndex) {
-                offsetIndex--
+          when (item) {
+            is Album -> {
+              if (item.title == null || item.mainArtist() == null) {
+                return@forEach
               }
+              rowAdapter.add(item)
             }
 
-            val header = HeaderItem(title)
-            rowsAdapter.replace(offsetIndex, ListRow(header, rowAdapter))
-            rowsAdapter.notifyArrayItemRangeChanged(offsetIndex, 1)
-
+            is Collection, is Artist, is Track -> rowAdapter.add(item)
+            else -> Log.w(TAG, "Skipping unsupported row item in $title: ${(item as Any?)?.javaClass?.name}")
           }
         }
+
+        if (rowAdapter.size() == 0) {
+          Log.d(TAG, "Skipping row with no renderable items: $title")
+          return null
+        }
+
+        return ListRow(HeaderItem(title), rowAdapter)
       }
 
       is ApiResult.Error -> {
-        Log.e(TAG, "Error fetching artist stuff: ${result.exception}")
-        deleteRow(rowsAdapter, index)
-      }
-    }
-
-  }
-
-  private suspend fun deleteRow(rowsAdapter: ArrayObjectAdapter, index: Int) {
-    withContext(Dispatchers.Main) {
-      mRowUpdateMutex.withLock {
-        // Calculate offset index based on rows already deleted
-        var offsetIndex = index
-        for (i in mRowsDeleted) {
-          if (i < offsetIndex) {
-            offsetIndex--
-          }
-        }
-
-        // Only remove if index is valid
-        if (offsetIndex >= 0 && offsetIndex < rowsAdapter.size()) {
-          rowsAdapter.remove(rowsAdapter.get(offsetIndex))
-          rowsAdapter.notifyArrayItemRangeChanged(offsetIndex, 1)
-          mRowsDeleted += index
-        }
+        Log.e(TAG, "Error fetching row $title: ${result.exception}")
+        return null
       }
     }
   }
@@ -254,19 +217,19 @@ abstract class BrowserFragment : BrowseSupportFragment() {
   }
 
   protected fun loadRowsFromDefinitions(rows: List<RowDefinition>) {
-    val rowsAdapter = initRowsAdapter(rows.size)
+    val rowsAdapter = initRowsAdapter()
     adapter = rowsAdapter
 
-    rows.forEachIndexed { index, row ->
-      viewLifecycleOwner.lifecycleScope.launch {
+    viewLifecycleOwner.lifecycleScope.launch {
+      rows.forEach { row ->
         @Suppress("UNCHECKED_CAST")
-        loadRow(
-          rowsAdapter,
-          row.fetcher() as ApiResult<List<Any>>,
-          index,
-          row.title,
-          row.flags
-        )
+        val listRow = buildRow(row.fetcher() as ApiResult<List<Any>>, row.title, row.flags)
+        if (listRow != null) {
+          withContext(Dispatchers.Main) {
+            rowsAdapter.add(listRow)
+            rowsAdapter.notifyArrayItemRangeChanged(rowsAdapter.size() - 1, 1)
+          }
+        }
       }
     }
   }
