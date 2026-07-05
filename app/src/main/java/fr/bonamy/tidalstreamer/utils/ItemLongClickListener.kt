@@ -1,8 +1,6 @@
 package fr.bonamy.tidalstreamer.utils
 
 import android.app.Activity
-import android.app.AlertDialog
-import android.content.DialogInterface
 import android.content.Intent
 import android.util.Log
 import androidx.core.app.ActivityOptionsCompat
@@ -63,44 +61,43 @@ class ItemLongClickedListener(private val mActivity: FragmentActivity, private v
       }
     }
 
-    // show the dialog
-    val builder: AlertDialog.Builder = AlertDialog.Builder(mActivity)
-    builder.setTitle(collection.title())
-    builder.setItems(menuItems.toTypedArray()) { _: DialogInterface?, which: Int ->
+    TvActionDialog.showActions(
+      mActivity,
+      collection.title(),
+      menuItems.map { menuItem ->
+        TvDialogAction(menuItem) {
+          val apiClient = StreamingClient(mActivity)
+          val tracksNeeded = isPlayNow(menuItem) || isPlayNext(menuItem) || isPlayAfter(menuItem)
 
-      val apiClient = StreamingClient(mActivity)
+          mActivity.lifecycleScope.launch {
 
-      val menuChosen = menuItems[which]
-      val tracksNeeded = isPlayNow(menuChosen) || isPlayNext(menuChosen) || isPlayAfter(menuChosen)
+            // first make sure we have tracks
+            if (tracksNeeded && collection.tracks == null) {
+              val metadataClient = MetadataClient(mActivity)
+              if (!metadataClient.fetchTracks(collection)) {
+                return@launch
+              }
+            }
 
-      mActivity.lifecycleScope.launch {
-
-        // first make sure we have tracks
-        if (tracksNeeded && collection.tracks == null) {
-          val metadataClient = MetadataClient(mActivity)
-          if (!metadataClient.fetchTracks(collection)) {
-            return@launch
+            if (isPlayNow(menuItem)) {
+              playTracks(apiClient, collection.tracks!!.toTypedArray())
+            } else if (isPlayNext(menuItem)) {
+              enqueueTracks(apiClient, collection.tracks!!.toTypedArray(), EnqueuePosition.NEXT)
+            } else if (isPlayAfter(menuItem)) {
+              enqueueTracks(apiClient, collection.tracks!!.toTypedArray(), EnqueuePosition.END)
+            } else if (isGoToAlbum(menuItem)) {
+              goToCollection(collection, cardView)
+            } else if (isGoToArtist(menuItem)) {
+              goToArtist((collection as Album).mainArtist()!!)
+            } else if (isGoToArtistPrefix(menuItem)) {
+              val artistName = menuItem.substring(mActivity.getString(R.string.go_to_prefix).length + 1)
+              val artist = (collection as Album).artists!!.find { it.name == artistName }
+              goToArtist(artist!!)
+            }
           }
         }
-
-        if (isPlayNow(menuChosen)) {
-          playTracks(apiClient, collection.tracks!!.toTypedArray())
-        } else if (isPlayNext(menuChosen)) {
-          enqueueTracks(apiClient, collection.tracks!!.toTypedArray(), EnqueuePosition.NEXT)
-        } else if (isPlayAfter(menuChosen)) {
-          enqueueTracks(apiClient, collection.tracks!!.toTypedArray(), EnqueuePosition.END)
-        } else if (isGoToAlbum(menuChosen)) {
-          goToCollection(collection, cardView)
-        } else if (isGoToArtist(menuChosen)) {
-          goToArtist((collection as Album).mainArtist()!!)
-        } else if (isGoToArtistPrefix(menuChosen)) {
-          val artistName = menuChosen.substring(mActivity.getString(R.string.go_to_prefix).length + 1)
-          val artist = (collection as Album).artists!!.find { it.name == artistName }
-          goToArtist(artist!!)
-        }
       }
-    }
-    builder.show()
+    )
   }
 
   private fun onArtistLongClicked(artist: Artist, cardView: ImageCardView?) {
@@ -110,21 +107,21 @@ class ItemLongClickedListener(private val mActivity: FragmentActivity, private v
     menuItems.add(mActivity.getString(R.string.go_to_artist_radio))
     menuItems.add(mActivity.getString(R.string.go_to_artist_info))
 
-    // show the dialog
-    val builder: AlertDialog.Builder = AlertDialog.Builder(mActivity)
-    builder.setTitle(artist.name)
-    builder.setItems(menuItems.toTypedArray()) { _: DialogInterface?, which: Int ->
-
-      val menuChosen = menuItems[which]
-      if (isGoToArtist(menuChosen)) {
-        goToArtist(artist)
-      } else if (isArtistRadio(menuChosen)) {
-        goToArtistRadio(artist, cardView)
-      } else if (isGoToArtistInfo(menuChosen)) {
-        goToArtistInfo(artist)
+    TvActionDialog.showActions(
+      mActivity,
+      artist.name,
+      menuItems.map { menuItem ->
+        TvDialogAction(menuItem) {
+          if (isGoToArtist(menuItem)) {
+            goToArtist(artist)
+          } else if (isArtistRadio(menuItem)) {
+            goToArtistRadio(artist, cardView)
+          } else if (isGoToArtistInfo(menuItem)) {
+            goToArtistInfo(artist)
+          }
+        }
       }
-    }
-    builder.show()
+    )
   }
 
   fun onTrackLongClicked(track: Track, cardView: ImageCardView?, navigationOnly: Boolean = false) {
@@ -157,33 +154,33 @@ class ItemLongClickedListener(private val mActivity: FragmentActivity, private v
     // track radio
     menuItems.add(mActivity.getString(R.string.go_to_track_radio))
 
-    // show the dialog
-    val builder: AlertDialog.Builder = AlertDialog.Builder(mActivity)
-    builder.setTitle("${track.title} - ${track.mainArtist()?.name}")
-    builder.setItems(menuItems.toTypedArray()) { _: DialogInterface?, which: Int ->
+    TvActionDialog.showActions(
+      mActivity,
+      "${track.title} - ${track.mainArtist()?.name}",
+      menuItems.map { menuItem ->
+        TvDialogAction(menuItem) {
+          val apiClient = StreamingClient(mActivity)
 
-      val apiClient = StreamingClient(mActivity)
-
-      val menuChosen = menuItems[which]
-      if (isPlayNow(menuChosen)) {
-        playTracks(apiClient, arrayOf(track))
-      } else if (isPlayNext(menuChosen)) {
-        enqueueTracks(apiClient, arrayOf(track), EnqueuePosition.NEXT)
-      } else if (isPlayAfter(menuChosen)) {
-        enqueueTracks(apiClient, arrayOf(track), EnqueuePosition.END)
-      } else if (isGoToAlbum(menuChosen)) {
-        goToCollection(track.album!!, cardView)
-      } else if (isGoToArtist(menuChosen)) {
-        goToArtist(artists[0])
-      } else if (isGoToArtistPrefix(menuChosen)) {
-        val artistName = menuChosen.substring(mActivity.getString(R.string.go_to_prefix).length + 1)
-        val artist = artists.find { it.name == artistName }
-        goToArtist(artist!!)
-      } else if (isTrackRadio(menuChosen)) {
-        goToTrackRadio(track, cardView)
+          if (isPlayNow(menuItem)) {
+            playTracks(apiClient, arrayOf(track))
+          } else if (isPlayNext(menuItem)) {
+            enqueueTracks(apiClient, arrayOf(track), EnqueuePosition.NEXT)
+          } else if (isPlayAfter(menuItem)) {
+            enqueueTracks(apiClient, arrayOf(track), EnqueuePosition.END)
+          } else if (isGoToAlbum(menuItem)) {
+            goToCollection(track.album!!, cardView)
+          } else if (isGoToArtist(menuItem)) {
+            goToArtist(artists[0])
+          } else if (isGoToArtistPrefix(menuItem)) {
+            val artistName = menuItem.substring(mActivity.getString(R.string.go_to_prefix).length + 1)
+            val artist = artists.find { it.name == artistName }
+            goToArtist(artist!!)
+          } else if (isTrackRadio(menuItem)) {
+            goToTrackRadio(track, cardView)
+          }
+        }
       }
-    }
-    builder.show()
+    )
   }
 
   private fun isPlayNow(menuChosen: String): Boolean {
@@ -304,11 +301,12 @@ class ItemLongClickedListener(private val mActivity: FragmentActivity, private v
       val metadataClient = MetadataClient(mActivity)
       when (val result = metadataClient.fetchArtistInfo(artist.id!!)) {
         is ApiResult.Success -> {
-          // show an alert showing result.text
-          val builder: AlertDialog.Builder = AlertDialog.Builder(mActivity)
-          builder.setTitle(artist.name)
-          builder.setMessage(result.data.getPlainText())
-          builder.show()
+          TvActionDialog.showMessage(
+            context = mActivity,
+            title = artist.name,
+            message = result.data.getPlainText(),
+            actionLabel = "OK"
+          )
         }
 
         is ApiResult.Error -> {

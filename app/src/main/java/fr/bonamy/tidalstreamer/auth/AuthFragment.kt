@@ -1,6 +1,5 @@
 package fr.bonamy.tidalstreamer.auth
 
-import android.app.AlertDialog
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
@@ -25,6 +24,7 @@ import fr.bonamy.tidalstreamer.api.ApiRetrofitClient
 import fr.bonamy.tidalstreamer.api.AuthClient
 import fr.bonamy.tidalstreamer.models.User
 import fr.bonamy.tidalstreamer.utils.Configuration
+import fr.bonamy.tidalstreamer.utils.TvActionDialog
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -218,25 +218,27 @@ class AuthFragment : VerticalGridSupportFragment() {
     codeText.text = "Code: $userCode"
     urlText.text = "https://$verificationUri"
 
-    AlertDialog.Builder(requireContext())
-      .setTitle("Scan to Login")
-      .setView(dialogView)
-      .setMessage("Scan the QR code or visit $verificationUri\n\nWaiting for authentication...")
-      .setPositiveButton("Cancel") { dialog, _ ->
+    TvActionDialog.showMessage(
+      context = requireContext(),
+      title = "Scan to Login",
+      message = "Scan the QR code or visit $verificationUri\n\nWaiting for authentication...",
+      actionLabel = "Cancel",
+      cancelable = false,
+      customView = dialogView,
+      onAction = {
         pollingJob?.cancel()
-        dialog.dismiss()
         loadUsers()
       }
-      .setCancelable(false)
-      .show()
+    )
   }
 
   private fun showErrorDialog(message: String) {
-    AlertDialog.Builder(requireContext())
-      .setTitle("Error")
-      .setMessage(message)
-      .setPositiveButton("OK") { dialog, _ -> dialog.dismiss() }
-      .show()
+    TvActionDialog.showMessage(
+      context = requireContext(),
+      title = "Error",
+      message = message,
+      actionLabel = "OK"
+    )
   }
 
   private fun generateQRCode(text: String, size: Int = 512): Bitmap {

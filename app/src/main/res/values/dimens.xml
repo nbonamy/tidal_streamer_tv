@@ -10,6 +10,8 @@
   <!-- the sum of the two below should be equal to artist_banner_height -->
   <dimen name="artist_banner_bottom_fade_height">75dp</dimen>
   <dimen name="artist_banner_bottom_fade_offset">175dp</dimen>
+  <dimen name="tv_dialog_width">520dp</dimen>
+  <dimen name="tv_dialog_action_spacing">4dp</dimen>
 
   <item name="orb_focused_zoom" type="fraction">110%</item>
 

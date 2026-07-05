@@ -1,8 +1,6 @@
 package fr.bonamy.tidalstreamer.queue
 
 import android.animation.ObjectAnimator
-import android.app.AlertDialog
-import android.content.DialogInterface
 import android.os.Bundle
 import android.util.Log
 import android.view.KeyEvent
@@ -29,6 +27,8 @@ import fr.bonamy.tidalstreamer.models.Status
 import fr.bonamy.tidalstreamer.models.StatusTrack
 import fr.bonamy.tidalstreamer.models.Track
 import fr.bonamy.tidalstreamer.playback.PlaybackFragmentBase
+import fr.bonamy.tidalstreamer.utils.TvActionDialog
+import fr.bonamy.tidalstreamer.utils.TvDialogAction
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 
@@ -463,15 +463,18 @@ class QueueFragment(private var initialStatus: Status?) : PlaybackFragmentBase()
     menuItems.add(getString(R.string.queue_remove))
 
     val title = tracks[position].item?.title ?: getString(R.string.queue_unavailable_track)
-    AlertDialog.Builder(requireContext())
-      .setTitle(title)
-      .setItems(menuItems.toTypedArray()) { _: DialogInterface?, which: Int ->
-        when (menuItems[which]) {
-          getString(R.string.queue_reorder) -> startReorder(position)
-          getString(R.string.queue_remove) -> removeTrack(position)
+    TvActionDialog.showActions(
+      requireContext(),
+      title,
+      menuItems.map { menuItem ->
+        TvDialogAction(menuItem) {
+          when (menuItem) {
+            getString(R.string.queue_reorder) -> startReorder(position)
+            getString(R.string.queue_remove) -> removeTrack(position)
+          }
         }
       }
-      .show()
+    )
   }
 
   private fun showFocusedQueueItemMenu() {
