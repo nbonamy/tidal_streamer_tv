@@ -13,6 +13,7 @@ import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import fr.bonamy.tidalstreamer.R
 import fr.bonamy.tidalstreamer.api.ApiResult
+import fr.bonamy.tidalstreamer.api.StreamerListener
 import fr.bonamy.tidalstreamer.api.StreamingClient
 import fr.bonamy.tidalstreamer.api.UserClient
 import fr.bonamy.tidalstreamer.models.STATE_STOPPED
@@ -40,6 +41,7 @@ abstract class PlaybackFragmentBase : Fragment() {
   private var favoriteLoadingView: View? = null
   private val handler = Handler(Looper.getMainLooper())
   private var currentMediaId: String? = null
+  private var favoriteCheckRequest = 0
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -62,7 +64,7 @@ abstract class PlaybackFragmentBase : Fragment() {
 
   override fun onResume() {
     super.onResume()
-    runUpdate()
+    runFallbackUpdate()
   }
 
   override fun onPause() {
@@ -70,7 +72,7 @@ abstract class PlaybackFragmentBase : Fragment() {
     cancelUpdate()
   }
 
-  protected fun runUpdate() {
+  protected fun runFallbackUpdate() {
     updateTask.run()
   }
 
@@ -79,23 +81,24 @@ abstract class PlaybackFragmentBase : Fragment() {
   }
 
   protected fun scheduleUpdate() {
-    handler.postDelayed(updateTask, REFRESH_INTERVAL)
+    handler.postDelayed(updateTask, FALLBACK_CHECK_INTERVAL)
   }
 
   private val updateTask = Runnable {
-    lifecycleScope.launch {
-      when (val status = apiClient.status()) {
-        is ApiResult.Success -> {
-          processStatus(status.data)
-        }
-
-        is ApiResult.Error -> {
-          hideSelf()
-        }
-      }
+    val listener = StreamerListener.getInstance()
+    if (listener.hasFreshStatus(WEBSOCKET_STATUS_MAX_AGE)) {
+      listener.status?.let { processStatus(it) }
+      scheduleUpdate()
+      return@Runnable
     }
 
-    scheduleUpdate()
+    lifecycleScope.launch {
+      when (val status = apiClient.status()) {
+        is ApiResult.Success -> processStatus(status.data)
+        is ApiResult.Error -> hideSelf()
+      }
+      scheduleUpdate()
+    }
   }
 
   open fun processStatus(status: Status): StatusProcessResult {
@@ -132,22 +135,37 @@ abstract class PlaybackFragmentBase : Fragment() {
       .error(R.drawable.album)
       .into(albumArtView)
 
-    // check favorite status
-    track.id?.let { checkFavoriteStatus(it) }
-
     // update
     currentMediaId = track.id
+
+    // check favorite status
+    track.id?.let { trackId ->
+      val favoriteState = favoriteStates[trackId]
+      if (favoriteState == null) {
+        checkFavoriteStatus(trackId)
+      } else {
+        updateFavoriteUI(favoriteState)
+      }
+    }
     return StatusProcessResult.NEW_TRACK
 
   }
 
   private fun checkFavoriteStatus(trackId: String) {
+    val request = ++favoriteCheckRequest
     heartView?.visibility = View.GONE
     favoriteLoadingView?.visibility = View.VISIBLE
     lifecycleScope.launch {
       when (val result = userClient.isTrackFavorite(trackId)) {
-        is ApiResult.Success -> updateFavoriteUI(result.data)
-        is ApiResult.Error -> updateFavoriteUI(false)
+        is ApiResult.Success -> {
+          if (currentMediaId != trackId || request != favoriteCheckRequest) return@launch
+          favoriteStates[trackId] = result.data
+          updateFavoriteUI(result.data)
+        }
+
+        is ApiResult.Error -> {
+          if (currentMediaId != trackId || request != favoriteCheckRequest) return@launch
+        }
       }
       favoriteLoadingView?.visibility = View.GONE
       heartView?.visibility = View.VISIBLE
@@ -160,7 +178,10 @@ abstract class PlaybackFragmentBase : Fragment() {
       favoriteLoadingView?.visibility = View.VISIBLE
       lifecycleScope.launch {
         when (val result = userClient.toggleTrackFavorite(trackId)) {
-          is ApiResult.Success -> updateFavoriteUI(result.data)
+          is ApiResult.Success -> {
+            favoriteStates[trackId] = result.data
+            updateFavoriteUI(result.data)
+          }
           is ApiResult.Error -> { }
         }
         favoriteLoadingView?.visibility = View.GONE
@@ -172,16 +193,18 @@ abstract class PlaybackFragmentBase : Fragment() {
   private fun updateFavoriteUI(isFavorite: Boolean) {
     if (isFavorite) {
       heartView?.setImageResource(R.drawable.ic_heart)
-      favoriteHintView?.text = "press  ●  to unfavorite"
+      favoriteHintView?.text = getString(R.string.playback_hint_unfavorite)
     } else {
       heartView?.setImageResource(R.drawable.ic_heart_outline)
-      favoriteHintView?.text = "press  ●  to favorite"
+      favoriteHintView?.text = getString(R.string.playback_hint_favorite)
     }
   }
 
   companion object {
     //private const val TAG = "PlaybackFragment"
-    private const val REFRESH_INTERVAL = 1000L
+    private const val FALLBACK_CHECK_INTERVAL = 3000L
+    private const val WEBSOCKET_STATUS_MAX_AGE = 3500L
+    private val favoriteStates = mutableMapOf<String, Boolean>()
   }
 
 }

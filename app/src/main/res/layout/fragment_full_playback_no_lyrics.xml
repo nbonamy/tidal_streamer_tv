@@ -29,7 +29,7 @@
       android:layout_height="wrap_content"
       android:textAlignment="center"
       android:textColor="@android:color/white"
-      android:textSize="32sp"
+      android:textSize="30sp"
       android:maxLines="1"
       android:ellipsize="end"
       android:transitionName="@string/playback_title_transition_name"
@@ -48,7 +48,7 @@
 
     <Space
       android:layout_width="0dp"
-      android:layout_height="32dp" />
+      android:layout_height="28dp" />
 
     <ProgressBar
       android:id="@+id/progress"
@@ -61,11 +61,19 @@
       tools:max="100"
       tools:progress="50" />
 
-    <Space
-      android:layout_width="0dp"
-      android:layout_height="24dp" />
-
-    <include layout="@layout/include_favorite_indicator" />
+    <TextView
+      android:id="@+id/next_track"
+      android:layout_width="300dp"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="24dp"
+      android:ellipsize="end"
+      android:gravity="center"
+      android:maxLines="1"
+      android:textSize="13sp"
+      android:textColor="@color/text_light_faded"
+      android:visibility="gone"
+      tools:text="Next: Alone / The Cure"
+      tools:visibility="visible" />
 
   </LinearLayout>
 
@@ -81,6 +89,32 @@
     <TextView
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
+      android:text="@string/playback_hint_rec"
+      android:textColor="@color/text_light_faded"
+      android:textSize="12sp"
+      android:textStyle="bold" />
+
+    <TextView
+      android:id="@+id/favorite_hint"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginStart="4dp"
+      android:text="@string/playback_hint_favorite"
+      android:textColor="@color/text_light_faded"
+      android:textSize="12sp" />
+
+    <TextView
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginStart="8dp"
+      android:text="●"
+      android:textColor="@color/text_light_faded"
+      android:textSize="12sp" />
+
+    <TextView
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginStart="8dp"
       android:text="@string/playback_hint_jump"
       android:textColor="@color/text_light_faded"
       android:textSize="12sp"

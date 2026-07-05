@@ -27,13 +27,4 @@
 
   </FrameLayout>
 
-  <TextView
-    android:id="@+id/favorite_hint"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_marginStart="6dp"
-    android:textColor="#FF5555"
-    android:textSize="12sp"
-    android:text="press  ●  to favorite" />
-
 </LinearLayout>

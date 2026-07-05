@@ -31,7 +31,7 @@ class PlaybackActivity : TidalActivity() {
   }
 
   override fun canSwitchToPlayback(): Boolean {
-    return currentMode == PlaybackScreenMode.PLAYBACK
+    return false
   }
 
   override fun closeOnGoToKey(): Boolean {
@@ -117,6 +117,10 @@ class PlaybackActivity : TidalActivity() {
 
     val currentFragment = supportFragmentManager.findFragmentById(R.id.playback_fragment)
     val previousMode = if (currentFragment is QueueFragment) PlaybackScreenMode.QUEUE else currentMode
+    if (!immediate && currentFragment != null && previousMode == mode) {
+      return
+    }
+
     currentMode = mode
     currentLayout = if (mode == PlaybackScreenMode.LYRICS) PlaybackLayout.LYRICS else PlaybackLayout.NO_LYRICS
 

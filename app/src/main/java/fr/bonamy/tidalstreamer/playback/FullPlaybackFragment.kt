@@ -38,6 +38,7 @@ class FullPlaybackFragment(private var mLayout: PlaybackLayout, private var mSta
   private var mScrollingLocked = false
   private var mSyncedLyrics = false
   private var mUnlockScrollTimer: Timer? = null
+  private var nextTrackView: TextView? = null
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -57,6 +58,7 @@ class FullPlaybackFragment(private var mLayout: PlaybackLayout, private var mSta
     }
     val v = createView(inflater, container, layoutId) ?: return null
     mLyricsView = v.findViewById(R.id.lyrics)
+    nextTrackView = v.findViewById(R.id.next_track)
 
     // if we have a status
     if (mStatus != null) {
@@ -113,6 +115,7 @@ class FullPlaybackFragment(private var mLayout: PlaybackLayout, private var mSta
 
     // we need the track
     val track = status.currentTrack() ?: return result
+    updateNextTrack(status)
 
     // load lyrics
     if (result == StatusProcessResult.NEW_TRACK && mLyricsView != null) {
@@ -160,6 +163,24 @@ class FullPlaybackFragment(private var mLayout: PlaybackLayout, private var mSta
     // done
     return result
 
+  }
+
+  private fun updateNextTrack(status: Status) {
+    val view = nextTrackView ?: return
+    val nextTrack = status.tracks?.getOrNull(status.position + 1)?.item
+    if (nextTrack == null) {
+      view.visibility = View.GONE
+      return
+    }
+
+    val title = nextTrack.title.orEmpty()
+    val artist = nextTrack.mainArtist()?.name.orEmpty()
+    view.text = if (artist.isBlank()) {
+      getString(R.string.playback_next_track_title_only, title)
+    } else {
+      getString(R.string.playback_next_track, title, artist)
+    }
+    view.visibility = VISIBLE
   }
 
   @Suppress("UNUSED_PARAMETER")

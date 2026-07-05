@@ -3,6 +3,7 @@ package fr.bonamy.tidalstreamer.api
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
+import android.os.SystemClock
 import android.util.Log
 import com.google.gson.Gson
 import fr.bonamy.tidalstreamer.models.Status
@@ -25,6 +26,7 @@ class StreamerListener private constructor() : WebSocketListener() {
   private lateinit var mClient: OkHttpClient
   private lateinit var mWebSocket: WebSocket
   private var mLatestStatus: Status? = null
+  private var mLatestStatusAt: Long = 0L
   private val mListeners = mutableListOf<StreamerEventListener>()
 
   fun addListener(listener: StreamerEventListener) {
@@ -37,6 +39,10 @@ class StreamerListener private constructor() : WebSocketListener() {
 
   val status: Status?
     get() = mLatestStatus
+
+  fun hasFreshStatus(maxAgeMillis: Long): Boolean {
+    return mLatestStatus != null && SystemClock.elapsedRealtime() - mLatestStatusAt <= maxAgeMillis
+  }
 
   fun start(context: Context) {
 
@@ -81,9 +87,11 @@ class StreamerListener private constructor() : WebSocketListener() {
     // decode
     try {
       mLatestStatus = Gson().fromJson(text, Status::class.java)
+      mLatestStatusAt = SystemClock.elapsedRealtime()
     } catch (e: Exception) {
       Log.e(TAG, "Failed to parse status: $e")
       mLatestStatus = null
+      mLatestStatusAt = 0L
       return
     }
 
