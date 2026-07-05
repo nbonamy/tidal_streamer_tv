@@ -92,6 +92,11 @@ abstract class TidalActivity : FragmentActivity() {
       return true
     }
 
+    if (RemoteKey.isAudioMenu(keyCode)) {
+      showCurrentTrackMenu()
+      return true
+    }
+
     // back to home
     if (RemoteKey.isHome(keyCode)) {
       val intent = Intent(this, MainActivity::class.java)
@@ -311,12 +316,30 @@ abstract class TidalActivity : FragmentActivity() {
     }
   }
 
-  protected fun showCurrentTrackMenu(): Boolean {
-    // we need a track
-    val status = StreamerListener.getInstance().status
+  protected fun showCurrentTrackMenu() {
+    if (showCurrentTrackMenu(StreamerListener.getInstance().status)) {
+      return
+    }
+
+    lifecycleScope.launch {
+      when (val result = mApiClient.status()) {
+        is ApiResult.Success -> {
+          if (!showCurrentTrackMenu(result.data)) {
+            Toast.makeText(this@TidalActivity, getString(R.string.error_no_playback), Toast.LENGTH_SHORT).show()
+          }
+        }
+
+        is ApiResult.Error -> {
+          Toast.makeText(this@TidalActivity, getString(R.string.error_no_playback), Toast.LENGTH_SHORT).show()
+        }
+      }
+    }
+  }
+
+  private fun showCurrentTrackMenu(status: Status?): Boolean {
     val track = status?.currentTrack() ?: return false
-    val handler = ItemLongClickedListener(this, if (closeOnGoToKey()) this else null)
-    handler.onTrackLongClicked(track, null, true)
+    ItemLongClickedListener(this, if (closeOnGoToKey()) this else null)
+      .onTrackLongClicked(track, null, true)
     return true
   }
 

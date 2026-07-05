@@ -75,11 +75,6 @@ class PlaybackActivity : TidalActivity() {
       return true
     }
 
-    if (RemoteKey.isAudioMenu(keyCode)) {
-      showCurrentTrackMenu()
-      return true
-    }
-
     if (RemoteKey.isQueue(keyCode)) {
       switchMode(if (currentMode == PlaybackScreenMode.QUEUE) PlaybackScreenMode.PLAYBACK else PlaybackScreenMode.QUEUE)
       return true
