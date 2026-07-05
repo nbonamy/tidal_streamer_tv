@@ -110,15 +110,6 @@ class PlaybackActivity : TidalActivity() {
     return super.onKeyDown(keyCode, event)
   }
 
-  override fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
-    val fragment = supportFragmentManager.findFragmentById(R.id.playback_fragment)
-    if (fragment is QueueFragment && fragment.onKeyUp(keyCode)) {
-      return true
-    }
-
-    return super.onKeyUp(keyCode, event)
-  }
-
   private fun switchMode(mode: PlaybackScreenMode, immediate: Boolean = false) {
     if (!immediate) {
       supportFragmentManager.executePendingTransactions()

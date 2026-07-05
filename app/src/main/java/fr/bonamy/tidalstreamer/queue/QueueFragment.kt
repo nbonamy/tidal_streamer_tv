@@ -189,15 +189,8 @@ class QueueFragment(private var initialStatus: Status?) : PlaybackFragmentBase()
         true
       }
 
-      KeyEvent.KEYCODE_MEDIA_REWIND,
-      KeyEvent.KEYCODE_MEDIA_FAST_FORWARD -> true
-
       else -> false
     }
-  }
-
-  fun onKeyUp(keyCode: Int): Boolean {
-    return keyCode == KeyEvent.KEYCODE_MEDIA_REWIND || keyCode == KeyEvent.KEYCODE_MEDIA_FAST_FORWARD
   }
 
   override fun onQueueItemFocused(position: Int) {
@@ -429,14 +422,12 @@ class QueueFragment(private var initialStatus: Status?) : PlaybackFragmentBase()
 
   private fun handleReorderKey(keyCode: Int): Boolean {
     return when (keyCode) {
-      KeyEvent.KEYCODE_DPAD_UP,
-      KeyEvent.KEYCODE_MEDIA_REWIND -> {
+      KeyEvent.KEYCODE_DPAD_UP -> {
         moveReorderItem(-1)
         true
       }
 
-      KeyEvent.KEYCODE_DPAD_DOWN,
-      KeyEvent.KEYCODE_MEDIA_FAST_FORWARD -> {
+      KeyEvent.KEYCODE_DPAD_DOWN -> {
         moveReorderItem(1)
         true
       }
@@ -458,9 +449,7 @@ class QueueFragment(private var initialStatus: Status?) : PlaybackFragmentBase()
 
   private fun isReorderKey(keyCode: Int): Boolean {
     return keyCode == KeyEvent.KEYCODE_DPAD_UP ||
-      keyCode == KeyEvent.KEYCODE_MEDIA_REWIND ||
       keyCode == KeyEvent.KEYCODE_DPAD_DOWN ||
-      keyCode == KeyEvent.KEYCODE_MEDIA_FAST_FORWARD ||
       keyCode == KeyEvent.KEYCODE_DPAD_CENTER ||
       keyCode == KeyEvent.KEYCODE_ENTER ||
       keyCode == KeyEvent.KEYCODE_BACK
