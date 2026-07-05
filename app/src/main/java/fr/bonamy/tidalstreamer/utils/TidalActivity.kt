@@ -82,23 +82,18 @@ abstract class TidalActivity : FragmentActivity() {
     schedulePlaybackTask()
 
     // playback family
-    if (keyCode == KeyEvent.KEYCODE_INFO) {
+    if (RemoteKey.isDisplay(keyCode)) {
       startPlaybackActivity(PlaybackScreenMode.PLAYBACK)
       return true
     }
 
-    if (keyCode == KeyEvent.KEYCODE_MEDIA_AUDIO_TRACK || keyCode == KeyEvent.KEYCODE_A) {
-      startPlaybackActivity(PlaybackScreenMode.QUEUE)
-      return true
-    }
-
-    if (keyCode == KeyEvent.KEYCODE_CAPTIONS || keyCode == KeyEvent.KEYCODE_C) {
+    if (RemoteKey.isCaptions(keyCode)) {
       startPlaybackActivity(PlaybackScreenMode.LYRICS)
       return true
     }
 
     // back to home
-    if (keyCode == KeyEvent.KEYCODE_PROG_YELLOW || keyCode == KeyEvent.KEYCODE_H) {
+    if (RemoteKey.isHome(keyCode)) {
       val intent = Intent(this, MainActivity::class.java)
       intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
       startActivity(intent)
@@ -106,14 +101,14 @@ abstract class TidalActivity : FragmentActivity() {
     }
 
     // user collection
-    if (keyCode == KeyEvent.KEYCODE_PROG_BLUE || keyCode == KeyEvent.KEYCODE_J) {
+    if (RemoteKey.isUserCollection(keyCode)) {
       val intent = Intent(this, UserActivity::class.java)
       startActivity(intent)
       return true
     }
 
     // user selection / authentication
-    if (keyCode == KeyEvent.KEYCODE_PROG_GREEN || keyCode == KeyEvent.KEYCODE_U) {
+    if (RemoteKey.isUserSelection(keyCode)) {
       val intent = Intent(this, AuthActivity::class.java)
       startActivity(intent)
       return true
@@ -180,9 +175,10 @@ abstract class TidalActivity : FragmentActivity() {
       return true
     }
 
-    // jump for menu
-    if (keyCode == KeyEvent.KEYCODE_LAST_CHANNEL || keyCode == KeyEvent.KEYCODE_J) {
-      return onGoToKey()
+    // queue
+    if (RemoteKey.isQueue(keyCode)) {
+      startPlaybackActivity(PlaybackScreenMode.QUEUE)
+      return true
     }
 
     // try fragment
@@ -315,7 +311,7 @@ abstract class TidalActivity : FragmentActivity() {
     }
   }
 
-  private fun onGoToKey(): Boolean {
+  protected fun showCurrentTrackMenu(): Boolean {
     // we need a track
     val status = StreamerListener.getInstance().status
     val track = status?.currentTrack() ?: return false

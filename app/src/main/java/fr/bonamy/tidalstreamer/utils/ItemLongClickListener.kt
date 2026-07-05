@@ -155,9 +155,7 @@ class ItemLongClickedListener(private val mActivity: FragmentActivity, private v
     }
 
     // track radio
-    if (!navigationOnly) {
-      menuItems.add(mActivity.getString(R.string.go_to_track_radio))
-    }
+    menuItems.add(mActivity.getString(R.string.go_to_track_radio))
 
     // show the dialog
     val builder: AlertDialog.Builder = AlertDialog.Builder(mActivity)

@@ -10,6 +10,7 @@ import androidx.fragment.app.commit
 import androidx.fragment.app.commitNow
 import fr.bonamy.tidalstreamer.R
 import fr.bonamy.tidalstreamer.queue.QueueFragment
+import fr.bonamy.tidalstreamer.utils.RemoteKey
 import fr.bonamy.tidalstreamer.utils.TidalActivity
 
 enum class PlaybackLayout {
@@ -67,17 +68,22 @@ class PlaybackActivity : TidalActivity() {
 
   override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
 
-    if (keyCode == KeyEvent.KEYCODE_CAPTIONS || keyCode == KeyEvent.KEYCODE_C) {
+    if (RemoteKey.isCaptions(keyCode)) {
       switchMode(if (currentMode == PlaybackScreenMode.LYRICS) PlaybackScreenMode.PLAYBACK else PlaybackScreenMode.LYRICS)
       return true
     }
 
-    if (keyCode == KeyEvent.KEYCODE_MEDIA_AUDIO_TRACK || keyCode == KeyEvent.KEYCODE_A) {
+    if (RemoteKey.isAudioMenu(keyCode)) {
+      showCurrentTrackMenu()
+      return true
+    }
+
+    if (RemoteKey.isQueue(keyCode)) {
       switchMode(if (currentMode == PlaybackScreenMode.QUEUE) PlaybackScreenMode.PLAYBACK else PlaybackScreenMode.QUEUE)
       return true
     }
 
-    if (keyCode == KeyEvent.KEYCODE_INFO) {
+    if (RemoteKey.isDisplay(keyCode)) {
       switchMode(PlaybackScreenMode.PLAYBACK)
       return true
     }
@@ -86,7 +92,7 @@ class PlaybackActivity : TidalActivity() {
     val fragment = supportFragmentManager.findFragmentById(R.id.playback_fragment)
 
     // toggle favorite
-    if (keyCode == KeyEvent.KEYCODE_MEDIA_RECORD || keyCode == KeyEvent.KEYCODE_F) {
+    if (RemoteKey.isFavorite(keyCode)) {
       (fragment as? FullPlaybackFragment)?.toggleFavorite()
       return true
     }
