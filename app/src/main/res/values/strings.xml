@@ -21,6 +21,10 @@
   <string name="go_to_artist_radio">Artist Radio</string>
   <string name="go_to_artist_info">Artist Info</string>
   <string name="go_to_track_radio">Track Radio</string>
+  <string name="playback_hint_jump">JUMP</string>
+  <string name="playback_hint_queue">Queue</string>
+  <string name="playback_hint_cc">CC</string>
+  <string name="playback_hint_lyrics">Lyrics</string>
 
   <string name="album_art_description">Album art</string>
   <string name="artist_description">Album art</string>

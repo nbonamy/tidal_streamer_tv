@@ -31,7 +31,7 @@ class PlaybackActivity : TidalActivity() {
   }
 
   override fun canSwitchToPlayback(): Boolean {
-    return currentMode != PlaybackScreenMode.QUEUE
+    return currentMode == PlaybackScreenMode.PLAYBACK
   }
 
   override fun closeOnGoToKey(): Boolean {

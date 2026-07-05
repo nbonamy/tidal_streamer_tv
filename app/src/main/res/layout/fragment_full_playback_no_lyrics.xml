@@ -1,65 +1,124 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
   xmlns:tools="http://schemas.android.com/tools"
   android:layout_width="match_parent"
   android:layout_height="match_parent"
-  android:orientation="vertical"
-  android:gravity="center_horizontal|center_vertical"
   tools:context=".playback.FullPlaybackFragment">
 
-  <ImageView
-    android:id="@+id/album_art"
-    android:layout_width="200dp"
-    android:layout_height="200dp"
-    android:transitionName="@string/playback_album_art_transition_name"
-    android:src="@drawable/album" />
-
-  <Space
-    android:layout_width="0dp"
-    android:layout_height="32dp" />
-
-  <TextView
-    android:id="@+id/title"
+  <LinearLayout
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:textAlignment="center"
-    android:textColor="@android:color/white"
-    android:textSize="32sp"
-    android:maxLines="1"
-    android:ellipsize="end"
-    android:transitionName="@string/playback_title_transition_name"
-    tools:text="I Can Never Say Goodbye" />
+    android:layout_gravity="center"
+    android:gravity="center_horizontal"
+    android:orientation="vertical">
 
-  <TextView
-    android:id="@+id/artist"
+    <ImageView
+      android:id="@+id/album_art"
+      android:layout_width="200dp"
+      android:layout_height="200dp"
+      android:transitionName="@string/playback_album_art_transition_name"
+      android:src="@drawable/album" />
+
+    <Space
+      android:layout_width="0dp"
+      android:layout_height="32dp" />
+
+    <TextView
+      android:id="@+id/title"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:textAlignment="center"
+      android:textColor="@android:color/white"
+      android:textSize="32sp"
+      android:maxLines="1"
+      android:ellipsize="end"
+      android:transitionName="@string/playback_title_transition_name"
+      tools:text="I Can Never Say Goodbye" />
+
+    <TextView
+      android:id="@+id/artist"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:textAlignment="center"
+      android:textSize="24sp"
+      android:maxLines="1"
+      android:ellipsize="end"
+      android:transitionName="@string/playback_artist_transition_name"
+      tools:text="The Cure" />
+
+    <Space
+      android:layout_width="0dp"
+      android:layout_height="32dp" />
+
+    <ProgressBar
+      android:id="@+id/progress"
+      style="?android:attr/progressBarStyleHorizontal"
+      android:layout_width="300dp"
+      android:layout_height="4dp"
+      android:indeterminate="false"
+      android:progressDrawable="@drawable/progress_rounded_corners"
+      android:transitionName="@string/playback_progress_transition_name"
+      tools:max="100"
+      tools:progress="50" />
+
+    <Space
+      android:layout_width="0dp"
+      android:layout_height="24dp" />
+
+    <include layout="@layout/include_favorite_indicator" />
+
+  </LinearLayout>
+
+  <LinearLayout
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:textAlignment="center"
-    android:textSize="24sp"
-    android:maxLines="1"
-    android:ellipsize="end"
-    android:transitionName="@string/playback_artist_transition_name"
-    tools:text="The Cure" />
+    android:layout_gravity="bottom|center_horizontal"
+    android:layout_marginBottom="12dp"
+    android:alpha="0.58"
+    android:gravity="center"
+    android:orientation="horizontal">
 
-  <Space
-    android:layout_width="0dp"
-    android:layout_height="32dp" />
+    <TextView
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="@string/playback_hint_jump"
+      android:textColor="@color/text_light_faded"
+      android:textSize="12sp"
+      android:textStyle="bold" />
 
-  <ProgressBar
-    android:id="@+id/progress"
-    style="?android:attr/progressBarStyleHorizontal"
-    android:layout_width="300dp"
-    android:layout_height="4dp"
-    android:indeterminate="false"
-    android:progressDrawable="@drawable/progress_rounded_corners"
-    android:transitionName="@string/playback_progress_transition_name"
-    tools:max="100"
-    tools:progress="50" />
+    <TextView
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginStart="8dp"
+      android:text="@string/playback_hint_queue"
+      android:textColor="@color/text_light_faded"
+      android:textSize="12sp" />
 
-  <Space
-    android:layout_width="0dp"
-    android:layout_height="24dp" />
+    <TextView
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginStart="8dp"
+      android:text="●"
+      android:textColor="@color/text_light_faded"
+      android:textSize="12sp" />
 
-  <include layout="@layout/include_favorite_indicator" />
+    <TextView
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginStart="8dp"
+      android:text="@string/playback_hint_cc"
+      android:textColor="@color/text_light_faded"
+      android:textSize="12sp"
+      android:textStyle="bold" />
 
-</LinearLayout>
+    <TextView
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginStart="8dp"
+      android:text="@string/playback_hint_lyrics"
+      android:textColor="@color/text_light_faded"
+      android:textSize="12sp" />
+
+  </LinearLayout>
+
+</FrameLayout>
