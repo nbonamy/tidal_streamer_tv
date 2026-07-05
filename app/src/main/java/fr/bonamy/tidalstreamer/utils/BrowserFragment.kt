@@ -38,7 +38,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.util.Timer
 import java.util.TimerTask
 
@@ -220,23 +219,32 @@ abstract class BrowserFragment : BrowseSupportFragment() {
 
   protected fun loadRowsFromDefinitions(rows: List<RowDefinition>) {
     val rowsAdapter = initRowsAdapter()
+    val rowLoaded = BooleanArray(rows.size)
+
+    rows.forEach {
+      rowsAdapter.add(ListRow(HeaderItem(""), ArrayObjectAdapter()))
+    }
+    adapter = rowsAdapter
 
     viewLifecycleOwner.lifecycleScope.launch {
-      val rowResults = rows.map { row ->
+      rows.mapIndexed { index, row ->
         async {
           @Suppress("UNCHECKED_CAST")
-          row to row.fetcher() as ApiResult<List<Any>>
+          val listRow = buildRow(row.fetcher() as ApiResult<List<Any>>, row.title, row.flags)
+          if (listRow != null && index < rowsAdapter.size()) {
+            rowsAdapter.replace(index, listRow)
+            rowsAdapter.notifyArrayItemRangeChanged(index, 1)
+            rowLoaded[index] = true
+          }
         }
       }.awaitAll()
 
-      rowResults.mapNotNull { (row, result) ->
-        @Suppress("UNCHECKED_CAST")
-        buildRow(result, row.title, row.flags)
-      }.forEach { row ->
-        rowsAdapter.add(row)
+      for (index in rows.indices.reversed()) {
+        if (!rowLoaded[index] && index < rowsAdapter.size()) {
+          rowsAdapter.remove(rowsAdapter.get(index))
+          rowsAdapter.notifyArrayItemRangeChanged(index, 1)
+        }
       }
-
-      adapter = rowsAdapter
     }
   }
 
