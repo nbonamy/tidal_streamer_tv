@@ -21,6 +21,7 @@ import fr.bonamy.tidalstreamer.models.STATE_STOPPED
 import fr.bonamy.tidalstreamer.models.Status
 import fr.bonamy.tidalstreamer.playback.MiniPlaybackFragment
 import fr.bonamy.tidalstreamer.playback.PlaybackActivity
+import fr.bonamy.tidalstreamer.queue.QueueActivity
 import fr.bonamy.tidalstreamer.user.UserActivity
 import kotlinx.coroutines.launch
 import kotlin.math.min
@@ -83,6 +84,13 @@ abstract class TidalActivity : FragmentActivity() {
     // playback
     if (keyCode == KeyEvent.KEYCODE_INFO || keyCode == KeyEvent.KEYCODE_I) {
       startPlaybackActivity()
+      return true
+    }
+
+    // queue
+    if (keyCode == KeyEvent.KEYCODE_MEDIA_AUDIO_TRACK || keyCode == KeyEvent.KEYCODE_A) {
+      val intent = Intent(this, QueueActivity::class.java)
+      startActivity(intent)
       return true
     }
 

@@ -91,6 +91,36 @@ class StreamingClient(mContext: Context) : ApiClient() {
     }
   }
 
+  suspend fun trackSeek(position: Int): ApiResult<String> = withContext(Dispatchers.IO) {
+    try {
+      Log.i(TAG, "trackSeek $position")
+      val response = apiService.trackSeek(position)
+      fetchResponse(response)
+    } catch (e: Exception) {
+      ApiResult.Error(e)
+    }
+  }
+
+  suspend fun dequeue(position: Int): ApiResult<String> = withContext(Dispatchers.IO) {
+    try {
+      Log.i(TAG, "dequeue $position")
+      val response = apiService.dequeue(position)
+      fetchResponse(response)
+    } catch (e: Exception) {
+      ApiResult.Error(e)
+    }
+  }
+
+  suspend fun reorderQueue(from: Int, to: Int): ApiResult<String> = withContext(Dispatchers.IO) {
+    try {
+      Log.i(TAG, "reorderQueue $from $to")
+      val response = apiService.reorderQueue(from, to)
+      fetchResponse(response)
+    } catch (e: Exception) {
+      ApiResult.Error(e)
+    }
+  }
+
   suspend fun volumeUp(): ApiResult<String> = withContext(Dispatchers.IO) {
     try {
       Log.i(TAG, "volumeUp")

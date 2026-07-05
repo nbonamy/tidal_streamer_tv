@@ -1,6 +1,14 @@
 <resources>
 
   <string name="app_name">TIDAL Streamer</string>
+  <string name="queue_action_error">Queue update failed</string>
+  <string name="queue_empty_message">Queue is empty</string>
+  <string name="queue_empty_title">Nothing playing</string>
+  <string name="queue_label">QUEUE</string>
+  <string name="queue_label_position_count">QUEUE • %1$d OF %2$d</string>
+  <string name="queue_reorder">Reorder</string>
+  <string name="queue_remove">Remove from queue</string>
+  <string name="queue_unavailable_track">Unavailable track</string>
   <string name="browse_main_title">TIDAL        </string>
   <string name="browse_user_title">Collection</string>
 

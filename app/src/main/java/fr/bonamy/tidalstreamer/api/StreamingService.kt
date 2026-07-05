@@ -33,6 +33,15 @@ interface StreamingService {
   @POST("/timeseek/{position}")
   suspend fun seek(@Path("position") position: Int): Response<ApiResponse<String>>
 
+  @POST("/trackseek/{position}")
+  suspend fun trackSeek(@Path("position") position: Int): Response<ApiResponse<String>>
+
+  @POST("/dequeue/{position}")
+  suspend fun dequeue(@Path("position") position: Int): Response<ApiResponse<String>>
+
+  @POST("/reorderqueue/{from}/{to}")
+  suspend fun reorderQueue(@Path("from") from: Int, @Path("to") to: Int): Response<ApiResponse<String>>
+
   @POST("/volume/up")
   suspend fun volumeUp(): Response<ApiResponse<String>>
 

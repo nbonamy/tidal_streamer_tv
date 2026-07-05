@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  android:background="@drawable/default_background"
+  tools:context=".queue.QueueActivity"
+  tools:deviceIds="tv">
+
+  <LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:baselineAligned="false"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingStart="64dp"
+    android:paddingTop="40dp"
+    android:paddingEnd="56dp"
+    android:paddingBottom="40dp">
+
+    <FrameLayout
+      android:layout_width="360dp"
+      android:layout_height="match_parent">
+
+      <TextView
+        android:id="@+id/queue_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/queue_label"
+        android:textColor="@color/button_bg_color"
+        android:textSize="14sp"
+        android:textStyle="bold" />
+
+      <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:gravity="center_vertical"
+        android:orientation="vertical">
+
+        <ImageView
+          android:id="@+id/queue_album_art"
+          android:layout_width="220dp"
+          android:layout_height="220dp"
+          android:layout_gravity="center_horizontal"
+          android:scaleType="centerCrop"
+          android:src="@drawable/album" />
+
+        <TextView
+          android:id="@+id/queue_current_title"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="22dp"
+          android:ellipsize="end"
+          android:gravity="center"
+          android:maxLines="2"
+          android:textColor="@color/text_light_normal"
+          android:textSize="25sp"
+          tools:text="A Fragile Thing" />
+
+        <TextView
+          android:id="@+id/queue_current_artist"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="8dp"
+          android:ellipsize="end"
+          android:gravity="center"
+          android:maxLines="1"
+          android:textColor="@color/text_light_faded"
+          android:textSize="19sp"
+          tools:text="The Cure" />
+
+        <ProgressBar
+          android:id="@+id/queue_progress"
+          style="?android:attr/progressBarStyleHorizontal"
+          android:layout_width="300dp"
+          android:layout_height="4dp"
+          android:layout_gravity="center_horizontal"
+          android:layout_marginTop="28dp"
+          android:indeterminate="false"
+          android:progressDrawable="@drawable/progress_rounded_corners"
+          tools:max="100"
+          tools:progress="50" />
+
+      </LinearLayout>
+
+    </FrameLayout>
+
+    <View
+      android:layout_width="1dp"
+      android:layout_height="match_parent"
+      android:layout_marginStart="48dp"
+      android:layout_marginEnd="48dp"
+      android:background="#22FFFFFF" />
+
+    <FrameLayout
+      android:layout_width="0dp"
+      android:layout_height="match_parent"
+      android:layout_weight="1">
+
+      <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/queue_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:fadeScrollbars="false"
+        android:paddingTop="6dp"
+        android:paddingBottom="6dp"
+        android:scrollbarStyle="outsideOverlay"
+        android:scrollbars="none"
+        tools:listitem="@layout/item_queue_track" />
+
+      <TextView
+        android:id="@+id/queue_empty"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:text="@string/queue_empty_message"
+        android:textColor="@color/text_light_faded"
+        android:textSize="24sp"
+        android:visibility="gone" />
+
+    </FrameLayout>
+
+  </LinearLayout>
+
+</FrameLayout>
