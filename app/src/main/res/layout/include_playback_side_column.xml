@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
   xmlns:tools="http://schemas.android.com/tools"
-  android:layout_width="150dp"
+  android:layout_width="175dp"
   android:layout_height="match_parent"
   android:gravity="center_horizontal"
   android:orientation="vertical"
@@ -9,8 +9,8 @@
 
   <ImageView
     android:id="@+id/album_art"
-    android:layout_width="150dp"
-    android:layout_height="150dp"
+    android:layout_width="175dp"
+    android:layout_height="175dp"
     android:contentDescription="@string/album_art_description"
     android:src="@drawable/album"
     android:transitionName="@string/playback_album_art_transition_name" />
