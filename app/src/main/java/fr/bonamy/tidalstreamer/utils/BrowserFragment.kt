@@ -35,6 +35,8 @@ import fr.bonamy.tidalstreamer.models.Track
 import fr.bonamy.tidalstreamer.search.SearchActivity
 import fr.bonamy.tidalstreamer.search.TrackCardPresenter
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Timer
@@ -218,19 +220,23 @@ abstract class BrowserFragment : BrowseSupportFragment() {
 
   protected fun loadRowsFromDefinitions(rows: List<RowDefinition>) {
     val rowsAdapter = initRowsAdapter()
-    adapter = rowsAdapter
 
     viewLifecycleOwner.lifecycleScope.launch {
-      rows.forEach { row ->
-        @Suppress("UNCHECKED_CAST")
-        val listRow = buildRow(row.fetcher() as ApiResult<List<Any>>, row.title, row.flags)
-        if (listRow != null) {
-          withContext(Dispatchers.Main) {
-            rowsAdapter.add(listRow)
-            rowsAdapter.notifyArrayItemRangeChanged(rowsAdapter.size() - 1, 1)
-          }
+      val rowResults = rows.map { row ->
+        async {
+          @Suppress("UNCHECKED_CAST")
+          row to row.fetcher() as ApiResult<List<Any>>
         }
+      }.awaitAll()
+
+      rowResults.mapNotNull { (row, result) ->
+        @Suppress("UNCHECKED_CAST")
+        buildRow(result, row.title, row.flags)
+      }.forEach { row ->
+        rowsAdapter.add(row)
       }
+
+      adapter = rowsAdapter
     }
   }
 
