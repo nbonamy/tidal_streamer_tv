@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  android:orientation="horizontal"
+  android:padding="64dp"
+  tools:context=".queue.QueueFragment">
+
+  <include layout="@layout/include_playback_side_column" />
+
+  <LinearLayout
+    android:layout_width="0dp"
+    android:layout_height="match_parent"
+    android:layout_marginStart="75dp"
+    android:layout_weight="1"
+    android:orientation="vertical">
+
+    <TextView
+      android:id="@+id/queue_label"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:text="@string/queue_label"
+      android:textColor="@color/button_bg_color"
+      android:textSize="14sp"
+      android:textStyle="bold" />
+
+    <androidx.recyclerview.widget.RecyclerView
+      android:id="@+id/queue_list"
+      android:layout_width="match_parent"
+      android:layout_height="0dp"
+      android:layout_weight="1"
+      android:clipToPadding="false"
+      android:fadeScrollbars="false"
+      android:layout_marginTop="20dp"
+      android:paddingBottom="6dp"
+      android:scrollbarStyle="outsideOverlay"
+      android:scrollbars="none"
+      tools:listitem="@layout/item_queue_track" />
+
+    <TextView
+      android:id="@+id/queue_empty"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_gravity="center"
+      android:gravity="center"
+      android:text="@string/queue_empty_message"
+      android:textColor="@color/text_light_faded"
+      android:textSize="24sp"
+      android:visibility="gone" />
+
+  </LinearLayout>
+
+</LinearLayout>

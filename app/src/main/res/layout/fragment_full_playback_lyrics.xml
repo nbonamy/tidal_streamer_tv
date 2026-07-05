@@ -7,68 +7,7 @@
   android:padding="64dp"
   tools:context=".playback.FullPlaybackFragment">
 
-  <LinearLayout
-    android:layout_width="150dp"
-    android:layout_height="match_parent"
-    android:gravity="center_horizontal"
-    android:orientation="vertical">
-
-    <ImageView
-      android:id="@+id/album_art"
-      android:layout_width="150dp"
-      android:layout_height="150dp"
-      android:contentDescription="@string/album_art_description"
-      android:transitionName="@string/playback_album_art_transition_name"
-      android:src="@drawable/album" />
-
-    <Space
-      android:layout_width="0dp"
-      android:layout_height="32dp" />
-
-    <TextView
-      android:id="@+id/title"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:textAlignment="center"
-      android:textSize="24sp"
-      android:transitionName="@string/playback_title_transition_name"
-      tools:text="I Can Never Say Goodbye" />
-
-    <Space
-      android:layout_width="0dp"
-      android:layout_height="16dp" />
-
-    <TextView
-      android:id="@+id/artist"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:textAlignment="center"
-      android:textSize="16sp"
-      android:transitionName="@string/playback_artist_transition_name"
-      tools:text="The Cure" />
-
-    <Space
-      android:layout_width="0dp"
-      android:layout_height="32dp" />
-
-    <ProgressBar
-      android:id="@+id/progress"
-      style="?android:attr/progressBarStyleHorizontal"
-      android:layout_width="150dp"
-      android:layout_height="4dp"
-      android:indeterminate="false"
-      android:progressDrawable="@drawable/progress_rounded_corners"
-      android:transitionName="@string/playback_progress_transition_name"
-      tools:max="100"
-      tools:progress="50" />
-
-    <Space
-      android:layout_width="0dp"
-      android:layout_height="16dp" />
-
-    <include layout="@layout/include_favorite_indicator" />
-
-  </LinearLayout>
+  <include layout="@layout/include_playback_side_column" />
 
   <ScrollView
     android:id="@+id/scroll"

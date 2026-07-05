@@ -57,10 +57,6 @@
       android:launchMode="singleTop"
       android:exported="false" />
     <activity
-      android:name=".queue.QueueActivity"
-      android:launchMode="singleTop"
-      android:exported="false" />
-    <activity
       android:name=".BrowseErrorActivity"
       android:exported="false" />
   </application>

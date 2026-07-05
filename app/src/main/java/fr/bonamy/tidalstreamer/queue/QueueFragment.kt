@@ -4,8 +4,11 @@ import android.animation.ObjectAnimator
 import android.app.AlertDialog
 import android.content.DialogInterface
 import android.os.Bundle
+import android.util.Log
 import android.view.KeyEvent
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
@@ -13,6 +16,7 @@ import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.transition.TransitionInflater
 import com.bumptech.glide.Glide
 import fr.bonamy.tidalstreamer.R
 import fr.bonamy.tidalstreamer.api.ApiResult
@@ -24,21 +28,21 @@ import fr.bonamy.tidalstreamer.models.STATE_STOPPED
 import fr.bonamy.tidalstreamer.models.Status
 import fr.bonamy.tidalstreamer.models.StatusTrack
 import fr.bonamy.tidalstreamer.models.Track
-import fr.bonamy.tidalstreamer.utils.TidalActivity
+import fr.bonamy.tidalstreamer.playback.PlaybackFragmentBase
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 
-class QueueActivity : TidalActivity(), QueueAdapter.Listener, StreamerEventListener {
+class QueueFragment(private var initialStatus: Status?) : PlaybackFragmentBase(), QueueAdapter.Listener, StreamerEventListener {
 
   private lateinit var streamingClient: StreamingClient
   private lateinit var adapter: QueueAdapter
   private lateinit var queueList: RecyclerView
   private lateinit var emptyView: TextView
+  private lateinit var countView: TextView
+  private lateinit var progressView: ProgressBar
   private lateinit var albumArtView: ImageView
   private lateinit var titleView: TextView
   private lateinit var artistView: TextView
-  private lateinit var countView: TextView
-  private lateinit var progressView: ProgressBar
 
   private val tracks = mutableListOf<StatusTrack>()
   private var currentPosition = -1
@@ -52,29 +56,38 @@ class QueueActivity : TidalActivity(), QueueAdapter.Listener, StreamerEventListe
   private var serverPlayingTrackId: String? = null
   private var pendingReorderPlayingTrackId: String? = null
 
-  override fun hasMiniPlayback(): Boolean = false
-
-  override fun canSwitchToPlayback(): Boolean = false
-
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setContentView(R.layout.activity_queue)
-
-    streamingClient = StreamingClient(this)
+    sharedElementEnterTransition = TransitionInflater.from(requireContext()).inflateTransition(R.transition.fragment_transition)
+    sharedElementReturnTransition = TransitionInflater.from(requireContext()).inflateTransition(R.transition.fragment_transition)
+    streamingClient = StreamingClient(requireContext())
     adapter = QueueAdapter(this)
+  }
 
-    queueList = findViewById(R.id.queue_list)
-    emptyView = findViewById(R.id.queue_empty)
-    albumArtView = findViewById(R.id.queue_album_art)
-    titleView = findViewById(R.id.queue_current_title)
-    artistView = findViewById(R.id.queue_current_artist)
-    countView = findViewById(R.id.queue_label)
-    progressView = findViewById(R.id.queue_progress)
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?
+  ): View? {
+    val view = createView(inflater, container, R.layout.fragment_queue) ?: return null
 
-    queueList.layoutManager = LinearLayoutManager(this)
+    queueList = view.findViewById(R.id.queue_list)
+    emptyView = view.findViewById(R.id.queue_empty)
+    countView = view.findViewById(R.id.queue_label)
+    progressView = view.findViewById(R.id.progress)
+    albumArtView = view.findViewById(R.id.album_art)
+    titleView = view.findViewById(R.id.title)
+    artistView = view.findViewById(R.id.artist)
+
+    queueList.layoutManager = LinearLayoutManager(requireContext())
     queueList.adapter = adapter
 
-    refreshStatus(focusCurrent = true)
+    initialStatus?.let {
+      showStatus(it, focusCurrent = true, requestedFocusPosition = RecyclerView.NO_POSITION, scrollToFocus = true)
+      initialStatus = null
+    }
+
+    return view
   }
 
   override fun onResume() {
@@ -87,18 +100,42 @@ class QueueActivity : TidalActivity(), QueueAdapter.Listener, StreamerEventListe
     StreamerListener.getInstance().removeListener(this)
   }
 
-  override fun onStatus(status: Status) {
-    runOnUiThread {
-      updateStatus(status)
-    }
+  override fun showSelf() {
   }
 
-  override fun dispatchKeyEvent(event: KeyEvent): Boolean {
+  override fun hideSelf() {
+    showEmpty()
+  }
+
+  fun latestStatus(): Status? = StreamerListener.getInstance().status
+
+  override fun onStatus(status: Status) {
+    cancelUpdate()
+    try {
+      viewLifecycleOwner.lifecycleScope.launch {
+        updateStatus(status)
+      }
+    } catch (e: Exception) {
+      Log.e(TAG, "Failed to process status: $e")
+    }
+    scheduleUpdate()
+  }
+
+  override fun processStatus(status: Status): fr.bonamy.tidalstreamer.playback.StatusProcessResult {
+    if (tracks.isEmpty()) {
+      showStatus(status, focusCurrent = true, requestedFocusPosition = RecyclerView.NO_POSITION, scrollToFocus = true)
+    } else {
+      updateStatus(status)
+    }
+    return fr.bonamy.tidalstreamer.playback.StatusProcessResult.SAME_TRACK
+  }
+
+  fun dispatchKeyEvent(event: KeyEvent): Boolean {
     if (isReorderMode) {
       return when (event.action) {
         KeyEvent.ACTION_DOWN -> handleReorderKey(event.keyCode)
         KeyEvent.ACTION_UP -> isReorderKey(event.keyCode)
-        else -> super.dispatchKeyEvent(event)
+        else -> false
       }
     }
 
@@ -126,14 +163,15 @@ class QueueActivity : TidalActivity(), QueueAdapter.Listener, StreamerEventListe
           true
         }
 
-        else -> super.dispatchKeyEvent(event)
+        else -> false
       }
     }
 
-    return super.dispatchKeyEvent(event)
+    return false
   }
 
-  override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+  @Suppress("UNUSED_PARAMETER")
+  fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
     if (isReorderMode) {
       return handleReorderKey(keyCode)
     }
@@ -151,25 +189,15 @@ class QueueActivity : TidalActivity(), QueueAdapter.Listener, StreamerEventListe
         true
       }
 
-      KeyEvent.KEYCODE_MEDIA_REWIND -> {
-        true
-      }
-
-      KeyEvent.KEYCODE_MEDIA_FAST_FORWARD -> {
-        true
-      }
-
-      else -> super.onKeyDown(keyCode, event)
-    }
-  }
-
-  override fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
-    return when (keyCode) {
       KeyEvent.KEYCODE_MEDIA_REWIND,
       KeyEvent.KEYCODE_MEDIA_FAST_FORWARD -> true
 
-      else -> super.onKeyUp(keyCode, event)
+      else -> false
     }
+  }
+
+  fun onKeyUp(keyCode: Int): Boolean {
+    return keyCode == KeyEvent.KEYCODE_MEDIA_REWIND || keyCode == KeyEvent.KEYCODE_MEDIA_FAST_FORWARD
   }
 
   override fun onQueueItemFocused(position: Int) {
@@ -292,7 +320,7 @@ class QueueActivity : TidalActivity(), QueueAdapter.Listener, StreamerEventListe
     )
 
     if (currentTrackId != track.id) {
-      Glide.with(this@QueueActivity)
+      Glide.with(this@QueueFragment)
         .load(track.imageUrl())
         .centerCrop()
         .error(R.drawable.album)
@@ -341,7 +369,7 @@ class QueueActivity : TidalActivity(), QueueAdapter.Listener, StreamerEventListe
   }
 
   private fun updateProgress(track: Track, progress: Int?, state: String?) {
-    progressView.progressDrawable = getDrawable(
+    progressView.progressDrawable = requireContext().getDrawable(
       if (state == STATE_PLAYING) R.drawable.progress_rounded_corners else
         R.drawable.progress_disabled_rounded_corners
     )
@@ -395,10 +423,6 @@ class QueueActivity : TidalActivity(), QueueAdapter.Listener, StreamerEventListe
     }
   }
 
-  private fun moveFocusedTrack(delta: Int) {
-    if (isReorderMode) moveReorderItem(delta)
-  }
-
   private fun isConfirmKey(keyCode: Int): Boolean {
     return keyCode == KeyEvent.KEYCODE_DPAD_CENTER || keyCode == KeyEvent.KEYCODE_ENTER
   }
@@ -450,7 +474,7 @@ class QueueActivity : TidalActivity(), QueueAdapter.Listener, StreamerEventListe
     menuItems.add(getString(R.string.queue_remove))
 
     val title = tracks[position].item?.title ?: getString(R.string.queue_unavailable_track)
-    AlertDialog.Builder(this)
+    AlertDialog.Builder(requireContext())
       .setTitle(title)
       .setItems(menuItems.toTypedArray()) { _: DialogInterface?, which: Int ->
         when (menuItems[which]) {
@@ -587,7 +611,7 @@ class QueueActivity : TidalActivity(), QueueAdapter.Listener, StreamerEventListe
   }
 
   private fun showActionError() {
-    Toast.makeText(this, getString(R.string.queue_action_error), Toast.LENGTH_SHORT).show()
+    Toast.makeText(requireContext(), getString(R.string.queue_action_error), Toast.LENGTH_SHORT).show()
   }
 
   private fun focusQueuePosition(position: Int) {
@@ -624,6 +648,7 @@ class QueueActivity : TidalActivity(), QueueAdapter.Listener, StreamerEventListe
   }
 
   companion object {
+    private const val TAG = "QueueFragment"
     private const val REORDER_SCROLL_FOCUS_DELAY = 180L
   }
 }

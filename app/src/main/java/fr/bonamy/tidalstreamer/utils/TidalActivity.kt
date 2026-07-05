@@ -21,7 +21,7 @@ import fr.bonamy.tidalstreamer.models.STATE_STOPPED
 import fr.bonamy.tidalstreamer.models.Status
 import fr.bonamy.tidalstreamer.playback.MiniPlaybackFragment
 import fr.bonamy.tidalstreamer.playback.PlaybackActivity
-import fr.bonamy.tidalstreamer.queue.QueueActivity
+import fr.bonamy.tidalstreamer.playback.PlaybackScreenMode
 import fr.bonamy.tidalstreamer.user.UserActivity
 import kotlinx.coroutines.launch
 import kotlin.math.min
@@ -81,16 +81,19 @@ abstract class TidalActivity : FragmentActivity() {
     // reschedule playback task
     schedulePlaybackTask()
 
-    // playback
-    if (keyCode == KeyEvent.KEYCODE_INFO || keyCode == KeyEvent.KEYCODE_I) {
-      startPlaybackActivity()
+    // playback family
+    if (keyCode == KeyEvent.KEYCODE_INFO) {
+      startPlaybackActivity(PlaybackScreenMode.PLAYBACK)
       return true
     }
 
-    // queue
     if (keyCode == KeyEvent.KEYCODE_MEDIA_AUDIO_TRACK || keyCode == KeyEvent.KEYCODE_A) {
-      val intent = Intent(this, QueueActivity::class.java)
-      startActivity(intent)
+      startPlaybackActivity(PlaybackScreenMode.QUEUE)
+      return true
+    }
+
+    if (keyCode == KeyEvent.KEYCODE_CAPTIONS || keyCode == KeyEvent.KEYCODE_C) {
+      startPlaybackActivity(PlaybackScreenMode.LYRICS)
       return true
     }
 
@@ -244,7 +247,7 @@ abstract class TidalActivity : FragmentActivity() {
           when (val status = mApiClient.status()) {
             is ApiResult.Success -> {
               if (status.data.state == STATE_PLAYING) {
-                startPlaybackActivity()
+                startPlaybackActivity(PlaybackScreenMode.PLAYBACK)
               }
             }
 
@@ -292,12 +295,14 @@ abstract class TidalActivity : FragmentActivity() {
     }
   }
 
-  private fun startPlaybackActivity() {
+  private fun startPlaybackActivity(mode: PlaybackScreenMode) {
     lifecycleScope.launch {
       when (val result = mApiClient.status()) {
         is ApiResult.Success -> {
-          if (result.data.state != STATE_STOPPED) {
+          if (result.data.state != STATE_STOPPED || mode == PlaybackScreenMode.QUEUE) {
             val intent = Intent(this@TidalActivity, PlaybackActivity::class.java)
+            intent.putExtra(PlaybackActivity.EXTRA_MODE, mode.name)
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
             startActivity(intent)
           } else {
             Toast.makeText(this@TidalActivity, getString(R.string.error_no_playback), Toast.LENGTH_SHORT).show()
