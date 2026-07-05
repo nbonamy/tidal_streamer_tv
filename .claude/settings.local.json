@@ -3,7 +3,10 @@
     "allow": [
       "Bash(cat:*)",
       "Bash(./gradlew assembleDebug:*)",
-      "Bash(./gradlew assembleRelease:*)"
+      "Bash(./gradlew assembleRelease:*)",
+      "Bash(ssh:*)",
+      "Bash(git push)",
+      "Bash(git checkout:*)"
     ],
     "deny": [],
     "ask": []
