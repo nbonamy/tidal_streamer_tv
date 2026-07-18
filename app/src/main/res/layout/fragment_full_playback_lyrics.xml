@@ -9,23 +9,37 @@
 
   <include layout="@layout/include_playback_side_column" />
 
-  <ScrollView
-    android:id="@+id/scroll"
+  <FrameLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginStart="75dp"
-    android:fadingEdge="vertical"
-    android:requiresFadingEdge="vertical"
-    android:fadingEdgeLength="50dp"
-    android:scrollbars="none">
+    android:layout_marginStart="75dp">
 
-    <LinearLayout
-      android:id="@+id/lyrics"
+    <ScrollView
+      android:id="@+id/scroll"
       android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:orientation="vertical"
-      android:visibility="invisible" />
+      android:layout_height="match_parent"
+      android:fadingEdge="vertical"
+      android:requiresFadingEdge="vertical"
+      android:fadingEdgeLength="50dp"
+      android:scrollbars="none"
+      android:visibility="invisible">
 
-  </ScrollView>
+      <LinearLayout
+        android:id="@+id/lyrics"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" />
+
+    </ScrollView>
+
+    <ProgressBar
+      android:id="@+id/lyrics_loading"
+      style="?android:attr/progressBarStyleLarge"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_gravity="center"
+      android:visibility="visible" />
+
+  </FrameLayout>
 
 </LinearLayout>

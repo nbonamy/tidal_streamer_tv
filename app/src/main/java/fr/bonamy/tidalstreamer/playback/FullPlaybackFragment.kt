@@ -37,10 +37,13 @@ class FullPlaybackFragment(private var mLayout: PlaybackLayout, private var mSta
 
   private var mLyricsLines = mutableListOf<LyricsLine>()
   private var mLyricsView: ViewGroup? = null
+  private var mLyricsLoadingView: ProgressBar? = null
   private val mLinesViews = mutableMapOf<LyricsLine, TextView>()
   private var mCurrentLine: LyricsLine? = null
   private var mScrollingLocked = false
   private var mSyncedLyrics = false
+  private var mLyricsReady = false
+  private var mLyricsRenderGeneration = 0
   private var mUnlockScrollTimer: Timer? = null
   private var nextTrackView: TextView? = null
   private var shortcutsView: View? = null
@@ -69,6 +72,7 @@ class FullPlaybackFragment(private var mLayout: PlaybackLayout, private var mSta
     }
     val v = createView(inflater, container, layoutId) ?: return null
     mLyricsView = v.findViewById(R.id.lyrics)
+    mLyricsLoadingView = v.findViewById(R.id.lyrics_loading)
     nextTrackView = v.findViewById(R.id.next_track)
     shortcutsView = v.findViewById(R.id.playback_shortcuts)
     revealTransientPlaybackInfo()
@@ -142,22 +146,25 @@ class FullPlaybackFragment(private var mLayout: PlaybackLayout, private var mSta
 
     // load lyrics
     if (result == StatusProcessResult.NEW_TRACK && mLyricsView != null) {
+      val requestedTrackId = track.id ?: return result
+      showLyricsLoading()
 
       // do we already have lyrics
-      if (mLyrics != null && mLyrics!!.trackId == track.id) {
+      if (mLyrics != null && mLyrics!!.trackId == requestedTrackId) {
         updateLyrics(mLyrics)
-        syncLyrics(status, true)
+        syncLyrics(status, true, false)
       } else {
         lifecycleScope.launch {
           val metadataClient = MetadataClient(requireContext())
-          when (val lyrics = metadataClient.fetchTrackLyrics(track.id!!)) {
+          when (val lyrics = metadataClient.fetchTrackLyrics(requestedTrackId)) {
             is ApiResult.Success -> {
+              if (mStatus?.currentTrack()?.id != requestedTrackId) return@launch
               updateLyrics(lyrics.data)
-              syncLyrics(status, true)
+              syncLyrics(mStatus ?: status, true, false)
             }
 
             is ApiResult.Error -> {
-              updateLyrics(null)
+              if (mStatus?.currentTrack()?.id == requestedTrackId) showLyricsUnavailable()
             }
           }
         }
@@ -181,7 +188,9 @@ class FullPlaybackFragment(private var mLayout: PlaybackLayout, private var mSta
     }
 
     // sync lyrics
-    syncLyrics(status, result == StatusProcessResult.NEW_TRACK)
+    if (result != StatusProcessResult.NEW_TRACK && mLyricsReady) {
+      syncLyrics(status, false, true)
+    }
 
     // done
     return result
@@ -247,7 +256,7 @@ class FullPlaybackFragment(private var mLayout: PlaybackLayout, private var mSta
         mScrollingLocked = false
         if (mStatus != null) {
           try {
-            requireActivity().runOnUiThread { syncLyrics(mStatus!!, true) }
+            requireActivity().runOnUiThread { syncLyrics(mStatus!!, true, true) }
           } catch (e: Exception) {
             //e.printStackTrace()
           }
@@ -289,6 +298,26 @@ class FullPlaybackFragment(private var mLayout: PlaybackLayout, private var mSta
       mLinesViews[line] = lineView
     }
 
+  }
+
+  private fun showLyricsLoading() {
+    mLyricsRenderGeneration++
+    mLyricsReady = false
+    mSyncedLyrics = false
+    mCurrentLine = null
+    mLyricsLines.clear()
+    mLinesViews.clear()
+    mLyricsView?.removeAllViews()
+    view?.findViewById<ScrollView>(R.id.scroll)?.apply {
+      scrollTo(0, 0)
+      visibility = INVISIBLE
+    }
+    mLyricsLoadingView?.visibility = VISIBLE
+  }
+
+  private fun showLyricsUnavailable() {
+    showLyricsLoading()
+    mLyricsLoadingView?.visibility = View.GONE
   }
 
   private fun parseLyrics() {
@@ -338,7 +367,7 @@ class FullPlaybackFragment(private var mLayout: PlaybackLayout, private var mSta
     }
   }
 
-  fun syncLyrics(status: Status, forceScroll: Boolean) {
+  fun syncLyrics(status: Status, forceScroll: Boolean, smoothScroll: Boolean = true) {
 
     // no sync
     if (!mSyncedLyrics) {
@@ -346,7 +375,7 @@ class FullPlaybackFragment(private var mLayout: PlaybackLayout, private var mSta
         setLyricsLine(mLinesViews[mCurrentLine], false)
         mCurrentLine = null
       }
-      mLyricsView?.visibility = VISIBLE
+      revealLyrics(mLyricsRenderGeneration)
       return
     }
 
@@ -371,8 +400,16 @@ class FullPlaybackFragment(private var mLayout: PlaybackLayout, private var mSta
       if (!mScrollingLocked) {
         val view = mLinesViews[activeLine]
         if (view != null) {
+          val renderGeneration = mLyricsRenderGeneration
           scrollView.post {
-            scrollView.smoothScrollTo(0, view.top - scrollView.height / 4)
+            if (renderGeneration != mLyricsRenderGeneration) return@post
+            val targetY = (view.top - scrollView.height / 4).coerceAtLeast(0)
+            if (smoothScroll) {
+              scrollView.smoothScrollTo(0, targetY)
+            } else {
+              scrollView.scrollTo(0, targetY)
+              revealLyrics(renderGeneration)
+            }
           }
         }
       }
@@ -380,7 +417,13 @@ class FullPlaybackFragment(private var mLayout: PlaybackLayout, private var mSta
 
     // done
     mCurrentLine = activeLine
-    scrollView.post { mLyricsView?.visibility = VISIBLE }
+  }
+
+  private fun revealLyrics(renderGeneration: Int) {
+    if (renderGeneration != mLyricsRenderGeneration) return
+    mLyricsReady = true
+    mLyricsLoadingView?.visibility = View.GONE
+    view?.findViewById<ScrollView>(R.id.scroll)?.visibility = VISIBLE
   }
 
   private fun setLyricsLine(view: TextView?, current: Boolean) {
