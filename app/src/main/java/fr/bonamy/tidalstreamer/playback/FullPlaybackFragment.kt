@@ -15,6 +15,7 @@ import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.ScrollView
 import android.widget.TextView
+import androidx.core.view.doOnLayout
 import androidx.lifecycle.lifecycleScope
 import androidx.transition.TransitionInflater
 import fr.bonamy.tidalstreamer.R
@@ -78,8 +79,9 @@ class FullPlaybackFragment(private var mLayout: PlaybackLayout, private var mSta
     revealTransientPlaybackInfo()
 
     // if we have a status
-    if (mStatus != null) {
-      processStatus(mStatus!!)
+    val initialStatus = mStatus
+    if (initialStatus != null) {
+      v.doOnLayout { processStatus(initialStatus) }
     }
 
     // done
@@ -401,8 +403,8 @@ class FullPlaybackFragment(private var mLayout: PlaybackLayout, private var mSta
         val view = mLinesViews[activeLine]
         if (view != null) {
           val renderGeneration = mLyricsRenderGeneration
-          scrollView.post {
-            if (renderGeneration != mLyricsRenderGeneration) return@post
+          val positionLyrics = Runnable {
+            if (renderGeneration != mLyricsRenderGeneration) return@Runnable
             val targetY = (view.top - scrollView.height / 4).coerceAtLeast(0)
             if (smoothScroll) {
               scrollView.smoothScrollTo(0, targetY)
@@ -410,6 +412,11 @@ class FullPlaybackFragment(private var mLayout: PlaybackLayout, private var mSta
               scrollView.scrollTo(0, targetY)
               revealLyrics(renderGeneration)
             }
+          }
+          if (smoothScroll) {
+            scrollView.post(positionLyrics)
+          } else {
+            scrollView.doOnLayout { positionLyrics.run() }
           }
         }
       }
